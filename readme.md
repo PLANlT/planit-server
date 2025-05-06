@@ -1,134 +1,103 @@
-# 🛠️ Planit - Spring Boot 백엔드 (Docker 기반 실행환경 통일)
+## 🚀 Planit 프로젝트 실행 가이드
 
-Planit은 Spring Boot 기반의 백엔드 서비스로, 개발/운영/테스트 환경을 Docker와 Spring Profile 분리를 통해 일관성 있게 관리합니다.
+이 문서는 Planit 프로젝트를 로컬 및 Docker 환경에서 실행하는 방법과 테스트 환경 설정에 대해 안내합니다.
 
----
+## 🛠️ 프로젝트 구성
 
-## 📦 기술 스택
+백엔드: Spring Boot 3 (JDK 17)
 
-- Java 17
-- Spring Boot
-- JPA (H2 / MySQL)
-- Docker / Docker Compose
+빌드 도구: Gradle
 
----
+DB:
 
-## 📁 환경 구성
+로컬: Docker 기반 MySQL 8.0
 
-| 환경 | 설명 | DB |
-|------|------|----|
-| dev  | 개발용, 빠른 테스트용 | H2 (In-Memory) |
-| prod | 운영 배포용 | MySQL |
-| test | 테스트 자동화/TDD용 | H2 (create-drop) |
+테스트: H2 (in-memory)
 
----
+## 🧩 환경 변수 설정
 
-## 🚀 실행 방법
+.env.local (로컬 실행용):
 
-### 1. `.env` 파일 생성
-
-아래 예시를 참고하여 `.env.dev`, `.env.prod`, `.env.test` 파일을 **루트 디렉토리에 생성**합니다.
-
-> ⚠️ **보안 주의:** 실제 계정/비밀번호가 포함된 `.env.prod`는 Git에 절대 커밋하지 말고, `.gitignore`에 반드시 포함시키세요.
-
-<details>
-<summary>📄 .env.dev (예시)</summary>
-
-```
-SPRING_PROFILES_ACTIVE=dev
-```
-
-</details>
-
-<details>
-<summary>📄 .env.prod (예시 - 실제 비밀번호 절대 커밋 금지)</summary>
-
-```
 SPRING_PROFILES_ACTIVE=prod
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/planit
+SPRING_DATASOURCE_USERNAME=planituser
+SPRING_DATASOURCE_PASSWORD=planitpass
 
-SPRING_DATASOURCE_URL=jdbc:mysql://<prod-db-host>:3306/planit
-SPRING_DATASOURCE_USERNAME=<prod_user>
-SPRING_DATASOURCE_PASSWORD=<prod_password>
+.env.prod (Docker Compose 실행용):
 
-MYSQL_DATABASE=planit
-MYSQL_ROOT_PASSWORD=<mysql_root_pw>
-```
+SPRING_PROFILES_ACTIVE=prod
+SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/planit
+SPRING_DATASOURCE_USERNAME=planituser
+SPRING_DATASOURCE_PASSWORD=planitpass
 
-</details>
+## 🐳 Docker로 실행하기
 
-<details>
-<summary>📄 .env.test (예시)</summary>
+1. 컨테이너 실행
 
-```
-SPRING_PROFILES_ACTIVE=test
-```
+docker-compose up --build -d
 
-</details>
+2. 실행 확인
 
----
+docker ps
 
-### 2. Docker 실행
+mysql, app 컨테이너가 떠 있어야 함
 
-```bash
-# 개발 환경 (H2 기반)
-docker-compose --env-file .env.dev up -d
+3. 로그 확인
 
-# 운영 환경 (MySQL 기반)
-docker-compose --env-file .env.prod up -d
+docker logs app
 
-# 테스트 환경 (TDD용 H2 + create-drop)
-docker-compose --env-file .env.test up -d
-```
+## 💻 로컬에서 실행하기 (도커 MySQL 사용)
 
-### 컨테이너 종료
+1. Docker로 MySQL만 실행
 
-```bash
-docker-compose down
-```
+docker-compose up -d mysql
 
----
+2. 로컬에서 Gradle 실행 (환경변수 로드)
 
-## 🧪 테스트 실행 (로컬 JUnit 기준)
+export $(cat .env.local | xargs)
+./gradlew bootRun
 
-### 방법 1: VM 옵션 지정
+또는 IntelliJ > Run Configuration > Environment variables에 다음 추가:
 
-```
--Dspring.profiles.active=test
-```
+SPRING_PROFILES_ACTIVE=prod;SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/planit;SPRING_DATASOURCE_USERNAME=planituser;SPRING_DATASOURCE_PASSWORD=planitpass
 
-### 방법 2: 테스트 클래스에 직접 지정
+## ✅ 테스트 환경 (TDD용)
 
-```java
-@ActiveProfiles("test")
+테스트 시 H2 인메모리 DB 사용
+
+프로파일: test
+
+application-test.yml 설정 요약:
+
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+테스트 코드 예시:
+
 @SpringBootTest
-class SomeServiceTest {
- 
+@ActiveProfiles("test")
+class MyServiceTest {
+    // ...
 }
-```
 
-### 방법 3: Gradle 설정에 추가
+## 📂 기타 참고
 
-`build.gradle`에 다음 추가:
+Dockerfile: 멀티스테이지 (Gradle → JDK Slim)
 
-```groovy
-test {
-    useJUnitPlatform()
-    systemProperty "spring.profiles.active", "test"
-}
-```
+docker-compose.yml: MySQL + Spring Boot 서비스 정의
 
----
+테스트용 DB는 H2, 운영/로컬은 MySQL 사용
 
+## 📝 작성자
 
-## 📌 Git 설정 주의사항
+프로젝트 리더: @Yoonhojoon
 
-`.gitignore`에 다음 항목을 추가해 주세요:
-
-```
-.env.dev
-.env.prod
-.env.test
-```
-
----
+작성일: 2025.05.07
 
