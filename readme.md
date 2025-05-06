@@ -14,21 +14,6 @@ DB:
 
 테스트: H2 (in-memory)
 
-## 🧩 환경 변수 설정
-
-.env.local (로컬 실행용):
-
-SPRING_PROFILES_ACTIVE=prod
-SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/planit
-SPRING_DATASOURCE_USERNAME=planituser
-SPRING_DATASOURCE_PASSWORD=planitpass
-
-.env.prod (Docker Compose 실행용):
-
-SPRING_PROFILES_ACTIVE=prod
-SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/planit
-SPRING_DATASOURCE_USERNAME=planituser
-SPRING_DATASOURCE_PASSWORD=planitpass
 
 ## 🐳 Docker로 실행하기
 
