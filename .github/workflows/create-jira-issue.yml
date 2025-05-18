@@ -81,6 +81,25 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: '[${{ steps.create.outputs.issue }}] ${{ github.event.issue.title }}'
 
+      - name: Link JIRA Issue with Branch
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+        run: |
+          ISSUE_KEY="${{ steps.create.outputs.issue }}"
+          BRANCH_NAME="${ISSUE_KEY}-$(echo ${{ steps.issue-parser.outputs.issueparser_branch }} | tr ' ' '-' | tr -cd '[:alnum:]-')"
+          BRANCH_URL="https://github.com/${{ github.repository }}/tree/${BRANCH_NAME}"
+
+          echo "Linking JIRA Issue $ISSUE_KEY with Branch $BRANCH_NAME"
+
+          # JIRA API에 브랜치 정보 업데이트
+          curl -u "${JIRA_USER_EMAIL}:${JIRA_API_TOKEN}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"branches\": [{\"name\": \"$BRANCH_NAME\", \"url\": \"$BRANCH_URL\"}]}" \
+            "${JIRA_BASE_URL}/rest/dev-status/1.0/issue/detail?issueId=${ISSUE_KEY}&type=branch"
+
       - name: Add comment with Jira issue link
         uses: actions-cool/issues-helper@v3
         with:
