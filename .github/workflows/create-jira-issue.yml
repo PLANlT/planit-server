@@ -86,6 +86,14 @@ jobs:
         if: steps.issue-type.outputs.type == 'Epic' || steps.issue-type.outputs.type == 'Task'
         run: echo "Jira Issue ${{ steps.create.outputs.issue }} was created"
 
+      - name: Create branch with Ticket number
+        run: |
+          ISSUE_NUMBER="${{ steps.create.outputs.issue }}"
+          ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch}}"
+          BRANCH_NAME="${ISSUE_NUMBER}-$(echo ${ISSUE_TITLE} | sed 's/ /-/g')"
+          git checkout -b "${BRANCH_NAME}"
+          git push origin "${BRANCH_NAME}"
+
       - name: Update GitHub Issue title
         if: steps.issue-type.outputs.type == 'Epic' || steps.issue-type.outputs.type == 'Task'
         uses: actions-cool/issues-helper@v3
@@ -106,7 +114,7 @@ jobs:
           if [ -z "$BRANCH_BASE" ]; then
             BRANCH_BASE="feature"
           fi
-          BRANCH_NAME="${ISSUE_KEY}-$(echo $BRANCH_BASE | tr ' ' '-' | tr -cd '[:alnum:]-')"
+          BRANCH_NAME="${ISSUE_KEY}-$(echo $BRANCH_BASE | tr ' ' '-' | tr -cd '[:alnum:]-/')"
           BRANCH_URL="https://github.com/${{ github.repository }}/tree/${BRANCH_NAME}"
 
           echo "Linking JIRA Issue $ISSUE_KEY with Branch $BRANCH_NAME"
