@@ -53,9 +53,9 @@ jobs:
             ### Github Issue Link
             - ${{ github.event.issue.html_url }}
 
-            ${{ github.event. }}
+            ${{ github.event.issue.body }}
           mode: md2jira
-
+          
       - name: Prepare fields JSON
         id: prepare-fields
         run: |
