@@ -4,6 +4,15 @@ labels: [feat]
 title: '이슈 이름을 작성해주세요'
 body: 
   - type: input
+    id: templateTag
+    attributes:
+      label: '템플릿 태그'
+      description: 'epic을 기입해주세요 (! 태그가 잘못되면 지라에 에픽이 생성되지 않습니다 !)'
+      value: 'epic'
+    validations:
+      required: true
+      
+  - type: input
     id: description
     attributes:
       label: '상세 내용(Description)'
@@ -29,9 +38,3 @@ body:
         - [ ] Task2
     validations:
       required: true
-
-  - type: markdown
-    id: template_tag
-    attributes:
-      value: 'epic-issue-form'
-      
