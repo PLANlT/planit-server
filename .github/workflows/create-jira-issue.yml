@@ -31,9 +31,9 @@ jobs:
         id: issue-type
         run: |
           echo "template_tag='${{ steps.template-issue-parser.outputs.issueparser_templateTag }}'"
-          if [ "${{ github.event.issue.body.template_tag }}" = "epic" ]; then
+          if [ "${{ steps.template-issue-parser.outputs.issueparser_templateTag }}" = "epic" ]; then
             echo "type=Epic" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.issue.body.template_tag }}" = "task" ]; then
+          elif [ "${{ steps.template-issue-parser.outputs.issueparser_templateTag }}" = "task" ]; then
             echo "type=Task" >> $GITHUB_OUTPUT
           else
             echo "type=Unknown" >> $GITHUB_OUTPUT
