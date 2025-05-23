@@ -3,10 +3,6 @@ description: '깃허브 이슈와 지라 티켓(작업)을 생성합니다'
 labels: [feat]
 title: '이슈 이름을 작성해주세요'
 body:
-  - type: markdown
-    attributes:
-      value: '<!-- task-issue-form -->'
-      
   - type: input
     id: parentKey
     attributes:
@@ -33,5 +29,6 @@ body:
       required: true
 
   - type: markdown
+    id: template_tag
     attributes:
-      value: 'made by task-issue-form'
+      value: 'task-issue-form'
