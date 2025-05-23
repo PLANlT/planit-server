@@ -1,0 +1,120 @@
+name: Create Jira Issue (Epic or Task)
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  create-issue:
+    name: Create Jira Issue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Jira
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+
+      - name: Checkout develop code
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Determine issue type from template
+        id: issue-type
+        run: |
+          if echo "${{ github.event.issue.body }}" | grep -q "epic-issue-form"; then
+            echo "::set-output name=type::Epic"
+          elif echo "${{ github.event.issue.body }}" | grep -q "task-issue-form"; then
+            echo "::set-output name=type::Task"
+          else
+            echo "::set-output name=type::Unknown"
+          fi
+
+      - name: Issue Parser
+        uses: stefanbuck/github-issue-praser@v3
+        id: issue-parser
+        with:
+          template-path: ${{ steps.issue-type.outputs.type == 'Epic' && '.github/ISSUE_TEMPLATE/epic-issue-form.yml' || steps.issue-type.outputs.type == 'Task' && '.github/ISSUE_TEMPLATE/task-issue-form.yml' || '' }}
+
+      - name: Log Issue Parser
+        run: |
+          echo 'Issue Type: ${{ steps.issue-type.outputs.type }}'
+          echo 'Ticket Number: ${{ steps.issue-parser.outputs.__ticket_number }}'
+          echo 'Parsed JSON: ${{ steps.issue-parser.outputs.jsonString }}'
+
+      - name: Convert markdown to Jira Syntax
+        uses: peter-evans/jira2md@v1
+        id: md2jira
+        with:
+          input-text: |
+            ### Github Issue Link
+            - ${{ github.event.issue.html_url }}
+
+            ${{ github.event.issue.body }}
+          mode: md2jira
+
+      - name: Prepare fields JSON
+        id: prepare-fields
+        run: |
+          if [ "${{ steps.issue-type.outputs.type }}" = "Task" ]; then
+            echo "::set-output name=json::{\"parent\": {\"key\": \"${{ steps.issue-parser.outputs.issueparser_parentKey }}\"}}"
+          else
+            echo "::set-output name=json::"
+          fi
+
+      - name: Create Jira Issue
+        id: create
+        uses: atlassian/gajira-create@v3
+        if: steps.issue-type.outputs.type == 'Epic' || steps.issue-type.outputs.type == 'Task'
+        with:
+          project: PL
+          issuetype: ${{ steps.issue-type.outputs.type }}
+          summary: '[server] ${{ github.event.issue.title }}'
+          description: '${{ steps.md2jira.outputs.output-text }}'
+          fields: ${{ steps.prepare-fields.outputs.json }}
+
+      - name: Log created issue
+        if: steps.issue-type.outputs.type == 'Epic' || steps.issue-type.outputs.type == 'Task'
+        run: echo "Jira Issue ${{ steps.create.outputs.issue }} was created"
+
+      - name: Update GitHub Issue title
+        if: steps.issue-type.outputs.type == 'Epic' || steps.issue-type.outputs.type == 'Task'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'update-issue'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: ${{ steps.issue-type.outputs.type == 'Epic' && format("'[{}] {}'", steps.create.outputs.issue, github.event.issue.title) || format("'[{}] {}'", steps.create.outputs.issue, github.event.issue.title) }}
+
+      - name: Link JIRA Issue with Branch
+        if: steps.issue-type.outputs.type == 'Epic' || steps.issue-type.outputs.type == 'Task'
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+        run: |
+          ISSUE_KEY="${{ steps.create.outputs.issue }}"
+          BRANCH_BASE="${{ steps.issue-parser.outputs.issueparser_branch }}"
+          if [ -z "$BRANCH_BASE" ]; then
+            BRANCH_BASE="feature"
+          fi
+          BRANCH_NAME="${ISSUE_KEY}-$(echo $BRANCH_BASE | tr ' ' '-' | tr -cd '[:alnum:]-')"
+          BRANCH_URL="https://github.com/${{ github.repository }}/tree/${BRANCH_NAME}"
+
+          echo "Linking JIRA Issue $ISSUE_KEY with Branch $BRANCH_NAME"
+
+          curl -u "${JIRA_USER_EMAIL}:${JIRA_API_TOKEN}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"branches\": [{\"name\": \"$BRANCH_NAME\", \"url\": \"$BRANCH_URL\"}]}" \
+            "${JIRA_BASE_URL}/rest/dev-status/1.0/issue/detail?issueId=${ISSUE_KEY}&type=branch"
+
+      - name: Add comment with Jira issue link
+        if: steps.issue-type.outputs.type == 'Epic' || steps.issue-type.outputs.type == 'Task'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'create-comment'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          body: 'Jira Issue Created: [${{ steps.create.outputs.issue }}](${{ secrets.JIRA_BASE_URL }}/browse/${{ steps.create.outputs.issue }})'
