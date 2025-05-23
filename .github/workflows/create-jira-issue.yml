@@ -24,7 +24,7 @@ jobs:
       - name: Determine issue type from template_tag field
         id: issue-type
         run: |
-          echo "template_tag='${{ github.event.issue.body.template_tag }}'"
+          echo "template_tag='${{ steps.issue-parser.outputs.issueparser_templateTag }}'"
           if [ "${{ github.event.issue.body.template_tag }}" = "epic-issue-form" ]; then
             echo "type=Epic" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.issue.body.template_tag }}" = "task-issue-form" ]; then
@@ -53,7 +53,7 @@ jobs:
             ### Github Issue Link
             - ${{ github.event.issue.html_url }}
 
-            ${{ github.event.issue.body }}
+            ${{ github.event. }}
           mode: md2jira
 
       - name: Prepare fields JSON
