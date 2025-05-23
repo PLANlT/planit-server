@@ -3,10 +3,6 @@ description: '깃허브 이슈와 지라 에픽을 생성합니다'
 labels: [feat]
 title: '이슈 이름을 작성해주세요'
 body: 
-  - type: markdown
-    attributes:
-      value: '<!-- epic-issue-form -->'
-  
   - type: input
     id: description
     attributes:
@@ -33,3 +29,7 @@ body:
         - [ ] Task2
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+    value: 'made by epic-issue-form'
