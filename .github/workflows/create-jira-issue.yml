@@ -24,12 +24,12 @@ jobs:
       - name: Determine issue type from template
         id: issue-type
         run: |
-          if echo "${{ github.event.issue.body }}" | grep -q "epic-issue-form"; then
-            echo "::set-output name=type::Epic"
-          elif echo "${{ github.event.issue.body }}" | grep -q "task-issue-form"; then
-            echo "::set-output name=type::Task"
+          if echo '${{ github.event.issue.body }}' | grep -q "epic-issue-form"; then
+            echo "type=Epic" >> $GITHUB_OUTPUT
+          elif echo '${{ github.event.issue.body }}' | grep -q "task-issue-form"; then
+            echo "type=Task" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=type::Unknown"
+            echo 'type=Unknown' >> $GITHUB_OUTPUT
           fi
 
       - name: Issue Parser
@@ -58,10 +58,10 @@ jobs:
       - name: Prepare fields JSON
         id: prepare-fields
         run: |
-          if [ "${{ steps.issue-type.outputs.type }}" = "Task" ]; then
-            echo "::set-output name=json::{\"parent\": {\"key\": \"${{ steps.issue-parser.outputs.issueparser_parentKey }}\"}}"
+          if [ '${{ steps.issue-type.outputs.type }}' = "Task" ]; then
+            echo "json={\"parent\": {\"key\": \"${{ steps.issue-parser.outputs.issueparser_parentKey }}\"}}" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=json::"
+            echo "json=" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Jira Issue
