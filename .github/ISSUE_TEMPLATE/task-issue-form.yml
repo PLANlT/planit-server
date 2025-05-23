@@ -7,8 +7,8 @@ body:
     id: templateTag
     attributes:
       label: '템플릿 태그'
-      description: 'epic을 기입해주세요 (! 태그가 잘못되면 지라에 에픽이 생성되지 않습니다 !)'
-      value: 'epic'
+      description: 'task를 기입해주세요 (! 태그가 잘못되면 지라에 작업이 생성되지 않습니다 !)'
+      value: 'task'
     validations:
       required: true
   
