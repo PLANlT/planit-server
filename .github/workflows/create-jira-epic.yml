@@ -48,7 +48,7 @@ jobs:
         with:
           project: PL
           issuetype: Epic
-          summary: '${{ github.event.issue.title }}'
+          summary: '[server] ${{ github.event.issue.title }}'
           description: '${{ steps.md2jira.outputs.output-text }}'
 
       - name: Log created issue
