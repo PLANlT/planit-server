@@ -85,7 +85,7 @@ jobs:
         with:
           actions: 'update-issue'
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: ${{ steps.issue-type.outputs.type == 'Epic' && format("'[{}] {}'", steps.create.outputs.issue, github.event.issue.title) || format("'[{}] {}'", steps.create.outputs.issue, github.event.issue.title) }}
+          title: '[${{ steps.create.outputs.issue }}] ${{ github.event.issue.title }}'
 
       - name: Link JIRA Issue with Branch
         if: steps.issue-type.outputs.type == 'Epic' || steps.issue-type.outputs.type == 'Task'
