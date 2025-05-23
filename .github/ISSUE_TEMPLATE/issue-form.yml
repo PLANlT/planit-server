@@ -1,12 +1,12 @@
-name: '이슈 생성'
-description: '깃허브 이슈와 지라 티켓을 생성합니다'
+name: '작업 생성'
+description: '깃허브 이슈와 지라 티켓(작업)을 생성합니다'
 labels: [feat]
 title: '이슈 이름을 작성해주세요'
 body:
   - type: input
     id: parentKey
     attributes:
-      label: '상위 작업 (Ticket Number)'
+      label: '상위 에픽 (Ticket Number)'
       description: '에픽의 Ticket Number를 기입해주세요'
       placeholder: 'PL'
     validations:
