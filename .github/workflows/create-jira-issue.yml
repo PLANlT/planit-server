@@ -21,17 +21,18 @@ jobs:
         with:
           ref: develop
 
-      - name: Determine issue type from template
+      - name: Determine issue type from template_tag field
         id: issue-type
         run: |
-          if echo '${{ github.event.issue.body }}' | grep -q "epic-issue-form"; then
+          echo "template_tag='${{ github.event.issue.body.template_tag }}'"
+          if [ "${{ github.event.issue.body.template_tag }}" = "epic-issue-form" ]; then
             echo "type=Epic" >> $GITHUB_OUTPUT
-          elif echo '${{ github.event.issue.body }}' | grep -q "task-issue-form"; then
+          elif [ "${{ github.event.issue.body.template_tag }}" = "task-issue-form" ]; then
             echo "type=Task" >> $GITHUB_OUTPUT
           else
-            echo 'type=Unknown' >> $GITHUB_OUTPUT
+            echo "type=Unknown" >> $GITHUB_OUTPUT
           fi
-
+          
       - name: Issue Parser
         uses: stefanbuck/github-issue-praser@v3
         id: issue-parser
