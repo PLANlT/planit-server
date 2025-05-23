@@ -4,12 +4,12 @@ labels: [feat]
 title: '이슈 이름을 작성해주세요'
 body:
   - type: input
-  id: templateTag
-  attributes:
-    label: '템플릿 태그'
-    value: 'epic 을 기입해주세요 (! 태그가 잘못되면 지라에 에픽이 생성되지 않습니다 !)'
-  validations:
-    required: false
+    id: templateTag
+    attributes:
+      label: '템플릿 태그'
+      value: 'epic 을 기입해주세요 (! 태그가 잘못되면 지라에 에픽이 생성되지 않습니다 !)'
+    validations:
+      required: false
   
   - type: input
     id: parentKey
