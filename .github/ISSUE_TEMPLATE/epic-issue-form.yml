@@ -31,6 +31,5 @@ body:
       required: true
 
   - type: markdown
-    id: epic
     attributes:
-    value: 'made by epic-issue-form'
+      value: 'made by epic-issue-form'
