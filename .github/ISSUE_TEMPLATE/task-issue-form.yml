@@ -31,3 +31,7 @@ body:
       description: '영어로 컨벤션/브랜치명을 작성해주세요. ex) feature/login'
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: 'made by task-issue-form'
