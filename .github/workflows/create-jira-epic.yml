@@ -1,11 +1,11 @@
-name: Create Jira issue
+name: Create Jira Epic
 on:
   issues:
     types:
       - opened
 jobs:
   create-issue:
-    name: Create Jira issue
+    name: Create Jira Epic
     runs-on: ubuntu-latest
     steps:
       - name: Login
@@ -24,11 +24,10 @@ jobs:
         uses: stefanbuck/github-issue-praser@v3
         id: issue-parser
         with:
-          template-path: .github/ISSUE_TEMPLATE/issue-form.yml
+          template-path: .github/ISSUE_TEMPLATE/epic-issue-form.yml
 
       - name: Log Issue Parser
         run: |
-          echo '${{ steps.issue-parser.outputs.issueparser_parentKey }}'
           echo '${{ steps.issue-parser.outputs.__ticket_number }}'
           echo '${{ steps.issue-parser.outputs.jsonString }}'
 
@@ -43,23 +42,17 @@ jobs:
             ${{ github.event.issue.body }}
           mode: md2jira
 
-      - name: Create Issue
+      - name: Create Epic
         id: create
         uses: atlassian/gajira-create@v3
         with:
           project: PL
-          issuetype: Task
+          issuetype: Epic
           summary: '${{ github.event.issue.title }}'
           description: '${{ steps.md2jira.outputs.output-text }}'
-          fields: |
-            {
-              "parent": {
-                "key": "${{ steps.issue-parser.outputs.issueparser_parentKey }}"
-              }
-            }
 
       - name: Log created issue
-        run: echo "Jira Issue ${{ steps.issue-parser.outputs.parentKey }}/${{ steps.create.outputs.issue }} was created"
+        run: echo "Jira Epic ${{ steps.create.outputs.issue }} was created"
 
       - name: Update issue title
         uses: actions-cool/issues-helper@v3
@@ -67,6 +60,25 @@ jobs:
           actions: 'update-issue'
           token: ${{ secrets.GITHUB_TOKEN }}
           title: '[${{ steps.create.outputs.issue }}] ${{ github.event.issue.title }}'
+
+      - name: Link JIRA Issue with Branch
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+        run: |
+          ISSUE_KEY="${{ steps.create.outputs.issue }}"
+          BRANCH_NAME="${ISSUE_KEY}-$(echo ${{ steps.issue-parser.outputs.issueparser_branch }} | tr ' ' '-' | tr -cd '[:alnum:]-')"
+          BRANCH_URL="https://github.com/${{ github.repository }}/tree/${BRANCH_NAME}"
+
+          echo "Linking JIRA Issue $ISSUE_KEY with Branch $BRANCH_NAME"
+
+          # JIRA API에 브랜치 정보 업데이트
+          curl -u "${JIRA_USER_EMAIL}:${JIRA_API_TOKEN}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"branches\": [{\"name\": \"$BRANCH_NAME\", \"url\": \"$BRANCH_URL\"}]}" \
+            "${JIRA_BASE_URL}/rest/dev-status/1.0/issue/detail?issueId=${ISSUE_KEY}&type=branch"
 
       - name: Add comment with Jira issue link
         uses: actions-cool/issues-helper@v3
