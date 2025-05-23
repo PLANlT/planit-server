@@ -21,10 +21,16 @@ jobs:
         with:
           ref: develop
 
+      - name: Template Issue Parser
+        uses: stefanbuck/github-issue-praser@v3
+        id: template-issue-parser
+        with:
+          template-path: '.github/ISSUE_TEMPLATE/epic-issue-form.yml'
+
       - name: Determine issue type from template_tag field
         id: issue-type
         run: |
-          echo "template_tag='${{ steps.issue-parser.outputs.issueparser_templateTag }}'"
+          echo "template_tag='${{ steps.template-issue-parser.outputs.issueparser_templateTag }}'"
           if [ "${{ github.event.issue.body.template_tag }}" = "epic-issue-form" ]; then
             echo "type=Epic" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.issue.body.template_tag }}" = "task-issue-form" ]; then
