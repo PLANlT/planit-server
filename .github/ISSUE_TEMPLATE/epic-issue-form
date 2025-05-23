@@ -1,0 +1,31 @@
+name: '에픽 생성'
+description: '깃허브 이슈와 지라 에픽을 생성합니다'
+labels: [feat]
+title: '이슈 이름을 작성해주세요'
+body: 
+  - type: input
+    id: description
+    attributes:
+      label: '상세 내용(Description)'
+      description: '이슈에 대해서 간략히 설명해주세요'
+    validations:
+      required: true
+
+  - type: input
+    id: branch
+    attributes:
+      label: '브랜치명 (Branch)'
+      description: '영어로 컨벤션/브랜치명을 작성해주세요. ex) feature/login'
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: '체크리스트(Tasks)'
+      description: '해당 이슈에 대해 필요한 작업목록을 작성해주세요'
+      value: |
+        - [ ] Task1
+        - [ ] Task2
+    validations:
+      required: true
