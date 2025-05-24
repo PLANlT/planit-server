@@ -6,7 +6,7 @@ body:
   - type: input
     id: templateTag
     attributes:
-      label: '템플릿 태그'
+      label: '템플릿 태그 (Template Tag)'
       description: 'task를 기입해주세요 (! 태그가 잘못되면 지라에 작업이 생성되지 않습니다 !)'
       value: 'task'
     validations:
@@ -20,19 +20,19 @@ body:
       placeholder: 'PL'
     validations:
       required: true
-      
-  - type: input
-    id: description
-    attributes:
-      label: '상세 내용(Description)'
-      description: '이슈에 대해서 간략히 설명해주세요'
-    validations:
-      required: true
 
   - type: input
     id: branch
     attributes:
       label: '브랜치명 (Branch)'
       description: '영어로 컨벤션/브랜치명을 작성해주세요. ex) feature/login'
+    validations:
+      required: true
+
+  - type: input
+    id: details
+    attributes:
+      label: '세부 작업 (Subtasks)'
+      description: '세부 작업에 대해서 간략히 설명해주세요'
     validations:
       required: true
