@@ -29,7 +29,7 @@ body:
     validations:
       required: true
 
-  - type: input
+  - type: textarea
     id: details
     attributes:
       label: '세부 작업 (Subtasks)'
