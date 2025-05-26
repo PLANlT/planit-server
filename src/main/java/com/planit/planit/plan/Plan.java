@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
+import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.task.Task;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -22,19 +24,23 @@ public class Plan extends BaseEntity {
     private Long id;
 
     @Column(nullable = false, length = 30)
-    private String title;
+    private String title;               // 플랜 제목
 
     @Column(nullable = false, length = 100)
-    private String goal;
+    private String motivation;          // 다짐 문장
 
-    @Column(nullable = false, length = 100)
-    private String motivation;
+    @Column(columnDefinition = "text")
+    private String icon;                // 아이콘
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Boolean isCompleted;
+    private PlanStatus planStatus;      // 플랜 진행 여부
 
     @Column
-    private LocalDateTime completedAt;
+    private LocalDateTime startedAt;    // 플랜 시작일
+
+    @Column
+    private LocalDateTime finishedAt;   // 플랜 종료일
 
     @Column
     private LocalDateTime deletedAt;
@@ -56,27 +62,30 @@ public class Plan extends BaseEntity {
     public Plan(
             Long id,
             String title,
-            String goal,
             String motivation,
+            String icon,
+            PlanStatus planStatus,
+            LocalDateTime startedAt,
+            LocalDateTime finishedAt,
             Member member
 
     ) {
         this.id = id;
         this.title = title;
-        this.goal = goal;
         this.motivation = motivation;
-        this.isCompleted = false;
+        this.icon = icon;
+        this.planStatus = planStatus;
+        this.startedAt = startedAt;
+        this.finishedAt = finishedAt;
         this.member = member;
+        this.tasks = new ArrayList<>();
     }
 
 /*------------------------------ METHOD ------------------------------*/
 
-    public void completePlan() {
-        this.isCompleted = true;
-        this.completedAt = LocalDateTime.now();
-    }
-
     public void deletePlan() {
         this.deletedAt = LocalDateTime.now();
     }
+
+    public int countTasks() { return this.tasks.size(); }
 }
