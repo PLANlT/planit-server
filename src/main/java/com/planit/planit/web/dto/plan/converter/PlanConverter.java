@@ -1,12 +1,14 @@
 package com.planit.planit.web.dto.plan.converter;
 
 import com.planit.planit.plan.Plan;
+import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.web.dto.plan.PlanRequestDTO;
 import com.planit.planit.web.dto.plan.PlanResponseDTO;
 import com.planit.planit.web.dto.task.converter.TaskConverter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 public class PlanConverter {
 
@@ -53,6 +55,15 @@ public class PlanConverter {
                 .planStatus(plan.getPlanStatus())
                 .startedAt(plan.getStartedAt())
                 .finishedAt(plan.getFinishedAt())
+                .build();
+    }
+
+    public static PlanResponseDTO.PlanListDTO toPlanListDTO(PlanStatus planStatus, List<Plan> plans) {
+        return PlanResponseDTO.PlanListDTO.builder()
+                .planStatus(planStatus)
+                .plans(plans.stream()
+                        .map(PlanConverter::toPlanPreviewDTO)
+                        .toList())
                 .build();
     }
 

@@ -48,4 +48,12 @@ public class PlanResponseDTO {
         private final LocalDateTime startedAt;
         private final LocalDateTime finishedAt;
     }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class PlanListDTO {
+        private final PlanStatus planStatus;
+        private final List<PlanPreviewDTO> plans;
+    }
 }
