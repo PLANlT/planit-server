@@ -4,6 +4,7 @@ import com.planit.planit.common.api.general.status.ErrorResponse;
 import org.springframework.http.HttpStatus;
 
 public enum MemberErrorStatus implements ErrorResponse {
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER-404", "회원을 찾을 수 없습니다.");
 
     ;
 
