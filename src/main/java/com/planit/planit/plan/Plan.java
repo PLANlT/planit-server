@@ -43,7 +43,7 @@ public class Plan extends BaseEntity {
     private LocalDateTime finishedAt;   // 플랜 종료일
 
     @Column
-    private LocalDateTime deletedAt;
+    private LocalDateTime inactive;     // 플랜 비활성화(중단, 아카이빙, 삭제)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -83,8 +83,31 @@ public class Plan extends BaseEntity {
 
 /*------------------------------ METHOD ------------------------------*/
 
+    public void updatePlan(
+            String title,          String motivation,       String icon,
+            PlanStatus planStatus, LocalDateTime startedAt, LocalDateTime finishedAt
+    ) {
+        this.title = title;
+        this.motivation = motivation;
+        this.icon = icon;
+        this.planStatus = planStatus;
+        this.startedAt = startedAt;
+        this.finishedAt = finishedAt;
+    }
+
+    public void completePlan() {
+        this.planStatus = PlanStatus.ARCHIVED;
+        this.inactive = LocalDateTime.now();
+    }
+
+    public void pausePlan() {
+        this.planStatus = PlanStatus.PAUSED;
+        this.inactive = LocalDateTime.now();
+    }
+
     public void deletePlan() {
-        this.deletedAt = LocalDateTime.now();
+        this.planStatus = PlanStatus.DELETED;
+        this.inactive = LocalDateTime.now();
     }
 
     public int countTasks() { return this.tasks.size(); }
