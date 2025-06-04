@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -82,6 +83,9 @@ public class Member extends BaseEntity {
         this.signType = signType;
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
+        this.plans = new ArrayList<>();
+        this.tasks = new ArrayList<>();
+        this.dreams = new ArrayList<>();
     }
 
 /*------------------------------ METHOD ------------------------------*/
