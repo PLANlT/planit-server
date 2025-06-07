@@ -13,22 +13,22 @@ public class PlanCommandServiceImpl implements PlanCommandService {
     }
 
     @Override
-    public PlanResponseDTO.PlanMetaDTO updatePlan(PlanRequestDTO.PlanDTO planDTO) {
+    public PlanResponseDTO.PlanMetaDTO updatePlan(Long planId, PlanRequestDTO.PlanDTO planDTO) {
         return null;
     }
 
     @Override
-    public PlanResponseDTO.PlanMetaDTO completePlan() {
+    public PlanResponseDTO.PlanMetaDTO completePlan(Long planId) {
         return null;
     }
 
     @Override
-    public PlanResponseDTO.PlanMetaDTO pausePlan() {
+    public PlanResponseDTO.PlanMetaDTO pausePlan(Long planId) {
         return null;
     }
 
     @Override
-    public PlanResponseDTO.PlanMetaDTO deletePlan() {
+    public PlanResponseDTO.PlanMetaDTO deletePlan(Long planId) {
         return null;
     }
 }
