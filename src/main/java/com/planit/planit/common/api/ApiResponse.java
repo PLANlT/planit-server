@@ -29,23 +29,23 @@ public class ApiResponse<T>  {
     }
 
     // Success
-    public static ApiResponse<Void> onSuccess(SuccessStatus status) {
+    public static ApiResponse<Void> onSuccess(SuccessResponse status) {
         return new ApiResponse<>(status);
     }
 
     // Success with Data
-    public static <T> ApiResponse<T> onSuccess(SuccessStatus status, T data) {
+    public static <T> ApiResponse<T> onSuccess(SuccessResponse status, T data) {
         return new ApiResponse<>(true, status.getCode(), status.getMessage(), data);
 
     }
 
     // Failure
-    public static <T> ApiResponse<T> onFailure(ErrorStatus status) {
+    public static <T> ApiResponse<T> onFailure(ErrorResponse status) {
         return new ApiResponse<>(false, status.getCode(), status.getMessage(), null);
     }
 
     // Failure with Data
-    public static <T> ApiResponse<T> onFailure(ErrorStatus status, T data) {
+    public static <T> ApiResponse<T> onFailure(ErrorResponse status, T data) {
         return new ApiResponse<>(false, status.getCode(), status.getMessage(), data);
     }
 

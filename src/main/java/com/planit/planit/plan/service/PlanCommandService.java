@@ -11,7 +11,7 @@ public interface PlanCommandService {
     // 플랜 수정하기
     PlanResponseDTO.PlanMetaDTO updatePlan(Long memberId, Long planId, PlanRequestDTO.PlanDTO planDTO);
 
-    // 플랜 완료 처리하기
+    // 플랜 완료(아카이빙) 하기
     PlanResponseDTO.PlanMetaDTO completePlan(Long memberId, Long planId);
 
     // 플랜 중단하기

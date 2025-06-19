@@ -29,6 +29,7 @@ public class PlanConverter {
                 .planId(plan.getId())
                 .title(plan.getTitle())
                 .icon(plan.getIcon())
+                .motivation(plan.getMotivation())
                 .totalTasks(plan.countTasks())
                 .dDay(dDay)
                 .build();
