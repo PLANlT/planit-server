@@ -9,6 +9,7 @@ import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
 import com.planit.planit.task.TaskRepository;
 import com.planit.planit.task.enums.RoutineDay;
+import com.planit.planit.task.enums.TaskType;
 import com.planit.planit.web.dto.plan.PlanResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +89,7 @@ class PlanQueryServiceTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.IN_PROGRESS)
-                .finishedAt(LocalDateTime.now())
+                .finishedAt(LocalDate.now())
                 .member(member1)
                 .build();
         planInProgress2 = Plan.builder()
@@ -96,7 +97,7 @@ class PlanQueryServiceTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.IN_PROGRESS)
-                .finishedAt(LocalDateTime.now().plusDays(1))
+                .finishedAt(LocalDate.now().plusDays(1))
                 .member(member1)
                 .build();
         pausedPlan1 = Plan.builder()
@@ -104,7 +105,7 @@ class PlanQueryServiceTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.PAUSED)
-                .finishedAt(LocalDateTime.now())
+                .finishedAt(LocalDate.now())
                 .member(member1)
                 .build();
         pausedPlan2 = Plan.builder()
@@ -112,7 +113,7 @@ class PlanQueryServiceTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.PAUSED)
-                .finishedAt(LocalDateTime.now().plusDays(1))
+                .finishedAt(LocalDate.now().plusDays(1))
                 .member(member1)
                 .build();
         archivedPlan1 = Plan.builder()
@@ -120,7 +121,7 @@ class PlanQueryServiceTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.ARCHIVED)
-                .finishedAt(LocalDateTime.now())
+                .finishedAt(LocalDate.now())
                 .member(member1)
                 .build();
         archivedPlan2 = Plan.builder()
@@ -128,7 +129,7 @@ class PlanQueryServiceTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.ARCHIVED)
-                .finishedAt(LocalDateTime.now().minusDays(1))
+                .finishedAt(LocalDate.now().minusDays(1))
                 .member(member1)
                 .build();
     }
@@ -138,8 +139,7 @@ class PlanQueryServiceTest {
                 .title("작업1")
                 .isRoutine(false)
                 .routineDay(RoutineDay.MON)
-                .taskForWellBeing("컨디션 좋을 때")
-                .taskForDistress("컨디션 나쁠 때")
+                .taskType(TaskType.PASSIONATE)
                 .member(member1)
                 .plan(planInProgress1)
                 .build();
@@ -147,14 +147,37 @@ class PlanQueryServiceTest {
                 .title("작업2")
                 .isRoutine(false)
                 .routineDay(RoutineDay.MON)
-                .taskForWellBeing("컨디션 좋을 때")
-                .taskForDistress("컨디션 나쁠 때")
+                .taskType(TaskType.SLOW)
                 .member(member1)
                 .plan(planInProgress2)
                 .build();
         task2.completeTask();
     }
 
+
+/*------------------------------ 오늘의 플랜 목록 조회 ------------------------------*/
+
+    @Test
+    @DisplayName("오늘의 플랜 목록 조회 (성공)")
+    public void getTodayPlanListTest_Success() {
+
+        // given
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(member1));
+        when(planRepository.findAllByMemberIdAndPlanStatus(1L, PlanStatus.IN_PROGRESS))
+                .thenReturn(List.of(planInProgress1, planInProgress2));
+
+        // when
+        PlanResponseDTO.TodayPlanListDTO result = planQueryService.getTodayPlans(1L);
+
+        // then
+        assertNotNull(result);
+        assertThat(result.getTodayDate()).isEqualTo(LocalDate.now());
+        assertThat(result.getPlans().size()).isEqualTo(2);
+        assertThat(result.getPlans().get(0).getTitle()).isEqualTo("1");
+        assertThat(result.getPlans().get(0).getDDay()).isEqualTo("D-Day");
+        assertThat(result.getPlans().get(1).getTitle()).isEqualTo("2");
+        assertThat(result.getPlans().get(1).getDDay()).isEqualTo("D-1");
+    }
 
 /*------------------------------ 플랜 단건 조회 ------------------------------*/
 
@@ -167,7 +190,7 @@ class PlanQueryServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.of(planInProgress1));
 
         // when
-        PlanResponseDTO.PlanContentDTO result = planQueryService.getPlan(1L);
+        PlanResponseDTO.PlanContentDTO result = planQueryService.getPlan(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -188,7 +211,7 @@ class PlanQueryServiceTest {
                 .thenReturn(List.of(task1, task2));
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planQueryService.getPlan(1L));
+        assertThrows(PlanHandler.class, () -> planQueryService.getPlan(1L, 1L));
     }
 
     @Test
@@ -208,7 +231,7 @@ class PlanQueryServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.of(planInProgress1));
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planQueryService.getPlan(1L));
+        assertThrows(PlanHandler.class, () -> planQueryService.getPlan(1L, 1L));
     }
 
 
@@ -224,7 +247,7 @@ class PlanQueryServiceTest {
                 .thenReturn(List.of(planInProgress1, planInProgress2));
 
         // when
-        PlanResponseDTO.PlanListDTO result = planQueryService.getPlansByPlanStatus(PlanStatus.IN_PROGRESS);
+        PlanResponseDTO.PlanListDTO result = planQueryService.getPlansByPlanStatus(1L, PlanStatus.IN_PROGRESS);
 
         // then
         assertNotNull(result);
@@ -245,7 +268,7 @@ class PlanQueryServiceTest {
                 .thenReturn(List.of(pausedPlan1, pausedPlan2));
 
         // when
-        PlanResponseDTO.PlanListDTO result = planQueryService.getPlansByPlanStatus(PlanStatus.PAUSED);
+        PlanResponseDTO.PlanListDTO result = planQueryService.getPlansByPlanStatus(1L, PlanStatus.PAUSED);
 
         // then
         assertNotNull(result);
@@ -266,7 +289,7 @@ class PlanQueryServiceTest {
                 .thenReturn(List.of(archivedPlan1, archivedPlan2));
 
         // when
-        PlanResponseDTO.PlanListDTO result = planQueryService.getPlansByPlanStatus(PlanStatus.ARCHIVED);
+        PlanResponseDTO.PlanListDTO result = planQueryService.getPlansByPlanStatus(1L, PlanStatus.ARCHIVED);
 
         // then
         assertNotNull(result);
