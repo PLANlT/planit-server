@@ -24,6 +24,7 @@ public class PlanCommandServiceImpl implements PlanCommandService {
     private final MemberRepository memberRepository;
     private final PlanRepository planRepository;
 
+
     @Override
     public PlanResponseDTO.PlanMetaDTO createPlan(Long memberId, PlanRequestDTO.PlanDTO planDTO) {
 
@@ -45,11 +46,9 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         return PlanConverter.toPlanMetaDTO(plan);
     }
 
+
     @Override
     public PlanResponseDTO.PlanMetaDTO updatePlan(Long memberId, Long planId, PlanRequestDTO.PlanDTO planDTO) {
-
-        memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
@@ -73,14 +72,22 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         return PlanConverter.toPlanMetaDTO(plan);
     }
 
+
     @Override
     public PlanResponseDTO.PlanMetaDTO completePlan(Long memberId, Long planId) {
 
-        memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
 
+        // 로그인한 회원의 플랜인지 확인
+        if (!memberId.equals(plan.getMember().getId())) {
+            throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
+        }
 
-        return null;
+        plan.completePlan();
+        planRepository.save(plan);
+
+        return PlanConverter.toPlanMetaDTO(plan);
     }
 
     @Override
