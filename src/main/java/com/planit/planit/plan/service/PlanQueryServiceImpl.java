@@ -4,7 +4,6 @@ import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
 import com.planit.planit.common.api.plan.PlanHandler;
 import com.planit.planit.common.api.plan.status.PlanErrorStatus;
-import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
@@ -60,6 +59,11 @@ public class PlanQueryServiceImpl implements PlanQueryService {
 
     @Override
     public PlanResponseDTO.PlanListDTO getPlansByPlanStatus(Long memberId, PlanStatus planStatus) {
-        return null;
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        List<Plan> plans = planRepository.findAllByMemberIdAndPlanStatus(memberId, planStatus);
+
+        return PlanConverter.toPlanListDTO(planStatus, plans);
     }
 }
