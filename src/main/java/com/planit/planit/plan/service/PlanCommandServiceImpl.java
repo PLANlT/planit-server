@@ -2,6 +2,8 @@ package com.planit.planit.plan.service;
 
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
+import com.planit.planit.common.api.plan.PlanHandler;
+import com.planit.planit.common.api.plan.status.PlanErrorStatus;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
 import com.planit.planit.plan.Plan;
@@ -45,7 +47,25 @@ public class PlanCommandServiceImpl implements PlanCommandService {
 
     @Override
     public PlanResponseDTO.PlanMetaDTO updatePlan(Long memberId, Long planId, PlanRequestDTO.PlanDTO planDTO) {
-        return null;
+
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
+
+        plan.updatePlan(
+                planDTO.getTitle(),
+                planDTO.getMotivation(),
+                planDTO.getIcon(),
+                planDTO.getPlanStatus(),
+                planDTO.getStartedAt(),
+                planDTO.getFinishedAt()
+        );
+
+        planRepository.save(plan);
+
+        return PlanConverter.toPlanMetaDTO(plan);
     }
 
     @Override
