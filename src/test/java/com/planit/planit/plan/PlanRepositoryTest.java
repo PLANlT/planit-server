@@ -10,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,7 +69,7 @@ class PlanRepositoryTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.PAUSED)
-                .finishedAt(LocalDateTime.now())
+                .finishedAt(LocalDate.now())
                 .member(member)
                 .build();
         pausedPlan2 = Plan.builder()
@@ -77,7 +77,7 @@ class PlanRepositoryTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.PAUSED)
-                .finishedAt(LocalDateTime.now().plusDays(1))
+                .finishedAt(LocalDate.now().plusDays(1))
                 .member(member)
                 .build();
         archivedPlan1 = Plan.builder()
@@ -85,7 +85,7 @@ class PlanRepositoryTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.ARCHIVED)
-                .finishedAt(LocalDateTime.now())
+                .finishedAt(LocalDate.now())
                 .member(member)
                 .build();
         archivedPlan2 = Plan.builder()
@@ -93,7 +93,7 @@ class PlanRepositoryTest {
                 .motivation("다짐문장")
                 .icon("아이콘")
                 .planStatus(PlanStatus.ARCHIVED)
-                .finishedAt(LocalDateTime.now().plusDays(1))
+                .finishedAt(LocalDate.now().plusDays(1))
                 .member(member)
                 .build();
     }
@@ -153,8 +153,8 @@ class PlanRepositoryTest {
 
         // then
         assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0).getTitle()).isEqualTo("2");
-        assertThat(result.get(1).getTitle()).isEqualTo("1");
+        assertThat(result.get(0).getTitle()).isEqualTo("1");
+        assertThat(result.get(1).getTitle()).isEqualTo("2");
     }
 
     @Test
@@ -173,8 +173,8 @@ class PlanRepositoryTest {
 
         // then
         assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0).getTitle()).isEqualTo("4");
-        assertThat(result.get(1).getTitle()).isEqualTo("3");
+        assertThat(result.get(0).getTitle()).isEqualTo("3");
+        assertThat(result.get(1).getTitle()).isEqualTo("4");
     }
 
     @Test
@@ -193,8 +193,8 @@ class PlanRepositoryTest {
 
         // then
         assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0).getTitle()).isEqualTo("6");
-        assertThat(result.get(1).getTitle()).isEqualTo("5");
+        assertThat(result.get(0).getTitle()).isEqualTo("5");
+        assertThat(result.get(1).getTitle()).isEqualTo("6");
     }
 
     @Test

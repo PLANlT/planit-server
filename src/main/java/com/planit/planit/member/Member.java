@@ -44,6 +44,15 @@ public class Member extends BaseEntity {
     private DailyCondition dailyCondition;
 
     @Column
+    private LocalDateTime lastAttendanceDate;       // 마지막 출석일
+
+    @Column(nullable = false)
+    private Integer consecutiveDays;                // 연속일 최고기록
+
+    @Column(nullable = false)
+    private Integer perfectConsecutiveDays;         // 완벽 연속일
+
+    @Column
     private LocalDateTime inactive;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -83,6 +92,8 @@ public class Member extends BaseEntity {
         this.signType = signType;
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
+        this.consecutiveDays = 0;
+        this.perfectConsecutiveDays = 0;
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();

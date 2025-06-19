@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 public class PlanRequestDTO {
@@ -19,7 +19,7 @@ public class PlanRequestDTO {
         private final String motivation;
         private final String icon;
         private final PlanStatus planStatus;
-        private final LocalDateTime startedAt;
-        private final LocalDateTime finishedAt;
+        private final LocalDate startedAt;
+        private final LocalDate finishedAt;
     }
 }

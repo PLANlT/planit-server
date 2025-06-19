@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,8 +73,8 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.IN_PROGRESS)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
                 .build();
 
         plan = Plan.builder()
@@ -113,8 +113,8 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.IN_PROGRESS)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
                 .build();
 
         plan = Plan.builder()
@@ -151,8 +151,8 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.IN_PROGRESS)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
@@ -176,8 +176,8 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.ARCHIVED)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
                 .member(member)
                 .build();
 
@@ -216,8 +216,8 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.PAUSED)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
                 .member(member)
                 .build();
 
@@ -256,8 +256,8 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.DELETED)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
                 .member(member)
                 .build();
 

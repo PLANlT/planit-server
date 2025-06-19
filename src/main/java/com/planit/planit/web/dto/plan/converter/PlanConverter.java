@@ -6,7 +6,7 @@ import com.planit.planit.web.dto.plan.PlanRequestDTO;
 import com.planit.planit.web.dto.plan.PlanResponseDTO;
 import com.planit.planit.web.dto.task.converter.TaskConverter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class PlanConverter {
     }
 
     public static PlanResponseDTO.PlanPreviewDTO toPlanPreviewDTO(Plan plan) {
-        String dDay = formatDDay(LocalDateTime.now(), plan.getFinishedAt());
+        String dDay = formatDDay(LocalDate.now(), plan.getFinishedAt());
         return PlanResponseDTO.PlanPreviewDTO.builder()
                 .planId(plan.getId())
                 .title(plan.getTitle())
@@ -46,6 +46,18 @@ public class PlanConverter {
                 .build();
     }
 
+    public static PlanResponseDTO.TodayPlanDTO toTodayPlanDTO(Plan plan) {
+        String dDay = formatDDay(LocalDate.now(), plan.getFinishedAt());
+        return PlanResponseDTO.TodayPlanDTO.builder()
+                .planId(plan.getId())
+                .title(plan.getTitle())
+                .dDay(dDay)
+                .tasks(plan.getTasks().stream()
+                        .map(TaskConverter::toTaskPreviewDTO)
+                        .toList())
+                .build();
+    }
+
     public static PlanResponseDTO.PlanMetaDTO toPlanMetaDTO(Plan plan) {
         return PlanResponseDTO.PlanMetaDTO.builder()
                 .planId(plan.getId())
@@ -58,6 +70,15 @@ public class PlanConverter {
                 .build();
     }
 
+    public static PlanResponseDTO.TodayPlanListDTO toTodayPlanListDTO(LocalDate todayDate, List<Plan> plans) {
+        return PlanResponseDTO.TodayPlanListDTO.builder()
+                .todayDate(todayDate)
+                .plans(plans.stream()
+                        .map(PlanConverter::toTodayPlanDTO)
+                        .toList())
+                .build();
+    }
+
     public static PlanResponseDTO.PlanListDTO toPlanListDTO(PlanStatus planStatus, List<Plan> plans) {
         return PlanResponseDTO.PlanListDTO.builder()
                 .planStatus(planStatus)
@@ -67,12 +88,15 @@ public class PlanConverter {
                 .build();
     }
 
-    private static String formatDDay(LocalDateTime startedAt, LocalDateTime finishedAt) {
+    private static String formatDDay(LocalDate startedAt, LocalDate finishedAt) {
         Long day = ChronoUnit.DAYS.between(startedAt, finishedAt);
         if (startedAt.isAfter(finishedAt)) {
             return String.format("D+%d", -day);
-        } else {
+        } else if (startedAt.isBefore(finishedAt)) {
             return String.format("D-%d", day);
+        }
+        else {
+            return "D-Day";
         }
     }
 }
