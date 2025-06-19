@@ -268,7 +268,7 @@ class PlanCommandServiceTest {
         // then
         assertNotNull(result);
         assertThat(result.getTitle()).isEqualTo("제목");
-        assertThat(result.getPlanStatus()).isEqualTo(PlanStatus.ARCHIVED);
+        assertThat(result.getPlanStatus()).isEqualTo(PlanStatus.PAUSED);
     }
 
     @Test
