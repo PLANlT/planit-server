@@ -39,7 +39,8 @@ class PlanCommandServiceTest {
     @InjectMocks
     private PlanCommandServiceImpl planCommandService;
 
-    private Member member;
+    private Member member1;
+    private Member member2;
     private Plan plan;
 
 
@@ -48,13 +49,19 @@ class PlanCommandServiceTest {
     @BeforeEach
     public void setUp() {
         initMember();                       // 회원 더미데이터 생성
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(member1));
     }
 
     private void initMember() {
-        member = Member.builder()
+        member1 = Member.builder()
                 .id(1L)
                 .email("xxx@email.com")
+                .password("password")
+                .guiltyFreeMode(false)
+                .build();
+        member2 = Member.builder()
+                .id(2L)
+                .email("yyy@email.com")
                 .password("password")
                 .guiltyFreeMode(false)
                 .build();
@@ -85,7 +92,7 @@ class PlanCommandServiceTest {
                 .planStatus(planDTO.getPlanStatus())
                 .startedAt(planDTO.getStartedAt())
                 .finishedAt(planDTO.getFinishedAt())
-                .member(member)
+                .member(member1)
                 .build();
 
         when(planRepository.save(any(Plan.class))).thenReturn(plan);
@@ -125,7 +132,7 @@ class PlanCommandServiceTest {
                 .planStatus(planDTO.getPlanStatus())
                 .startedAt(planDTO.getStartedAt())
                 .finishedAt(planDTO.getFinishedAt())
-                .member(member)
+                .member(member1)
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
@@ -161,6 +168,27 @@ class PlanCommandServiceTest {
         assertThrows(PlanHandler.class, () -> planCommandService.updatePlan(1L, 1L, planDTO));
     }
 
+    @Test
+    @DisplayName("플랜 수정 (사용자의 플랜이 아님)")
+    public void updatePlanTest_NotMyPlan_Fail() {
+
+        // given
+        PlanRequestDTO.PlanDTO planDTO = PlanRequestDTO.PlanDTO.builder()
+                .title("수정된 제목")
+                .motivation("목표")
+                .icon("아이콘")
+                .planStatus(PlanStatus.IN_PROGRESS)
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
+                .build();
+
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
+        when(planRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(PlanHandler.class, () -> planCommandService.updatePlan(2L, 1L, planDTO));
+    }
+
 
 
     /*------------------------------ 플랜 완료 ------------------------------*/
@@ -178,7 +206,7 @@ class PlanCommandServiceTest {
                 .planStatus(PlanStatus.ARCHIVED)
                 .startedAt(LocalDate.now())
                 .finishedAt(LocalDate.now().plusMonths(1))
-                .member(member)
+                .member(member1)
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
@@ -202,6 +230,17 @@ class PlanCommandServiceTest {
         assertThrows(PlanHandler.class, () -> planCommandService.completePlan(1L, 1L));
     }
 
+    @Test
+    @DisplayName("플랜 완료 (사용자의 플랜이 아님)")
+    public void completePlanTest_NotMyPlan_Fail() {
+        // given
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
+        when(planRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(PlanHandler.class, () -> planCommandService.completePlan(2L, 1L));
+    }
+
 
 /*------------------------------ 플랜 중단 ------------------------------*/
 
@@ -218,7 +257,7 @@ class PlanCommandServiceTest {
                 .planStatus(PlanStatus.PAUSED)
                 .startedAt(LocalDate.now())
                 .finishedAt(LocalDate.now().plusMonths(1))
-                .member(member)
+                .member(member1)
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
@@ -242,6 +281,17 @@ class PlanCommandServiceTest {
         assertThrows(PlanHandler.class, () -> planCommandService.pausePlan(1L, 1L));
     }
 
+    @Test
+    @DisplayName("플랜 중단 (사용자의 플랜이 아님)")
+    public void pausePlanTest_NotMyPlan_Fail() {
+        // given
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
+        when(planRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(PlanHandler.class, () -> planCommandService.pausePlan(1L, 1L));
+    }
+
 
 /*------------------------------ 플랜 삭제 ------------------------------*/
 
@@ -258,7 +308,7 @@ class PlanCommandServiceTest {
                 .planStatus(PlanStatus.DELETED)
                 .startedAt(LocalDate.now())
                 .finishedAt(LocalDate.now().plusMonths(1))
-                .member(member)
+                .member(member1)
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
@@ -276,6 +326,17 @@ class PlanCommandServiceTest {
     @DisplayName("플랜 삭제 (없는 플랜)")
     public void deletePlanTest_NoPlan_Fail() {
         // given
+        when(planRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(PlanHandler.class, () -> planCommandService.deletePlan(1L, 1L));
+    }
+
+    @Test
+    @DisplayName("플랜 삭제 (사용자의 플랜이 아님)")
+    public void deletePlanTest_NotMyPlan_Fail() {
+        // given
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then

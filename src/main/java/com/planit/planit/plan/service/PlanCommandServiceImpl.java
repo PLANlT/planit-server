@@ -54,6 +54,11 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
 
+        // 로그인한 회원의 플랜인지 확인
+        if (!memberId.equals(plan.getMember().getId())) {
+            throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
+        }
+
         plan.updatePlan(
                 planDTO.getTitle(),
                 planDTO.getMotivation(),
@@ -70,6 +75,11 @@ public class PlanCommandServiceImpl implements PlanCommandService {
 
     @Override
     public PlanResponseDTO.PlanMetaDTO completePlan(Long memberId, Long planId) {
+
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+
         return null;
     }
 

@@ -51,7 +51,7 @@ public class PlanQueryServiceImpl implements PlanQueryService {
         Plan plan = planRepository.findById(planId)
             .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
 
-        // 로그인한 회원의 plan인지 확인
+        // 로그인한 회원의 플랜인지 확인
         if (!memberId.equals(plan.getMember().getId())) {
             throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
         }
