@@ -91,7 +91,7 @@ class PlanCommandServiceTest {
         when(planRepository.save(any(Plan.class))).thenReturn(plan);
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.createPlan(planDTO);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.createPlan(1L, planDTO);
 
         // then
         assertNotNull(result);
@@ -132,7 +132,7 @@ class PlanCommandServiceTest {
         when(planRepository.save(any(Plan.class))).thenReturn(plan);
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.updatePlan(1L, planDTO);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.updatePlan(1L, 1L, planDTO);
 
         // then
         assertNotNull(result);
@@ -158,7 +158,7 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planCommandService.updatePlan(1L, planDTO));
+        assertThrows(PlanHandler.class, () -> planCommandService.updatePlan(1L, 1L, planDTO));
     }
 
 
@@ -184,7 +184,7 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.completePlan(1L);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.completePlan(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -199,7 +199,7 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planCommandService.completePlan(1L));
+        assertThrows(PlanHandler.class, () -> planCommandService.completePlan(1L, 1L));
     }
 
 
@@ -224,7 +224,7 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.pausePlan(1L);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.pausePlan(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -239,7 +239,7 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planCommandService.pausePlan(1L));
+        assertThrows(PlanHandler.class, () -> planCommandService.pausePlan(1L, 1L));
     }
 
 
@@ -264,7 +264,7 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.deletePlan(1L);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.deletePlan(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -279,6 +279,6 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planCommandService.deletePlan(1L));
+        assertThrows(PlanHandler.class, () -> planCommandService.deletePlan(1L, 1L));
     }
 }
