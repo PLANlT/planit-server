@@ -2,6 +2,9 @@ package com.planit.planit.plan.service;
 
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
+import com.planit.planit.common.api.plan.PlanHandler;
+import com.planit.planit.common.api.plan.status.PlanErrorStatus;
+import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
@@ -40,7 +43,19 @@ public class PlanQueryServiceImpl implements PlanQueryService {
 
     @Override
     public PlanResponseDTO.PlanContentDTO getPlan(Long memberId, Long planId) {
-        return null;
+
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        Plan plan = planRepository.findById(planId)
+            .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
+
+        // 로그인한 회원의 plan인지 확인
+        if (!memberId.equals(plan.getMember().getId())) {
+            throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
+        }
+
+        return PlanConverter.toPlanContentDTO(plan);
     }
 
     @Override

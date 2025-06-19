@@ -34,7 +34,7 @@ public class PlanConverter {
                 .build();
     }
 
-    public static PlanResponseDTO.PlanContentDTO toPlanDetailDTO(Plan plan) {
+    public static PlanResponseDTO.PlanContentDTO toPlanContentDTO(Plan plan) {
         return PlanResponseDTO.PlanContentDTO.builder()
                 .planId(plan.getId())
                 .title(plan.getTitle())

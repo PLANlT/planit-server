@@ -112,4 +112,8 @@ public class Plan extends BaseEntity {
     }
 
     public int countTasks() { return this.tasks.size(); }
+
+    public void addTask(Task task) {
+        tasks.add(task);
+    }
 }

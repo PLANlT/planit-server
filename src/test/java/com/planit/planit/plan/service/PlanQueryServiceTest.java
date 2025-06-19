@@ -85,6 +85,7 @@ class PlanQueryServiceTest {
 
     private void initPlan() {
         planInProgress1 = Plan.builder()
+                .id(1L)
                 .title("1")
                 .motivation("다짐문장")
                 .icon("아이콘")
@@ -93,6 +94,7 @@ class PlanQueryServiceTest {
                 .member(member1)
                 .build();
         planInProgress2 = Plan.builder()
+                .id(2L)
                 .title("2")
                 .motivation("다짐문장")
                 .icon("아이콘")
@@ -101,6 +103,7 @@ class PlanQueryServiceTest {
                 .member(member1)
                 .build();
         pausedPlan1 = Plan.builder()
+                .id(3L)
                 .title("3")
                 .motivation("다짐문장")
                 .icon("아이콘")
@@ -109,6 +112,7 @@ class PlanQueryServiceTest {
                 .member(member1)
                 .build();
         pausedPlan2 = Plan.builder()
+                .id(4L)
                 .title("4")
                 .motivation("다짐문장")
                 .icon("아이콘")
@@ -117,6 +121,7 @@ class PlanQueryServiceTest {
                 .member(member1)
                 .build();
         archivedPlan1 = Plan.builder()
+                .id(5L)
                 .title("5")
                 .motivation("다짐문장")
                 .icon("아이콘")
@@ -125,6 +130,7 @@ class PlanQueryServiceTest {
                 .member(member1)
                 .build();
         archivedPlan2 = Plan.builder()
+                .id(6L)
                 .title("6")
                 .motivation("다짐문장")
                 .icon("아이콘")
@@ -136,6 +142,7 @@ class PlanQueryServiceTest {
 
     private void initTask() {
         task1 = Task.builder()
+                .id(1L)
                 .title("작업1")
                 .isRoutine(false)
                 .routineDay(RoutineDay.MON)
@@ -144,14 +151,18 @@ class PlanQueryServiceTest {
                 .plan(planInProgress1)
                 .build();
         task2 = Task.builder()
+                .id(2L)
                 .title("작업2")
                 .isRoutine(false)
                 .routineDay(RoutineDay.MON)
                 .taskType(TaskType.SLOW)
                 .member(member1)
-                .plan(planInProgress2)
+                .plan(planInProgress1)
                 .build();
         task2.completeTask();
+
+        planInProgress1.addTask(task1);
+        planInProgress1.addTask(task2);
     }
 
 
