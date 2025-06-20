@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +38,10 @@ public class Plan extends BaseEntity {
     private PlanStatus planStatus;      // 플랜 진행 여부
 
     @Column
-    private LocalDateTime startedAt;    // 플랜 시작일
+    private LocalDate startedAt;    // 플랜 시작일
 
     @Column
-    private LocalDateTime finishedAt;   // 플랜 종료일
+    private LocalDate finishedAt;   // 플랜 종료일
 
     @Column
     private LocalDateTime inactive;     // 플랜 비활성화(중단, 아카이빙, 삭제)
@@ -65,8 +66,8 @@ public class Plan extends BaseEntity {
             String motivation,
             String icon,
             PlanStatus planStatus,
-            LocalDateTime startedAt,
-            LocalDateTime finishedAt,
+            LocalDate startedAt,
+            LocalDate finishedAt,
             Member member
 
     ) {
@@ -85,7 +86,7 @@ public class Plan extends BaseEntity {
 
     public void updatePlan(
             String title,          String motivation,       String icon,
-            PlanStatus planStatus, LocalDateTime startedAt, LocalDateTime finishedAt
+            PlanStatus planStatus, LocalDate startedAt,     LocalDate finishedAt
     ) {
         this.title = title;
         this.motivation = motivation;
@@ -111,4 +112,8 @@ public class Plan extends BaseEntity {
     }
 
     public int countTasks() { return this.tasks.size(); }
+
+    public void addTask(Task task) {
+        tasks.add(task);
+    }
 }

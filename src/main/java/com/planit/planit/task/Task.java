@@ -5,6 +5,7 @@ import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.task.enums.RoutineDay;
+import com.planit.planit.task.enums.TaskType;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -35,11 +36,9 @@ public class Task extends BaseEntity {
     @Column
     private LocalTime routineTime;
 
-    @Column(nullable = false, length = 30)
-    private String taskForWellBeing;
-
-    @Column(nullable = false, length = 30)
-    private String taskForDistress;
+    @Enumerated(EnumType.STRING)
+    @Column
+    private TaskType taskType;
 
     @Column(nullable = false, length = 30)
     private Boolean isCompleted;
@@ -69,8 +68,7 @@ public class Task extends BaseEntity {
             Long id,
             String title,
             Boolean isRoutine,
-            String taskForWellBeing,
-            String taskForDistress,
+            TaskType taskType,
             Member member,
             @Nullable Plan plan,
             @Nullable RoutineDay routineDay,
@@ -79,8 +77,7 @@ public class Task extends BaseEntity {
         this.id = id;
         this.title = title;
         this.isRoutine = isRoutine;
-        this.taskForWellBeing = taskForWellBeing;
-        this.taskForDistress = taskForDistress;
+        this.taskType = taskType;
         this.isCompleted = false;
         this.member = member;
         this.plan = plan;

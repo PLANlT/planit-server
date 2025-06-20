@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 
 public enum PlanErrorStatus implements ErrorResponse {
 
+    PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "PLAN4001", "플랜을 찾을 수 없습니다."),
+    MEMBER_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "PLAN4002", "사용자의 플랜을 찾을 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

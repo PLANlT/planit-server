@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,14 +40,33 @@ public class PlanResponseDTO {
     @Getter
     @Builder
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class TodayPlanDTO {
+        private final Long planId;
+        private final String title;
+        private final String dDay;
+        private final List<TaskPreviewDTO> tasks;
+    }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static class PlanMetaDTO {
         private final Long planId;
         private final String title;
         private final String icon;
         private final String motivation;
         private final PlanStatus planStatus;
-        private final LocalDateTime startedAt;
-        private final LocalDateTime finishedAt;
+        private final LocalDate startedAt;
+        private final LocalDate finishedAt;
+    }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class TodayPlanListDTO {
+        private final LocalDate todayDate;
+        private final List<TodayPlanDTO> plans;
+
     }
 
     @Getter
