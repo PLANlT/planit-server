@@ -7,7 +7,7 @@ import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
-import com.planit.planit.task.TaskRepository;
+import com.planit.planit.task.repository.TaskRepository;
 import com.planit.planit.task.association.CompletedTask;
 import com.planit.planit.task.enums.RoutineDay;
 import com.planit.planit.task.enums.TaskType;
@@ -145,23 +145,16 @@ class PlanQueryServiceTest {
         task1 = Task.builder()
                 .id(1L)
                 .title("작업1")
-                .isRoutine(false)
-                .routineDay(RoutineDay.MON)
-                .taskType(TaskType.PASSIONATE)
                 .member(member1)
                 .plan(planInProgress1)
                 .build();
         task2 = Task.builder()
                 .id(2L)
                 .title("작업2")
-                .isRoutine(false)
-                .routineDay(RoutineDay.MON)
-                .taskType(TaskType.SLOW)
                 .member(member1)
                 .plan(planInProgress1)
                 .build();
         CompletedTask completedTask = new CompletedTask(task2);
-        task2.completeTask(completedTask);
 
         planInProgress1.addTask(task1);
         planInProgress1.addTask(task2);
@@ -210,7 +203,6 @@ class PlanQueryServiceTest {
         assertThat(result.getPlanId()).isEqualTo(1L);
         assertThat(result.getTasks().get(0).getTaskId()).isEqualTo(1L);
         assertThat(result.getTasks().get(1).getTaskId()).isEqualTo(2L);
-        assertThat(result.getTasks().get(1).getIsCompleted()).isEqualTo(true);
     }
 
     @Test

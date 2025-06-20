@@ -16,6 +16,5 @@ public class TaskResponseDTO {
         private final Long taskId;
         private final TaskType taskType;
         private final String title;
-        private final Boolean isCompleted;
     }
 }

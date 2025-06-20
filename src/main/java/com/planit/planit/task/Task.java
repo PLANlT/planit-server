@@ -30,9 +30,6 @@ public class Task extends BaseEntity {
     @Column(nullable = false, length = 30)
     private String title;
 
-    @Column(nullable = false)
-    private Boolean isRoutine;
-
     @Enumerated(EnumType.STRING)
     @Column
     private RoutineDay routineDay;
@@ -43,12 +40,6 @@ public class Task extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column
     private TaskType taskType;
-
-    @Column(nullable = false, length = 30)
-    private Boolean isCompleted;
-
-    @Column
-    private LocalDateTime completedAt;
 
     @Column
     private LocalDateTime deletedAt;
@@ -75,20 +66,13 @@ public class Task extends BaseEntity {
     public Task(
             Long id,
             String title,
-            Boolean isRoutine,
-            TaskType taskType,
             Member member,
-            @Nullable Plan plan,
-            @Nullable RoutineDay routineDay,
-            @Nullable LocalTime routineTime
+            Plan plan
     ) {
         this.id = id;
         this.title = title;
-        this.isRoutine = isRoutine;
-        this.taskType = taskType;
-        this.routineDay = routineDay;
-        this.routineTime = routineTime;
-        this.isCompleted = false;
+        this.taskType = TaskType.ALL;
+        this.routineDay = RoutineDay.MON;
         this.member = member;
         this.plan = plan;
         this.completedTasks = new ArrayList<>();
@@ -96,9 +80,22 @@ public class Task extends BaseEntity {
 
 /*------------------------------ METHOD ------------------------------*/
 
-    public void completeTask(CompletedTask completedTask) {
-        this.isCompleted = true;
-        this.completedAt = LocalDateTime.now();
+    public void updateTaskTitle(String title) {
+        this.title = title;
+    }
+
+    public void setRoutine(
+            TaskType taskType,
+            RoutineDay routineDay,
+            @Nullable LocalTime routineTime
+    ) {
+        this.taskType = taskType;
+        this.routineDay = routineDay;
+        this.routineTime = routineTime;
+    }
+
+    public void addCompletedTask(CompletedTask completedTask) {
+        this.completedTasks.add(completedTask);
     }
 
     public void deleteTask() {

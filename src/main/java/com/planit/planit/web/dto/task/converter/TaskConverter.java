@@ -10,7 +10,6 @@ public class TaskConverter {
                 .taskId(task.getId())
                 .taskType(task.getTaskType())
                 .title(task.getTitle())
-                .isCompleted(task.getIsCompleted())
                 .build();
     }
 }
