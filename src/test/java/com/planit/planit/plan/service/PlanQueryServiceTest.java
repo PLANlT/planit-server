@@ -8,6 +8,7 @@ import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
 import com.planit.planit.task.TaskRepository;
+import com.planit.planit.task.association.CompletedTask;
 import com.planit.planit.task.enums.RoutineDay;
 import com.planit.planit.task.enums.TaskType;
 import com.planit.planit.web.dto.plan.PlanResponseDTO;
@@ -59,7 +60,7 @@ class PlanQueryServiceTest {
     private Task task2;
 
 
-/*------------------------------ SETUP ------------------------------*/
+    /*------------------------------ SETUP ------------------------------*/
 
     @BeforeEach
     public void setUp() {
@@ -159,7 +160,8 @@ class PlanQueryServiceTest {
                 .member(member1)
                 .plan(planInProgress1)
                 .build();
-        task2.completeTask();
+        CompletedTask completedTask = new CompletedTask(task2);
+        task2.completeTask(completedTask);
 
         planInProgress1.addTask(task1);
         planInProgress1.addTask(task2);

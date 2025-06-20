@@ -1,9 +1,11 @@
 package com.planit.planit.task;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import com.planit.planit.plan.Plan;
+import com.planit.planit.task.association.CompletedTask;
 import com.planit.planit.task.enums.RoutineDay;
 import com.planit.planit.task.enums.TaskType;
 import jakarta.annotation.Nullable;
@@ -13,6 +15,8 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -49,6 +53,10 @@ public class Task extends BaseEntity {
     @Column
     private LocalDateTime deletedAt;
 
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<CompletedTask> completedTasks;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     @JsonBackReference
@@ -78,16 +86,17 @@ public class Task extends BaseEntity {
         this.title = title;
         this.isRoutine = isRoutine;
         this.taskType = taskType;
+        this.routineDay = routineDay;
+        this.routineTime = routineTime;
         this.isCompleted = false;
         this.member = member;
         this.plan = plan;
-        this.routineDay = routineDay;
-        this.routineTime = routineTime;
+        this.completedTasks = new ArrayList<>();
     }
 
 /*------------------------------ METHOD ------------------------------*/
 
-    public void completeTask() {
+    public void completeTask(CompletedTask completedTask) {
         this.isCompleted = true;
         this.completedAt = LocalDateTime.now();
     }
