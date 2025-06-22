@@ -154,7 +154,7 @@ class PlanQueryServiceTest {
                 .member(member1)
                 .plan(planInProgress1)
                 .build();
-        CompletedTask completedTask = new CompletedTask(task2);
+        CompletedTask completedTask = new CompletedTask(task2, LocalDate.now());
 
         planInProgress1.addTask(task1);
         planInProgress1.addTask(task2);

@@ -1,9 +1,9 @@
-package com.planit.planit.plan;
+package com.planit.planit.plan.repository;
 
 import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
+import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
-import com.planit.planit.plan.repository.PlanRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

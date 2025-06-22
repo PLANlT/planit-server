@@ -1,20 +1,21 @@
-package com.planit.planit.task;
+package com.planit.planit.task.repository;
 
 import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
+import com.planit.planit.task.Task;
 import com.planit.planit.task.association.CompletedTask;
 import com.planit.planit.task.enums.RoutineDay;
 import com.planit.planit.task.enums.TaskType;
-import com.planit.planit.task.repository.TaskRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -78,7 +79,7 @@ class TaskRepositoryTest {
                 .plan(plan)
                 .build();
 
-        CompletedTask completedTask = new CompletedTask(task1);
+        CompletedTask completedTask = new CompletedTask(task1, LocalDate.now());
         task1.addCompletedTask(completedTask);
     }
 
