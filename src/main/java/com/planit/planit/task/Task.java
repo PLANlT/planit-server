@@ -6,13 +6,13 @@ import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.task.association.CompletedTask;
-import com.planit.planit.task.enums.RoutineDay;
 import com.planit.planit.task.enums.TaskType;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class Task extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column
-    private RoutineDay routineDay;
+    private DayOfWeek routineDay;
 
     @Column
     private LocalTime routineTime;
@@ -72,7 +72,7 @@ public class Task extends BaseEntity {
         this.id = id;
         this.title = title;
         this.taskType = TaskType.ALL;
-        this.routineDay = RoutineDay.MON;
+        this.routineDay = DayOfWeek.MONDAY;
         this.member = member;
         this.plan = plan;
         this.completedTasks = new ArrayList<>();
@@ -86,7 +86,7 @@ public class Task extends BaseEntity {
 
     public void setRoutine(
             TaskType taskType,
-            RoutineDay routineDay,
+            DayOfWeek routineDay,
             @Nullable LocalTime routineTime
     ) {
         this.taskType = taskType;

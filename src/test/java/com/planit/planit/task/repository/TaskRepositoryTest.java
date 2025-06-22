@@ -7,7 +7,6 @@ import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
 import com.planit.planit.task.association.CompletedTask;
-import com.planit.planit.task.enums.RoutineDay;
 import com.planit.planit.task.enums.TaskType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -182,14 +182,14 @@ class TaskRepositoryTest {
         task1 = taskRepository.save(task1);
 
         // when
-        task1.setRoutine(TaskType.SLOW, RoutineDay.WED, LocalTime.of(13,0));
+        task1.setRoutine(TaskType.SLOW, DayOfWeek.WEDNESDAY, LocalTime.of(13,0));
 
         // then
         Task result = taskRepository.findById(task1.getId()).get();
         assertNotNull(result);
         assertThat(result.getId()).isEqualTo(task1.getId());
         assertThat(result.getTaskType()).isEqualTo(TaskType.SLOW);
-        assertThat(result.getRoutineDay()).isEqualTo(RoutineDay.WED);
+        assertThat(result.getRoutineDay()).isEqualTo(DayOfWeek.WEDNESDAY);
         assertThat(result.getRoutineTime()).isEqualTo(LocalTime.of(13, 0));
     }
 
