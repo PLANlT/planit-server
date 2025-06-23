@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +39,8 @@ class PlanCommandServiceTest {
     @InjectMocks
     private PlanCommandServiceImpl planCommandService;
 
-    private Member member;
+    private Member member1;
+    private Member member2;
     private Plan plan;
 
 
@@ -48,13 +49,19 @@ class PlanCommandServiceTest {
     @BeforeEach
     public void setUp() {
         initMember();                       // 회원 더미데이터 생성
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(member1));
     }
 
     private void initMember() {
-        member = Member.builder()
+        member1 = Member.builder()
                 .id(1L)
                 .email("xxx@email.com")
+                .password("password")
+                .guiltyFreeMode(false)
+                .build();
+        member2 = Member.builder()
+                .id(2L)
+                .email("yyy@email.com")
                 .password("password")
                 .guiltyFreeMode(false)
                 .build();
@@ -73,8 +80,8 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.IN_PROGRESS)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
                 .build();
 
         plan = Plan.builder()
@@ -85,13 +92,13 @@ class PlanCommandServiceTest {
                 .planStatus(planDTO.getPlanStatus())
                 .startedAt(planDTO.getStartedAt())
                 .finishedAt(planDTO.getFinishedAt())
-                .member(member)
+                .member(member1)
                 .build();
 
         when(planRepository.save(any(Plan.class))).thenReturn(plan);
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.createPlan(planDTO);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.createPlan(1L, planDTO);
 
         // then
         assertNotNull(result);
@@ -113,8 +120,8 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.IN_PROGRESS)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
                 .build();
 
         plan = Plan.builder()
@@ -125,14 +132,14 @@ class PlanCommandServiceTest {
                 .planStatus(planDTO.getPlanStatus())
                 .startedAt(planDTO.getStartedAt())
                 .finishedAt(planDTO.getFinishedAt())
-                .member(member)
+                .member(member1)
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
         when(planRepository.save(any(Plan.class))).thenReturn(plan);
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.updatePlan(1L, planDTO);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.updatePlan(1L, 1L, planDTO);
 
         // then
         assertNotNull(result);
@@ -151,14 +158,35 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.IN_PROGRESS)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planCommandService.updatePlan(1L, planDTO));
+        assertThrows(PlanHandler.class, () -> planCommandService.updatePlan(1L, 1L, planDTO));
+    }
+
+    @Test
+    @DisplayName("플랜 수정 (사용자의 플랜이 아님)")
+    public void updatePlanTest_NotMyPlan_Fail() {
+
+        // given
+        PlanRequestDTO.PlanDTO planDTO = PlanRequestDTO.PlanDTO.builder()
+                .title("수정된 제목")
+                .motivation("목표")
+                .icon("아이콘")
+                .planStatus(PlanStatus.IN_PROGRESS)
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
+                .build();
+
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
+        when(planRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(PlanHandler.class, () -> planCommandService.updatePlan(2L, 1L, planDTO));
     }
 
 
@@ -176,15 +204,15 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.ARCHIVED)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
-                .member(member)
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
+                .member(member1)
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.completePlan(1L);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.completePlan(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -199,7 +227,18 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planCommandService.completePlan(1L));
+        assertThrows(PlanHandler.class, () -> planCommandService.completePlan(1L, 1L));
+    }
+
+    @Test
+    @DisplayName("플랜 완료 (사용자의 플랜이 아님)")
+    public void completePlanTest_NotMyPlan_Fail() {
+        // given
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
+        when(planRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(PlanHandler.class, () -> planCommandService.completePlan(2L, 1L));
     }
 
 
@@ -216,20 +255,20 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.PAUSED)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
-                .member(member)
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
+                .member(member1)
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.pausePlan(1L);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.pausePlan(1L, 1L);
 
         // then
         assertNotNull(result);
         assertThat(result.getTitle()).isEqualTo("제목");
-        assertThat(result.getPlanStatus()).isEqualTo(PlanStatus.ARCHIVED);
+        assertThat(result.getPlanStatus()).isEqualTo(PlanStatus.PAUSED);
     }
 
     @Test
@@ -239,7 +278,18 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planCommandService.pausePlan(1L));
+        assertThrows(PlanHandler.class, () -> planCommandService.pausePlan(1L, 1L));
+    }
+
+    @Test
+    @DisplayName("플랜 중단 (사용자의 플랜이 아님)")
+    public void pausePlanTest_NotMyPlan_Fail() {
+        // given
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
+        when(planRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(PlanHandler.class, () -> planCommandService.pausePlan(1L, 1L));
     }
 
 
@@ -256,15 +306,15 @@ class PlanCommandServiceTest {
                 .motivation("목표")
                 .icon("아이콘")
                 .planStatus(PlanStatus.DELETED)
-                .startedAt(LocalDateTime.now())
-                .finishedAt(LocalDateTime.now().plusMonths(1))
-                .member(member)
+                .startedAt(LocalDate.now())
+                .finishedAt(LocalDate.now().plusMonths(1))
+                .member(member1)
                 .build();
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
         // when
-        PlanResponseDTO.PlanMetaDTO result = planCommandService.deletePlan(1L);
+        PlanResponseDTO.PlanMetaDTO result = planCommandService.deletePlan(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -279,6 +329,17 @@ class PlanCommandServiceTest {
         when(planRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(PlanHandler.class, () -> planCommandService.deletePlan(1L));
+        assertThrows(PlanHandler.class, () -> planCommandService.deletePlan(1L, 1L));
+    }
+
+    @Test
+    @DisplayName("플랜 삭제 (사용자의 플랜이 아님)")
+    public void deletePlanTest_NotMyPlan_Fail() {
+        // given
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
+        when(planRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(PlanHandler.class, () -> planCommandService.deletePlan(1L, 1L));
     }
 }
