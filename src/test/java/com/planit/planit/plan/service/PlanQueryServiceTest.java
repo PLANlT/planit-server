@@ -9,8 +9,6 @@ import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
 import com.planit.planit.task.repository.TaskRepository;
 import com.planit.planit.task.association.CompletedTask;
-import com.planit.planit.task.enums.RoutineDay;
-import com.planit.planit.task.enums.TaskType;
 import com.planit.planit.web.dto.plan.PlanResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

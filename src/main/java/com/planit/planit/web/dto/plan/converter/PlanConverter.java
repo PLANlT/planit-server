@@ -12,17 +12,6 @@ import java.util.List;
 
 public class PlanConverter {
 
-    public static PlanRequestDTO.PlanDTO toPlanDTO(Plan plan) {
-        return PlanRequestDTO.PlanDTO.builder()
-                .title(plan.getTitle())
-                .motivation(plan.getMotivation())
-                .icon(plan.getIcon())
-                .planStatus(plan.getPlanStatus())
-                .startedAt(plan.getStartedAt())
-                .finishedAt(plan.getFinishedAt())
-                .build();
-    }
-
     public static PlanResponseDTO.PlanPreviewDTO toPlanPreviewDTO(Plan plan) {
         String dDay = formatDDay(LocalDate.now(), plan.getFinishedAt());
         return PlanResponseDTO.PlanPreviewDTO.builder()
