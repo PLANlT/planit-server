@@ -13,3 +13,7 @@ spring:
   logging:
     level:
       root: DEBUG
+
+jwt:
+  secret: your-super-secret-key-that-should-be-long-and-secure
+  expirationMs: 3600000 # 1시간 (밀리초)
