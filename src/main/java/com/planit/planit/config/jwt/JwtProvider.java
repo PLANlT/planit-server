@@ -1,18 +1,31 @@
 package com.planit.planit.config.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
 
+@Component
 public class JwtProvider {
 
     private final SecretKey secretKey;
     private final long expirationMs;
+    private final long refreshTokenExpirationMs;
+    private final String tokenPrefix;
+    private final String issuer;
+    private final List<String> audiences;
 
-    public JwtProvider(String secret, long expirationMs) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes()); // 256비트 이상 secret
-        this.expirationMs = expirationMs;
+    @Autowired
+    public JwtProvider(JwtProperties jwtProperties) {
+        this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        this.expirationMs = jwtProperties.getExpirationMs();
+        this.refreshTokenExpirationMs = jwtProperties.getRefreshTokenExpirationMs();
+        this.tokenPrefix = jwtProperties.getTokenPrefix();
+        this.issuer = jwtProperties.getIssuer();
+        this.audiences = jwtProperties.getAudiences();
     }
 
     public String createToken(Long id, String email, String name, String role) {
