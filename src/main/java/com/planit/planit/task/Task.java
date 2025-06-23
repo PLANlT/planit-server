@@ -1,17 +1,22 @@
 package com.planit.planit.task;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import com.planit.planit.plan.Plan;
-import com.planit.planit.task.enums.RoutineDay;
+import com.planit.planit.task.association.CompletedTask;
+import com.planit.planit.task.enums.TaskType;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -25,30 +30,23 @@ public class Task extends BaseEntity {
     @Column(nullable = false, length = 30)
     private String title;
 
-    @Column(nullable = false)
-    private Boolean isRoutine;
-
     @Enumerated(EnumType.STRING)
     @Column
-    private RoutineDay routineDay;
+    private DayOfWeek routineDay;
 
     @Column
     private LocalTime routineTime;
 
-    @Column(nullable = false, length = 30)
-    private String taskForWellBeing;
-
-    @Column(nullable = false, length = 30)
-    private String taskForDistress;
-
-    @Column(nullable = false, length = 30)
-    private Boolean isCompleted;
-
+    @Enumerated(EnumType.STRING)
     @Column
-    private LocalDateTime completedAt;
+    private TaskType taskType;
 
     @Column
     private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<CompletedTask> completedTasks;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -68,31 +66,36 @@ public class Task extends BaseEntity {
     public Task(
             Long id,
             String title,
-            Boolean isRoutine,
-            String taskForWellBeing,
-            String taskForDistress,
             Member member,
-            @Nullable Plan plan,
-            @Nullable RoutineDay routineDay,
-            @Nullable LocalTime routineTime
+            Plan plan
     ) {
         this.id = id;
         this.title = title;
-        this.isRoutine = isRoutine;
-        this.taskForWellBeing = taskForWellBeing;
-        this.taskForDistress = taskForDistress;
-        this.isCompleted = false;
+        this.taskType = TaskType.ALL;
+        this.routineDay = DayOfWeek.MONDAY;
         this.member = member;
         this.plan = plan;
-        this.routineDay = routineDay;
-        this.routineTime = routineTime;
+        this.completedTasks = new ArrayList<>();
     }
 
 /*------------------------------ METHOD ------------------------------*/
 
-    public void completeTask() {
-        this.isCompleted = true;
-        this.completedAt = LocalDateTime.now();
+    public void updateTaskTitle(String title) {
+        this.title = title;
+    }
+
+    public void setRoutine(
+            TaskType taskType,
+            DayOfWeek routineDay,
+            @Nullable LocalTime routineTime
+    ) {
+        this.taskType = taskType;
+        this.routineDay = routineDay;
+        this.routineTime = routineTime;
+    }
+
+    public void addCompletedTask(CompletedTask completedTask) {
+        this.completedTasks.add(completedTask);
     }
 
     public void deleteTask() {

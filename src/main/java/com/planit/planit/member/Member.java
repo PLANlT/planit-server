@@ -6,7 +6,7 @@ import com.planit.planit.dream.Dream;
 import com.planit.planit.member.association.GuiltyFree;
 import com.planit.planit.member.association.Term;
 import com.planit.planit.member.enums.DailyCondition;
-import com.planit.planit.member.enums.Role;
+import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.task.Task;
@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -44,15 +45,19 @@ public class Member extends BaseEntity {
     private DailyCondition dailyCondition;
 
     @Column
+    private LocalDateTime lastAttendanceDate;           // 마지막 출석일
+
+    @Column
+    private Integer currentConsecutiveDays;             // 현재 연속일
+
+    @Column(nullable = false)
+    private Integer maxConsecutiveDays;                 // 연속일 최고기록
+
+    @Column(nullable = false)
+    private Integer perfectConsecutiveDays;             // 완벽 연속일
+
+    @Column
     private LocalDateTime inactive;
-
-    @Column(nullable = false, length = 20)
-    private String memberName;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Role role;
-
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private GuiltyFree guiltyFree;
@@ -83,9 +88,7 @@ public class Member extends BaseEntity {
             String password,
             SignType signType,
             Boolean guiltyFreeMode,
-            DailyCondition dailyCondition,
-            String memberName,
-            Role role
+            DailyCondition dailyCondition
     ) {
         this.id = id;
         this.email = email;
@@ -93,10 +96,13 @@ public class Member extends BaseEntity {
         this.signType = signType;
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
-        this.memberName = memberName;
-        this.role = role;
+        this.currentConsecutiveDays = 0;
+        this.maxConsecutiveDays = 0;
+        this.perfectConsecutiveDays = 0;
+        this.plans = new ArrayList<>();
+        this.tasks = new ArrayList<>();
+        this.dreams = new ArrayList<>();
     }
-
 
 /*------------------------------ METHOD ------------------------------*/
 

@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +38,13 @@ public class Plan extends BaseEntity {
     private PlanStatus planStatus;      // 플랜 진행 여부
 
     @Column
-    private LocalDateTime startedAt;    // 플랜 시작일
+    private LocalDate startedAt;    // 플랜 시작일
 
     @Column
-    private LocalDateTime finishedAt;   // 플랜 종료일
+    private LocalDate finishedAt;   // 플랜 종료일
 
     @Column
-    private LocalDateTime deletedAt;
+    private LocalDateTime inactive;     // 플랜 비활성화(중단, 아카이빙, 삭제)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -65,8 +66,8 @@ public class Plan extends BaseEntity {
             String motivation,
             String icon,
             PlanStatus planStatus,
-            LocalDateTime startedAt,
-            LocalDateTime finishedAt,
+            LocalDate startedAt,
+            LocalDate finishedAt,
             Member member
 
     ) {
@@ -83,9 +84,36 @@ public class Plan extends BaseEntity {
 
 /*------------------------------ METHOD ------------------------------*/
 
+    public void updatePlan(
+            String title,          String motivation,       String icon,
+            PlanStatus planStatus, LocalDate startedAt,     LocalDate finishedAt
+    ) {
+        this.title = title;
+        this.motivation = motivation;
+        this.icon = icon;
+        this.planStatus = planStatus;
+        this.startedAt = startedAt;
+        this.finishedAt = finishedAt;
+    }
+
+    public void completePlan() {
+        this.planStatus = PlanStatus.ARCHIVED;
+        this.inactive = LocalDateTime.now();
+    }
+
+    public void pausePlan() {
+        this.planStatus = PlanStatus.PAUSED;
+        this.inactive = LocalDateTime.now();
+    }
+
     public void deletePlan() {
-        this.deletedAt = LocalDateTime.now();
+        this.planStatus = PlanStatus.DELETED;
+        this.inactive = LocalDateTime.now();
     }
 
     public int countTasks() { return this.tasks.size(); }
+
+    public void addTask(Task task) {
+        tasks.add(task);
+    }
 }

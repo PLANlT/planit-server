@@ -1,0 +1,61 @@
+name: Slack Noticat
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  notify:
+    name: Slack Noticat
+    runs-on: ubuntu-latest
+    steps:
+      - name: getPrUrl
+        id: pr-url
+        uses: ammaratef45/pr-url-action@v1
+        
+      - name: Send to Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "잘 지냈냐옹? 새로운 PR이 올라왔다옹!",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "잘 지냈냐옹? 새로운 PR이 올라왔다옹! 리뷰 달라옹!!"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":point_down: PR 바로가기"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ steps.pr-url.outputs.url }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":point_down: 확인 부탁드려요!"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<@U08QB4NG5L0> <@U08PS1ML266>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CAT_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
