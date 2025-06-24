@@ -4,6 +4,7 @@ import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.enums.Role;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
@@ -56,6 +57,8 @@ class CompletedTaskRepositoryTest {
                 .email("xxx@email.com")
                 .password("password")
                 .guiltyFreeMode(false)
+                .memberName("xxx")
+                .role(Role.USER)
                 .build();
     }
 

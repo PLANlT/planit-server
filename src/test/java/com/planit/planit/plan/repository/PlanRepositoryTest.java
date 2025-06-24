@@ -2,6 +2,7 @@ package com.planit.planit.plan.repository;
 
 import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.enums.Role;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
 import org.junit.jupiter.api.*;
@@ -46,6 +47,8 @@ class PlanRepositoryTest {
                 .email("xxx@email.com")
                 .password("password")
                 .guiltyFreeMode(false)
+                .memberName("xxx")
+                .role(Role.USER)
                 .build();
     }
 
