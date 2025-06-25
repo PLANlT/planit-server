@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.planit.planit.member.enums.Role;
+
 @Getter
 @Entity
 public class Member extends BaseEntity {
@@ -59,6 +61,13 @@ public class Member extends BaseEntity {
     @Column
     private LocalDateTime inactive;
 
+    @Column(nullable = false)
+    private String memberName;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private GuiltyFree guiltyFree;
 
@@ -88,7 +97,9 @@ public class Member extends BaseEntity {
             String password,
             SignType signType,
             Boolean guiltyFreeMode,
-            DailyCondition dailyCondition
+            DailyCondition dailyCondition,
+            String memberName,
+            Role role
     ) {
         this.id = id;
         this.email = email;
@@ -102,6 +113,8 @@ public class Member extends BaseEntity {
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();
+        this.memberName = (memberName != null) ? memberName : "여행자";
+        this.role = role;
     }
 
 /*------------------------------ METHOD ------------------------------*/

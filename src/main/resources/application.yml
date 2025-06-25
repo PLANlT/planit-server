@@ -3,3 +3,5 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev}  # 기본 dev
 
 # 공통 설정이 있다면 여기에
+jwt:
+  secret: your-super-secret-key-that-should-be-long-and-secure

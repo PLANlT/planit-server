@@ -13,3 +13,6 @@ spring:
   logging:
     level:
       root: DEBUG
+
+jwt:
+  expirationMs: 3600000 # 1시간 (밀리초)
