@@ -20,6 +20,7 @@ class JwtProviderTest {
         long expiration = 3600000; // 1시간
         jwtProperties.setSecret(secretKey);
         jwtProperties.setExpirationMs(expiration);
+        jwtProperties.setRefreshTokenExpirationMs(expiration);
         jwtProvider = new JwtProvider(jwtProperties);
     }
 
@@ -34,7 +35,7 @@ class JwtProviderTest {
         String role = "USER";
 
         // when
-        String token = jwtProvider.createToken(userId, email, memberName, role);
+        String token = jwtProvider.createAccessToken(userId, email, memberName, role);
 
         // then
         assertThat(jwtProvider.validateToken(token)).isTrue();
@@ -51,10 +52,32 @@ class JwtProviderTest {
         jwtProperties.setExpirationMs(1);
         jwtProperties.setSecret("\"short-key-which-is-long-enough-for-test-purpose\"");
         JwtProvider shortLivedProvider = new JwtProvider(jwtProperties);
-        String token = shortLivedProvider.createToken(1L, "a@a.com", "Test", "USER");
+        String token = shortLivedProvider.createAccessToken(1L, "a@a.com", "Test", "USER");
 
         Thread.sleep(10); // 토큰 만료 기다림
 
         assertThat(shortLivedProvider.validateToken(token)).isFalse();
     }
+
+    @Test
+    @Order(3)
+    @DisplayName("RefreshToken 생성 및 파싱 (성공)")
+    void 리프레시_토큰_생성_및_파싱_테스트() {
+        // given
+        Long userId = 84L;
+        String email = "refresh@example.com";
+        String memberName = "리프레시";
+        String role = "USER";
+
+        // when
+        String refreshToken = jwtProvider.createRefreshToken(userId, email, memberName, role);
+
+        // then
+        assertThat(jwtProvider.validateToken(refreshToken)).isTrue();
+        assertThat(jwtProvider.getId(refreshToken)).isEqualTo(userId);
+        assertThat(jwtProvider.getEmail(refreshToken)).isEqualTo(email);
+        assertThat(jwtProvider.getMemberName(refreshToken)).isEqualTo(memberName);
+        assertThat(jwtProvider.getRole(refreshToken)).isEqualTo(role);
+    }
+
 }
