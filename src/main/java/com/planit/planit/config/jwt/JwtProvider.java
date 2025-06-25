@@ -28,12 +28,20 @@ public class JwtProvider {
         this.audiences = jwtProperties.getAudiences();
     }
 
-    public String createToken(Long id, String email, String name, String role) {
+    public String createAccessToken(Long id, String email, String name, String role) {
+        return createToken(id, email, name, role, expirationMs);
+    }
+
+    public String createRefreshToken(Long id, String email, String name, String role) {
+        return createToken(id, email, name, role, refreshTokenExpirationMs);
+    }
+
+    private String createToken(Long id, String email, String name, String role, long expirationMs) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
-                .setSubject(String.valueOf(id)) // sub: id
+                .setSubject(String.valueOf(id))
                 .claim("email", email)
                 .claim("memberName", name)
                 .claim("role", role)

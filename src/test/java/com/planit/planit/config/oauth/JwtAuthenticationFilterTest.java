@@ -19,6 +19,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -35,37 +36,33 @@ class JwtAuthenticationFilterTest {
     @BeforeEach
     void setUp() {
         jwtProperties = mock(JwtProperties.class);
-
-        // 원하는 프로퍼티 값 설정
         when(jwtProperties.getSecret()).thenReturn("test-secret-key-which-is-long-enough");
-        when(jwtProperties.getExpirationMs()).thenReturn(3600000L);  // 1시간
+        when(jwtProperties.getExpirationMs()).thenReturn(3600000L);
 
         jwtProvider = new JwtProvider(jwtProperties);
-
         memberRepository = mock(MemberRepository.class);
         filter = new JwtAuthenticationFilter(jwtProvider, memberRepository);
+
         SecurityContextHolder.clearContext();
     }
 
-
-
     @Test
     @Order(1)
-    @DisplayName("jwt로 인증 객체 생성 (성공)")
-    void 유효한_JWT가_있으면_인증_객체가_생성된다() throws ServletException, IOException {
+    @DisplayName("유효한 accessToken이 있으면 인증 객체가 SecurityContext에 등록된다")
+    void 유효한_AccessToken이_있으면_인증_객체가_생성된다() throws ServletException, IOException {
         // given
         Long userId = 1L;
-        String token = jwtProvider.createToken(userId, "user@example.com", "홍길동", "USER");
-
+        String accessToken = jwtProvider.createAccessToken(userId, "user@example.com", "홍길동", "USER");
 
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addHeader("Authorization", "Bearer " + token);
+        request.addHeader("Authorization", "Bearer " + accessToken); // ⬅ 수정됨
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain chain = mock(FilterChain.class);
 
-        // mock MemberRepository
-        Member fakeMember = new Member(userId, "user@example.com", "test", SignType.KAKAO, false, DailyCondition.DISTRESS,"홍길동", Role.USER);
-        when(memberRepository.findById(userId)).thenReturn(java.util.Optional.of(fakeMember));
+        Member fakeMember = new Member(userId, "user@example.com", "test", SignType.KAKAO, false,
+                DailyCondition.DISTRESS, "홍길동", Role.USER);
+        when(memberRepository.findById(userId)).thenReturn(
+                Optional.of(fakeMember));
 
         // when
         filter.doFilterInternal(request, response, chain);
