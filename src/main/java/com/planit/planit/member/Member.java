@@ -61,10 +61,11 @@ public class Member extends BaseEntity {
     @Column
     private LocalDateTime inactive;
 
-    @Column
+    @Column(nullable = false)
     private String memberName;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -112,7 +113,7 @@ public class Member extends BaseEntity {
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();
-        this.memberName = memberName;
+        this.memberName = (memberName != null) ? memberName : "여행자";
         this.role = role;
     }
 
