@@ -2,9 +2,11 @@ package com.planit.planit.jwt;
 
 import com.planit.planit.config.jwt.JwtProperties;
 import com.planit.planit.config.jwt.JwtProvider;
+import com.planit.planit.member.enums.Role;
 import org.junit.jupiter.api.*;
 
 
+import static com.planit.planit.member.enums.Role.USER;
 import static org.assertj.core.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -32,7 +34,7 @@ class JwtProviderTest {
         Long userId = 42L;
         String email = "user@example.com";
         String memberName = "홍길동";
-        String role = "USER";
+        Role role = USER;
 
         // when
         String token = jwtProvider.createAccessToken(userId, email, memberName, role);
@@ -52,7 +54,7 @@ class JwtProviderTest {
         jwtProperties.setExpirationMs(1);
         jwtProperties.setSecret("\"short-key-which-is-long-enough-for-test-purpose\"");
         JwtProvider shortLivedProvider = new JwtProvider(jwtProperties);
-        String token = shortLivedProvider.createAccessToken(1L, "a@a.com", "Test", "USER");
+        String token = shortLivedProvider.createAccessToken(1L, "a@a.com", "Test", USER);
 
         Thread.sleep(10); // 토큰 만료 기다림
 
@@ -67,7 +69,7 @@ class JwtProviderTest {
         Long userId = 84L;
         String email = "refresh@example.com";
         String memberName = "리프레시";
-        String role = "USER";
+        Role role = USER;
 
         // when
         String refreshToken = jwtProvider.createRefreshToken(userId, email, memberName, role);

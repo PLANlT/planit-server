@@ -1,4 +1,5 @@
 package com.planit.planit.config.jwt;
+import com.planit.planit.member.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +29,15 @@ public class JwtProvider {
         this.audiences = jwtProperties.getAudiences();
     }
 
-    public String createAccessToken(Long id, String email, String name, String role) {
+    public String createAccessToken(Long id, String email, String name, Role role) {
         return createToken(id, email, name, role, expirationMs);
     }
 
-    public String createRefreshToken(Long id, String email, String name, String role) {
+    public String createRefreshToken(Long id, String email, String name, Role role) {
         return createToken(id, email, name, role, refreshTokenExpirationMs);
     }
 
-    private String createToken(Long id, String email, String name, String role, long expirationMs) {
+    private String createToken(Long id, String email, String name, Role role, long expirationMs) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 

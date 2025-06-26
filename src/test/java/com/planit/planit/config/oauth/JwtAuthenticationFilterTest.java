@@ -52,7 +52,7 @@ class JwtAuthenticationFilterTest {
     void 유효한_AccessToken이_있으면_인증_객체가_생성된다() throws ServletException, IOException {
         // given
         Long userId = 1L;
-        String accessToken = jwtProvider.createAccessToken(userId, "user@example.com", "홍길동", "USER");
+        String accessToken = jwtProvider.createAccessToken(userId, "user@example.com", "홍길동", Role.USER);
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + accessToken); // ⬅ 수정됨
