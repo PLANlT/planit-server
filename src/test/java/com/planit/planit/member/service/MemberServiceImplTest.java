@@ -40,7 +40,7 @@ class MemberServiceImplTest {
 
     @Test
     @Order(1)
-    @DisplayName("신규 회원이면 회원가입 처리되고 isNewMember = true 를 반환한다")
+    @DisplayName("신규 회원이면 회원가입 처리되고 isNewMember = true 를 반환한다-성공")
     void register_newMember_returnsTrue() {
         // given
         Map<String, Object> attributes = Map.of(
@@ -63,7 +63,7 @@ class MemberServiceImplTest {
 
     @Test
     @Order(2)
-    @DisplayName("기존 회원이면 isNewMember = false 를 반환한다")
+    @DisplayName("기존 회원이면 isNewMember = false 를 반환한다-성공")
     void register_existingMember_returnsFalse() {
         // given
         Map<String, Object> attributes = Map.of(
