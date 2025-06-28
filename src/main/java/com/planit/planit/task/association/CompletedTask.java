@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.task.Task;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public class CompletedTask {
 
     protected CompletedTask() {}
 
+    @Builder
     public CompletedTask(Task task, LocalDate completedAt) {
         this.task = task;
         this.completedAt = completedAt;

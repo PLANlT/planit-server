@@ -27,19 +27,25 @@ public class TaskConverter {
                 .build();
     }
 
-    public static List<TaskResponseDTO.TaskStatusDTO> toTodayTaskListDTO(Plan plan, LocalDate today) {
-        return plan.getTasks().stream()
+    public static TaskResponseDTO.TodayTaskListDTO toTodayTaskListDTO(Plan plan, LocalDate today) {
+
+        List<TaskResponseDTO.TaskStatusDTO> todayTasks = plan.getTasks().stream()
                 // 플랜에서 오늘 루틴에 해당하는 작업만 필터링
                 .filter(task -> task.getRoutineDay().equals(today.getDayOfWeek()))
-                        // 오늘 완료된 작업이 있으면 true로 표시
-                        .map(task -> {
-                            List<Task> tasks = task.getCompletedTasks().stream()
-                                    .filter(completedTask -> completedTask.getCompletedAt().equals(today))
-                                    .map(CompletedTask::getTask)
-                                    .toList();
-                            return toTaskStatusDTO(task, !tasks.isEmpty());
-                        })
-                        .toList();
+                // 오늘 완료된 작업이 있으면 true로 표시
+                .map(task -> {
+                    List<Task> tasks = task.getCompletedTasks().stream()
+                            .filter(completedTask -> completedTask.getCompletedAt().equals(today))
+                            .map(CompletedTask::getTask)
+                            .toList();
+                    return toTaskStatusDTO(task, !tasks.isEmpty());
+                })
+                .toList();
+
+        return TaskResponseDTO.TodayTaskListDTO.builder()
+                .date(today)
+                .dayOfWeek(today.getDayOfWeek())
+                .build();
     }
 
     public static TaskResponseDTO.TaskStatusDTO toTaskStatusDTO(Task task, Boolean isCompleted) {
@@ -48,6 +54,14 @@ public class TaskConverter {
                 .title(task.getTitle())
                 .routineTime(task.getRoutineTime())
                 .isCompleted(isCompleted)
+                .build();
+    }
+
+    public static TaskResponseDTO.CompletedTaskDTO toCompletedTaskDTO(CompletedTask completedTask) {
+        return TaskResponseDTO.CompletedTaskDTO.builder()
+                .taskId(completedTask.getTask().getId())
+                .title(completedTask.getTask().getTitle())
+                .date(completedTask.getCompletedAt())
                 .build();
     }
 }
