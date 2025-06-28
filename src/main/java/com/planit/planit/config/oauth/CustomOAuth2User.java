@@ -1,5 +1,6 @@
 package com.planit.planit.config.oauth;
 
+import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,14 @@ public class CustomOAuth2User implements OAuth2User {
     private final OAuth2User delegate;
     @Getter
     private final SignType signType;
+    @Getter
+    private final Long id;
+    @Getter
+    private final String email;
+    @Getter
+    private final Role role;
+    @Getter
+    private final String memberName;
 
     @Override
     public Map<String, Object> getAttributes() {
