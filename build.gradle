@@ -54,6 +54,9 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core'
 	testImplementation 'org.mockito:mockito-junit-jupiter'
 
+	// 환경변수 다루기
+	implementation 'me.paulschwarz:spring-dotenv:2.2.0'
+
 
 
 }
