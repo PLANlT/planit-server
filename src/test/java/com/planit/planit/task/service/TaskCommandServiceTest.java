@@ -585,6 +585,7 @@ class TaskCommandServiceTest {
                 .task(task)
                 .completedAt(LocalDate.of(2025, 1, 1))
                 .build();
+        task.addCompletedTask(completedTask);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
         when(completedTaskRepository.findAllByTaskIdAndCompletedAt(1L, LocalDate.of(2025, 1, 1)))
@@ -628,6 +629,7 @@ class TaskCommandServiceTest {
                 .task(task)
                 .completedAt(LocalDate.of(2025, 1, 1))
                 .build();
+        task.addCompletedTask(completedTask);
 
         when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
