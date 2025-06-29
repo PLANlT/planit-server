@@ -359,6 +359,8 @@ class TaskCommandServiceTest {
                 .plan(plan)
                 .build();
 
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 3).getDayOfWeek(), null);
+
         completedTask = CompletedTask.builder()
                 .task(task)
                 .completedAt(LocalDate.of(2025, 1, 3))
@@ -402,6 +404,8 @@ class TaskCommandServiceTest {
                 .plan(plan)
                 .build();
 
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 3).getDayOfWeek(), null);
+
         completedTask = CompletedTask.builder()
                 .task(task)
                 .completedAt(LocalDate.of(2025, 1, 3))
@@ -440,6 +444,8 @@ class TaskCommandServiceTest {
                 .member(member1)
                 .plan(plan)
                 .build();
+
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 4).getDayOfWeek(), null);
 
         completedTask = CompletedTask.builder()
                 .task(task)
@@ -483,6 +489,8 @@ class TaskCommandServiceTest {
                 .member(member1)
                 .plan(plan)
                 .build();
+
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 5).getDayOfWeek(), null);
 
         completedTask = CompletedTask.builder()
                 .task(task)
@@ -553,6 +561,8 @@ class TaskCommandServiceTest {
                 .member(member1)
                 .plan(plan)
                 .build();
+
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 5).getDayOfWeek(), null);
 
         completedTask = CompletedTask.builder()
                 .task(task)
