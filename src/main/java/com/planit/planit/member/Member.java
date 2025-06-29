@@ -61,9 +61,6 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Long maxConsecutiveDays;                    // 연속일 최고기록
 
-//    @Column(nullable = false)
-//    private Integer perfectConsecutiveDays;             // 완벽 연속일
-
     @Column
     private LocalDateTime inactive;
 

@@ -135,11 +135,6 @@ public class PlanCommandServiceImpl implements PlanCommandService {
             throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
         }
 
-        // 삭제된 플랜인지 확인
-        if (plan.getPlanStatus().equals(PlanStatus.DELETED)) {
-            throw new PlanHandler(PlanErrorStatus.PLAN_DELETED);
-        }
-
         plan.deletePlan();
         planRepository.save(plan);
 
