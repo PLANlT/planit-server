@@ -36,18 +36,6 @@ public class PlanConverter {
                 .build();
     }
 
-    public static PlanResponseDTO.TodayPlanDTO toTodayPlanDTO(Plan plan) {
-        String dDay = formatDDay(LocalDate.now(), plan.getFinishedAt());
-        return PlanResponseDTO.TodayPlanDTO.builder()
-                .planId(plan.getId())
-                .title(plan.getTitle())
-                .dDay(dDay)
-                .tasks(plan.getTasks().stream()
-                        .map(TaskConverter::toTaskPreviewDTO)
-                        .toList())
-                .build();
-    }
-
     public static PlanResponseDTO.PlanMetaDTO toPlanMetaDTO(Plan plan) {
         return PlanResponseDTO.PlanMetaDTO.builder()
                 .planId(plan.getId())
@@ -60,11 +48,22 @@ public class PlanConverter {
                 .build();
     }
 
+    public static PlanResponseDTO.TodayPlanDTO toTodayPlanDTO(Plan plan, LocalDate today) {
+        String dDay = formatDDay(LocalDate.now(), plan.getFinishedAt());
+        return PlanResponseDTO.TodayPlanDTO.builder()
+                .planId(plan.getId())
+                .title(plan.getTitle())
+                .dDay(dDay)
+                .tasks(TaskConverter.toTodayTaskList(plan, today))
+                .build();
+    }
+
     public static PlanResponseDTO.TodayPlanListDTO toTodayPlanListDTO(LocalDate todayDate, List<Plan> plans) {
         return PlanResponseDTO.TodayPlanListDTO.builder()
                 .todayDate(todayDate)
+                .dayOfWeek(todayDate.getDayOfWeek())
                 .plans(plans.stream()
-                        .map(PlanConverter::toTodayPlanDTO)
+                        .map(plan -> PlanConverter.toTodayPlanDTO(plan, todayDate))
                         .toList())
                 .build();
     }

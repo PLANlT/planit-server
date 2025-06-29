@@ -58,6 +58,11 @@ public class PlanCommandServiceImpl implements PlanCommandService {
             throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
         }
 
+        // 삭제된 플랜인지 확인
+        if (plan.getPlanStatus().equals(PlanStatus.DELETED)) {
+            throw new PlanHandler(PlanErrorStatus.PLAN_DELETED);
+        }
+
         plan.updatePlan(
                 planDTO.getTitle(),
                 planDTO.getMotivation(),
@@ -84,6 +89,11 @@ public class PlanCommandServiceImpl implements PlanCommandService {
             throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
         }
 
+        // 삭제된 플랜인지 확인
+        if (plan.getPlanStatus().equals(PlanStatus.DELETED)) {
+            throw new PlanHandler(PlanErrorStatus.PLAN_DELETED);
+        }
+
         plan.completePlan();
         planRepository.save(plan);
 
@@ -102,6 +112,11 @@ public class PlanCommandServiceImpl implements PlanCommandService {
             throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
         }
 
+        // 삭제된 플랜인지 확인
+        if (plan.getPlanStatus().equals(PlanStatus.DELETED)) {
+            throw new PlanHandler(PlanErrorStatus.PLAN_DELETED);
+        }
+
         plan.pausePlan();
         planRepository.save(plan);
 
@@ -118,6 +133,11 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         // 로그인한 회원의 플랜인지 확인
         if (!memberId.equals(plan.getMember().getId())) {
             throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
+        }
+
+        // 삭제된 플랜인지 확인
+        if (plan.getPlanStatus().equals(PlanStatus.DELETED)) {
+            throw new PlanHandler(PlanErrorStatus.PLAN_DELETED);
         }
 
         plan.deletePlan();
