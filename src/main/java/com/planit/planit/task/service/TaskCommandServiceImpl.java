@@ -4,6 +4,8 @@ import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
 import com.planit.planit.common.api.plan.PlanHandler;
 import com.planit.planit.common.api.plan.status.PlanErrorStatus;
+import com.planit.planit.common.api.task.TaskHandler;
+import com.planit.planit.common.api.task.status.TaskErrorStatus;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
 import com.planit.planit.plan.Plan;
@@ -30,6 +32,7 @@ public class TaskCommandServiceImpl implements TaskCommandService {
 
     @Override
     public TaskResponseDTO.TaskPreviewDTO createTask(Long memberId, Long planId, String title) {
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
@@ -54,7 +57,22 @@ public class TaskCommandServiceImpl implements TaskCommandService {
 
     @Override
     public TaskResponseDTO.TaskPreviewDTO updateTaskTitle(Long memberId, Long taskId, String title) {
-        return null;
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskHandler(TaskErrorStatus.TASK_NOT_FOUND));
+
+        // 로그인한 회원의 작업인지 확인
+        if (!task.getPlan().getMember().getId().equals(member.getId())) {
+            throw new TaskHandler(TaskErrorStatus.MEMBER_TASK_NOT_FOUND);
+        }
+
+        // 작업명 업데이트
+        task.updateTaskTitle(title);
+
+        return TaskConverter.toTaskPreviewDTO(task);
     }
 
     @Override

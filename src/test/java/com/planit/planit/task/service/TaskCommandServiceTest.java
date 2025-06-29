@@ -192,6 +192,7 @@ class TaskCommandServiceTest {
                 .id(1L)
                 .title("작업1")
                 .member(member1)
+                .plan(plan)
                 .build();
 
         when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));

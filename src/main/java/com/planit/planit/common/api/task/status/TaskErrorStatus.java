@@ -5,6 +5,11 @@ import org.springframework.http.HttpStatus;
 
 public enum TaskErrorStatus implements ErrorResponse {
 
+    TASK_NOT_FOUND(HttpStatus.NOT_FOUND, "TASK4001", "작업을 찾을 수 없습니다."),
+    MEMBER_TASK_NOT_FOUND(HttpStatus.NOT_FOUND, "TASK4002", "사용자의 작업을 찾을 수 없습니다."),
+
+
+
     ;
 
     private final HttpStatus httpStatus;
