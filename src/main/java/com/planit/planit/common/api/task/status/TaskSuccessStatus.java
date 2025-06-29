@@ -11,6 +11,7 @@ public enum TaskSuccessStatus implements SuccessResponse {
     TASK_DELETED(HttpStatus.OK, "TASK2004", "작업을 삭제하였습니다."),
     TASK_COMPLETED(HttpStatus.CREATED, "TASK2005", "작업을 완료하였습니다."),
     TASK_COMPLETION_CANCELED(HttpStatus.OK, "TASK2006", "작업 완료를 취소하였습니다."),
+    TASK_ROUTINE_FOUND(HttpStatus.OK, "TASK2007", "작업 루틴을 조회하였습니다."),
 
 
     ;

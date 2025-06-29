@@ -78,7 +78,7 @@ public class TaskController {
     }
 
     @Operation(summary = "[TASK] 작업 완료 취소하기")
-    @PostMapping("/tasks/{taskId}/cancel-completion")
+    @PatchMapping("/tasks/{taskId}/cancel-completion")
     public ApiResponse<TaskResponseDTO.CompletedTaskDTO> cancelTaskCompletion(
             @PathVariable Long taskId
     ) {
@@ -86,5 +86,15 @@ public class TaskController {
         LocalDate today = LocalDate.now();
         TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService.cancelTaskCompletion(memberId, taskId, today);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_COMPLETION_CANCELED, completedTaskDTO);
+    }
+
+    @Operation(summary = "[TASK] 루틴 조회하기")
+    @GetMapping("/tasks/{taskId}/routine")
+    public ApiResponse<TaskResponseDTO.TaskRoutineDTO> getCurrentRoutine(
+            @PathVariable Long taskId
+    ) {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        TaskResponseDTO.TaskRoutineDTO taskRoutineDTO = taskQueryService.getCurrentRoutine(memberId, taskId);
+        return ApiResponse.onSuccess(TaskSuccessStatus.TASK_ROUTINE_FOUND, taskRoutineDTO);
     }
 }

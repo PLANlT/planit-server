@@ -73,6 +73,11 @@ public class TaskCommandServiceImpl implements TaskCommandService {
             throw new TaskHandler(TaskErrorStatus.MEMBER_TASK_NOT_FOUND);
         }
 
+        // 삭제된 작업인지 확인
+        if (task.getDeletedAt() != null) {
+            throw new TaskHandler(TaskErrorStatus.TASK_DELETED);
+        }
+
         // 작업명 업데이트
         task.updateTaskTitle(title);
 
@@ -91,6 +96,11 @@ public class TaskCommandServiceImpl implements TaskCommandService {
         // 로그인한 회원의 작업인지 확인
         if (!task.getPlan().getMember().getId().equals(member.getId())) {
             throw new TaskHandler(TaskErrorStatus.MEMBER_TASK_NOT_FOUND);
+        }
+
+        // 삭제된 작업인지 확인
+        if (task.getDeletedAt() != null) {
+            throw new TaskHandler(TaskErrorStatus.TASK_DELETED);
         }
 
         // 루틴 설정
@@ -117,6 +127,11 @@ public class TaskCommandServiceImpl implements TaskCommandService {
             throw new TaskHandler(TaskErrorStatus.MEMBER_TASK_NOT_FOUND);
         }
 
+        // 삭제된 작업인지 확인
+        if (task.getDeletedAt() != null) {
+            throw new TaskHandler(TaskErrorStatus.TASK_DELETED);
+        }
+
         // 작업 삭제
         task.deleteTask();
 
@@ -135,6 +150,16 @@ public class TaskCommandServiceImpl implements TaskCommandService {
         // 로그인한 회원의 작업인지 확인
         if (!task.getPlan().getMember().getId().equals(member.getId())) {
             throw new TaskHandler(TaskErrorStatus.MEMBER_TASK_NOT_FOUND);
+        }
+
+        // 삭제된 작업인지 확인
+        if (task.getDeletedAt() != null) {
+            throw new TaskHandler(TaskErrorStatus.TASK_DELETED);
+        }
+
+        // 오늘 루틴에 해당하는 작업인지 확인
+        if (!task.getRoutineDay().equals(today.getDayOfWeek())) {
+            throw new TaskHandler(TaskErrorStatus.NOT_ROUTINE_OF_TODAY);
         }
 
         // 작업 완료 처리
@@ -189,6 +214,11 @@ public class TaskCommandServiceImpl implements TaskCommandService {
         // 로그인한 회원의 작업인지 확인
         if (!task.getPlan().getMember().getId().equals(member.getId())) {
             throw new TaskHandler(TaskErrorStatus.MEMBER_TASK_NOT_FOUND);
+        }
+
+        // 삭제된 작업인지 확인
+        if (task.getDeletedAt() != null) {
+            throw new TaskHandler(TaskErrorStatus.TASK_DELETED);
         }
 
         // 완료된 작업 정보 삭제
