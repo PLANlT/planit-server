@@ -1,5 +1,6 @@
 package com.planit.planit.member.association;
 
+import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.enums.GuiltyFreeReason;
 import jakarta.annotation.Nullable;
@@ -7,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -26,10 +28,7 @@ public class GuiltyFree {
     private GuiltyFreeReason reason;
 
     @Column
-    private LocalDateTime active;
-
-    @Column
-    private LocalDateTime inactive;
+    private LocalDate active;
 
 /*------------------------------ CONSTRUCTOR ------------------------------*/
 
@@ -39,23 +38,18 @@ public class GuiltyFree {
     public GuiltyFree(
             Member member,
             GuiltyFreeReason reason,
-            @Nullable LocalDateTime active,
-            @Nullable LocalDateTime inactive
+            @Nullable LocalDate active
     ) {
         this.memberId = member.getId();
         this.member = member;
         this.reason = reason;
         this.active = active;
-        this.inactive = inactive;
     }
 
 /*------------------------------ METHOD ------------------------------*/
 
-    public void activate() {
-        this.active = LocalDateTime.now();
-    }
-
-    public void inactivate() {
-        this.inactive = LocalDateTime.now();
+    public void activate(GuiltyFreeReason reason, LocalDate active) {
+        this.reason = reason;
+        this.active = active;
     }
 }
