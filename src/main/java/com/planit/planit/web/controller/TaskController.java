@@ -11,6 +11,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/planit")
@@ -69,7 +72,8 @@ public class TaskController {
             @PathVariable Long taskId
     ) {
         Long memberId = 1L; // 인증 기능 구현 이후 변경
-        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService.completeTask(memberId, taskId);
+        LocalDate today = LocalDate.now();
+        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService.completeTask(memberId, taskId, today);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_COMPLETED, completedTaskDTO);
     }
 
@@ -79,7 +83,8 @@ public class TaskController {
             @PathVariable Long taskId
     ) {
         Long memberId = 1L; // 인증 기능 구현 이후 변경
-        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService.cancelTaskCompletion(memberId, taskId);
+        LocalDate today = LocalDate.now();
+        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService.cancelTaskCompletion(memberId, taskId, today);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_COMPLETION_CANCELED, completedTaskDTO);
     }
 }

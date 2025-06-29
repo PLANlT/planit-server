@@ -3,6 +3,8 @@ package com.planit.planit.task.service;
 import com.planit.planit.web.dto.task.TaskRequestDTO;
 import com.planit.planit.web.dto.task.TaskResponseDTO;
 
+import java.time.LocalDate;
+
 public interface TaskCommandService {
 
     // 작업 생성하기
@@ -18,8 +20,8 @@ public interface TaskCommandService {
     TaskResponseDTO.TaskPreviewDTO deleteTask(Long memberId, Long taskId);
 
     // 작업 완료하기
-    TaskResponseDTO.CompletedTaskDTO completeTask(Long memberId, Long taskId);
+    TaskResponseDTO.CompletedTaskDTO completeTask(Long memberId, Long taskId, LocalDate today);
 
     // 작업 완료 취소하기
-    TaskResponseDTO.CompletedTaskDTO cancelTaskCompletion(Long memberId, Long taskId);
+    TaskResponseDTO.CompletedTaskDTO cancelTaskCompletion(Long memberId, Long taskId, LocalDate today);
 }

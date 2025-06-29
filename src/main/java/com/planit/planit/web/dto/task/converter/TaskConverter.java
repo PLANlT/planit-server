@@ -57,11 +57,12 @@ public class TaskConverter {
                 .build();
     }
 
-    public static TaskResponseDTO.CompletedTaskDTO toCompletedTaskDTO(CompletedTask completedTask) {
+    public static TaskResponseDTO.CompletedTaskDTO toCompletedTaskDTO(CompletedTask completedTask, Boolean isCompleted) {
         return TaskResponseDTO.CompletedTaskDTO.builder()
                 .taskId(completedTask.getTask().getId())
                 .title(completedTask.getTask().getTitle())
                 .date(completedTask.getCompletedAt())
+                .isCompleted(isCompleted)
                 .build();
     }
 }

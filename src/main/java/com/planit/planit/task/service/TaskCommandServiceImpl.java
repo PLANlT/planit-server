@@ -11,6 +11,7 @@ import com.planit.planit.member.MemberRepository;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
+import com.planit.planit.task.association.CompletedTask;
 import com.planit.planit.task.repository.CompletedTaskRepository;
 import com.planit.planit.task.repository.TaskRepository;
 import com.planit.planit.web.dto.task.TaskRequestDTO;
@@ -19,6 +20,9 @@ import com.planit.planit.web.dto.task.converter.TaskConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @Transactional
@@ -120,12 +124,54 @@ public class TaskCommandServiceImpl implements TaskCommandService {
     }
 
     @Override
-    public TaskResponseDTO.CompletedTaskDTO completeTask(Long memberId, Long taskId) {
-        return null;
+    public TaskResponseDTO.CompletedTaskDTO completeTask(Long memberId, Long taskId, LocalDate today) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskHandler(TaskErrorStatus.TASK_NOT_FOUND));
+
+        // 로그인한 회원의 작업인지 확인
+        if (!task.getPlan().getMember().getId().equals(member.getId())) {
+            throw new TaskHandler(TaskErrorStatus.MEMBER_TASK_NOT_FOUND);
+        }
+
+        // 작업 완료 처리
+        CompletedTask completedTask = createCompletedTask(today, task);
+
+        // 연속일 정보 업데이트
+        member.updateConsecutiveDays(today);
+
+        return TaskConverter.toCompletedTaskDTO(completedTask, true);
+    }
+
+    private CompletedTask createCompletedTask(LocalDate today, Task task) {
+
+        // 오늘 완료된 작업 목록 조회
+        List<CompletedTask> completedTasks = task.getCompletedTasks().stream()
+                .filter(completedTask -> completedTask.getTask().getId().equals(task.getId()))    // 선택된 작업
+                .filter(completedTask ->                                                    // 오늘 작업
+                        completedTask.getCompletedAt().equals(today))
+                .toList();
+
+        // 이미 완료된 작업은 완료 처리 불가
+        if (!completedTasks.isEmpty()) {
+            throw new TaskHandler(TaskErrorStatus.TASK_ALREADY_COMPLETED);
+        }
+
+        // 작업 완료 정보 저장
+        CompletedTask completedTask = CompletedTask.builder()
+                .task(task)
+                .completedAt(today)
+                .build();
+
+        completedTaskRepository.save(completedTask);
+
+        return completedTask;
     }
 
     @Override
-    public TaskResponseDTO.CompletedTaskDTO cancelTaskCompletion(Long memberId, Long taskId) {
+    public TaskResponseDTO.CompletedTaskDTO cancelTaskCompletion(Long memberId, Long taskId, LocalDate today) {
         return null;
     }
 }

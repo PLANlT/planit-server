@@ -7,7 +7,7 @@ public enum TaskErrorStatus implements ErrorResponse {
 
     TASK_NOT_FOUND(HttpStatus.NOT_FOUND, "TASK4001", "작업을 찾을 수 없습니다."),
     MEMBER_TASK_NOT_FOUND(HttpStatus.NOT_FOUND, "TASK4002", "사용자의 작업을 찾을 수 없습니다."),
-
+    TASK_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "TASK4003", "이미 완료된 작업입니다.")
 
 
     ;
