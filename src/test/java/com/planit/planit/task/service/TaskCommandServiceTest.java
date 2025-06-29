@@ -1,5 +1,6 @@
 package com.planit.planit.task.service;
 
+import com.planit.planit.common.api.plan.PlanHandler;
 import com.planit.planit.common.api.task.TaskHandler;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
@@ -139,7 +140,7 @@ class TaskCommandServiceTest {
         when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         // when & then
-        assertThrows(TaskHandler.class, () ->
+        assertThrows(PlanHandler.class, () ->
                 taskCommandService.createTask(2L,1L, "작업1"));
     }
 
@@ -161,7 +162,7 @@ class TaskCommandServiceTest {
 
         // when
         TaskResponseDTO.TaskPreviewDTO result = taskCommandService
-                .updateTaskTitle(1L, 1L, 1L, "변경된 작업");
+                .updateTaskTitle(1L, 1L, "변경된 작업");
 
         // then
         assertNotNull(result);
@@ -179,7 +180,7 @@ class TaskCommandServiceTest {
 
         // when & then
         assertThrows(TaskHandler.class, () ->
-                taskCommandService.updateTaskTitle(1L, 1L, 1L, "변경된 작업"));
+                taskCommandService.updateTaskTitle(1L, 1L, "변경된 작업"));
     }
 
     @Test
@@ -198,7 +199,7 @@ class TaskCommandServiceTest {
 
         // when & then
         assertThrows(TaskHandler.class, () ->
-                taskCommandService.updateTaskTitle(2L, 1L, 1L, "변경된 작업"));
+                taskCommandService.updateTaskTitle(2L, 1L, "변경된 작업"));
     }
 
 /*------------------------------ 루틴 설정 ------------------------------*/
@@ -224,7 +225,7 @@ class TaskCommandServiceTest {
                 .build();
 
         // when
-        TaskResponseDTO.TaskRoutineDTO result = taskCommandService.setRoutine(1L, 1L, 1L, routineDTO);
+        TaskResponseDTO.TaskRoutineDTO result = taskCommandService.setRoutine(1L, 1L, routineDTO);
 
         // then
         assertNotNull(result);
@@ -249,7 +250,7 @@ class TaskCommandServiceTest {
 
         // when & then
         assertThrows(TaskHandler.class, () ->
-                taskCommandService.setRoutine(1L, 1L, 1L, routineDTO));
+                taskCommandService.setRoutine(1L, 1L, routineDTO));
     }
 
     @Test
@@ -275,7 +276,7 @@ class TaskCommandServiceTest {
 
         // when & then
         assertThrows(TaskHandler.class, () ->
-                taskCommandService.setRoutine(2L, 1L, 1L, routineDTO));
+                taskCommandService.setRoutine(2L, 1L, routineDTO));
     }
 
 /*------------------------------ 작업 삭제 ------------------------------*/
@@ -295,7 +296,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
         // when
-        TaskResponseDTO.TaskPreviewDTO result = taskCommandService.deleteTask(1L, 1L, 1L);
+        TaskResponseDTO.TaskPreviewDTO result = taskCommandService.deleteTask(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -310,7 +311,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(1L, 1L));
     }
 
     @Test
@@ -329,7 +330,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(1L, 1L));
     }
 
 /*------------------------------ 작업 완료 ------------------------------*/
@@ -357,7 +358,7 @@ class TaskCommandServiceTest {
                 .thenReturn(List.of());
 
         // when
-        TaskResponseDTO.CompletedTaskDTO result = taskCommandService.completeTask(1L, 1L, 1L);
+        TaskResponseDTO.CompletedTaskDTO result = taskCommandService.completeTask(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -374,7 +375,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(1L, 1L));
 
     }
 
@@ -396,7 +397,7 @@ class TaskCommandServiceTest {
                 .thenReturn(List.of());
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(2L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(2L, 1L));
     }
 
     @Test
@@ -421,7 +422,7 @@ class TaskCommandServiceTest {
                 .thenReturn(List.of(completedTask));
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(1L, 1L));
     }
 
 /*------------------------------ 작업 완료 취소 ------------------------------*/
@@ -449,7 +450,7 @@ class TaskCommandServiceTest {
 
         // when
         TaskResponseDTO.CompletedTaskDTO result = taskCommandService
-                .cancelTaskCompletion(1L, 1L, 1L);
+                .cancelTaskCompletion(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -466,7 +467,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(1L, 1L));
     }
 
     @Test
@@ -493,7 +494,7 @@ class TaskCommandServiceTest {
 
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(2L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(2L,  1L));
     }
 
     @Test
@@ -519,7 +520,7 @@ class TaskCommandServiceTest {
 
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(1L, 1L));
 
     }
 }
