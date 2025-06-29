@@ -331,7 +331,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(2L, 1L));
     }
 
 /*------------------------------ 작업 완료 ------------------------------*/
