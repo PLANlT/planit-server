@@ -77,7 +77,26 @@ public class TaskCommandServiceImpl implements TaskCommandService {
 
     @Override
     public TaskResponseDTO.TaskRoutineDTO setRoutine(Long memberId, Long taskId, TaskRequestDTO.RoutineDTO routineDTO) {
-        return null;
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskHandler(TaskErrorStatus.TASK_NOT_FOUND));
+
+        // 로그인한 회원의 작업인지 확인
+        if (!task.getPlan().getMember().getId().equals(member.getId())) {
+            throw new TaskHandler(TaskErrorStatus.MEMBER_TASK_NOT_FOUND);
+        }
+
+        // 루틴 설정
+        task.setRoutine(
+                routineDTO.getTaskType(),
+                routineDTO.getRoutineDay(),
+                routineDTO.getRoutineTime()
+        );
+
+        return TaskConverter.toTaskRoutineDTO(task);
     }
 
     @Override
