@@ -30,7 +30,26 @@ public class TaskCommandServiceImpl implements TaskCommandService {
 
     @Override
     public TaskResponseDTO.TaskPreviewDTO createTask(Long memberId, Long planId, String title) {
-        return null;
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
+
+        // 로그인한 회원의 플랜인지 확인
+        if (!plan.getMember().getId().equals(member.getId())) {
+            throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
+        }
+
+        // 새로운 작업 생성
+        Task task = Task.builder()
+                .title(title)
+                .member(member)
+                .plan(plan)
+                .build();
+
+        task = taskRepository.save(task);
+        return TaskConverter.toTaskPreviewDTO(task);
     }
 
     @Override
