@@ -1,7 +1,6 @@
 package com.planit.planit.task.association;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.task.Task;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -26,6 +25,9 @@ public class CompletedTask {
     @JsonBackReference
     private Task task;
 
+    @Column
+    private Boolean isDeleted;
+
 /*------------------------------ CONSTRUCTOR ------------------------------*/
 
     protected CompletedTask() {}
@@ -34,5 +36,16 @@ public class CompletedTask {
     public CompletedTask(Task task, LocalDate completedAt) {
         this.task = task;
         this.completedAt = completedAt;
+        this.isDeleted = false;
+    }
+
+/*------------------------------ METHOD ------------------------------*/
+
+    public void setIsDeletedFalse() {
+        this.isDeleted = true;
+    }
+
+    public void setIsDeletedTrue() {
+        this.isDeleted = false;
     }
 }

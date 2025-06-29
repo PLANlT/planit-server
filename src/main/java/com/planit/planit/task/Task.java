@@ -101,4 +101,8 @@ public class Task extends BaseEntity {
     public void deleteTask() {
         this.deletedAt = LocalDateTime.now();
     }
+
+    public void deleteCompletedTasks(List<CompletedTask> completedTasks) {
+        completedTasks.forEach(CompletedTask::setIsDeletedFalse);
+    }
 }
