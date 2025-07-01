@@ -1,3 +1,4 @@
+
 package com.planit.planit.member.service;
 
 import com.planit.planit.config.jwt.JwtProvider;
@@ -136,3 +137,4 @@ class MemberServiceImplTest {
         verify(jwtProvider).createRefreshToken(any(), any(), any(), any());
     }
 }
+
