@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -26,14 +27,18 @@ class OAuth2SuccessHandlerTest {
     @InjectMocks
     private OAuth2SuccessHandler successHandler;
 
+
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
+
+    @Mock
     private MemberService memberService;
 
     @BeforeEach
-    void setup() {
+    void setUp() {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
+
     }
 
 
@@ -105,4 +110,3 @@ class OAuth2SuccessHandlerTest {
     }
 }
 
-}
