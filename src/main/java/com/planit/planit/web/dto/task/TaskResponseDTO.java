@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -36,8 +37,9 @@ public class TaskResponseDTO {
     @Builder
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static class TodayTaskListDTO {
-        private final List<TaskStatusDTO> completedTasks;
-        private final List<TaskStatusDTO> uncompletedTasks;
+        private final LocalDate date;
+        private final DayOfWeek dayOfWeek;
+        private final List<TaskStatusDTO> tasks;
     }
 
     @Getter
@@ -47,6 +49,16 @@ public class TaskResponseDTO {
         private final Long taskId;
         private final String title;
         private final LocalTime routineTime;
+        private final Boolean isCompleted;
+    }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class CompletedTaskDTO {
+        private final Long taskId;
+        private final String title;
+        private final LocalDate date;
         private final Boolean isCompleted;
     }
 }
