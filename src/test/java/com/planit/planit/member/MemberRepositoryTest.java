@@ -25,7 +25,7 @@ class MemberRepositoryTest {
 
     @Test
     @Order(1)
-    @DisplayName("새로운 멤버 저장 가능(성공)")
+    @DisplayName("새로운 멤버 저장 가능-성공")
     @Transactional
     public void testSaveMember(){
         //given
@@ -51,7 +51,7 @@ class MemberRepositoryTest {
 
     @Test
     @Order(2)
-    @DisplayName("이메일로 멤버를 조회할 수 있다")
+    @DisplayName("이메일로 멤버를 조회할 수 있다-성공")
     @Transactional
     void testFindByEmail_ExistingMember() {
         // Given
@@ -75,7 +75,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 이메일로 조회 시 비어있는 Optional을 반환한다")
+    @DisplayName("존재하지 않는 이메일로 조회 시 비어있는 Optional을 반환한다-성공")
     @Order(3)
     @Transactional
     void testFindByEmail_NonExistingMember() {
@@ -89,7 +89,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    @DisplayName("중복된 이메일로 저장 시 예외가 발생한다")
+    @DisplayName("중복된 이메일로 저장 시 예외가 발생한다-성공")
     @Order(4)
     @Transactional
     void testSaveDuplicateEmailThrowsException() {
