@@ -1,0 +1,11 @@
+<h2>기존 로그인 성공</h2>
+<p id="access"></p>
+<p id="refresh"></p>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById("access").innerText = "AccessToken: " + params.get("accessToken");
+    document.getElementById("refresh").innerText = "RefreshToken: " + params.get("refreshToken");
+</script>
+
+

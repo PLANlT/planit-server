@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입 성공</title>
+</head>
+<body>
+<h2>신규 회원가입 🎉</h2>
+<p id="user-name"></p>
+<p id="user-email"></p>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const name = decodeURIComponent(params.get("name"));
+    const email = decodeURIComponent(params.get("email"));
+
+    document.getElementById("user-name").innerText = `이름: ${name}`;
+    document.getElementById("user-email").innerText = `이메일: ${email}`;
+</script>
+</body>
+</html>
