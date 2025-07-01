@@ -43,7 +43,7 @@ class OAuth2SuccessHandlerTest {
 
 
     @Test
-    @DisplayName("기존회원이면_로그인링크로_리디렉션")
+    @DisplayName("기존회원이면_로그인링크로_리디렉션 - 성공")
     void 기존회원이면_login딥링크로_리디렉션한다() throws Exception {
         // given
         CustomOAuth2User principal = new CustomOAuth2User(
@@ -77,6 +77,7 @@ class OAuth2SuccessHandlerTest {
     }
 
     @Test
+    @DisplayName("신규회원이면_회원가입링크로_리디렉션-성공")
     void 신규회원이면_register딥링크로_리디렉션한다() throws Exception {
         // given
         CustomOAuth2User principal = new CustomOAuth2User(

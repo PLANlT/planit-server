@@ -11,11 +11,17 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-    private MemberService memberService;
+    private final MemberService memberService;
+
+    public OAuth2SuccessHandler(MemberService memberService) {
+        this.memberService = memberService;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -23,14 +29,16 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
         OAuthLoginDTO.Response loginResult = memberService.checkOAuthMember(oAuth2User);
+        String encodedName = URLEncoder.encode(loginResult.getName(), StandardCharsets.UTF_8);
+        String encodedEmail = URLEncoder.encode(loginResult.getEmail(), StandardCharsets.UTF_8);
 
         String redirectUri;
         if (loginResult.isNewMember()) {
-            redirectUri = "yourapp://register"
-                    + "?email=" + loginResult.getEmail()
-                    + "&name=" + loginResult.getName();
+            redirectUri = "http://localhost:8080/register.html" //TODO: 추후 수정
+                    + "?email=" + encodedEmail
+                    + "&name=" + encodedName;
         } else {
-            redirectUri = "yourapp://login"
+            redirectUri = "http://localhost:8080/login.html"    //TODO: 추후 수정
                     + "?accessToken=" + loginResult.getAccessToken()
                     + "&refreshToken=" + loginResult.getRefreshToken();
         }
