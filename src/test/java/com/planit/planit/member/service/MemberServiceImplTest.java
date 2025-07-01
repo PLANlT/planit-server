@@ -1,3 +1,4 @@
+
 package com.planit.planit.member.service;
 
 import com.planit.planit.auth.FakeCustomOAuth2User;
@@ -99,3 +100,4 @@ class MemberServiceImplTest {
         verify(jwtProvider).createRefreshToken(any(), any(), any(), any());
     }
 }
+
