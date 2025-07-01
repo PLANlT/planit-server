@@ -15,7 +15,5 @@ public interface MemberService {
     //로그인인지 회원가입인지 감지
     OAuthLoginDTO.Response checkOAuthMember(CustomOAuth2User oAuth2User);
 
-    OAuthLoginDTO.Response checkOAuthMember(OAuth2User oAuth2User, SignType signType);
-
     OAuthLoginDTO.Response registerOAuthMember(CustomOAuth2User oAuth2User, TermAgreementDTO.Request request);
 }

@@ -67,10 +67,7 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    @Override
-    public OAuthLoginDTO.Response checkOAuthMember(OAuth2User oAuth2User, SignType signType) {
-        return null;
-    }
+
 
     @Override
     public OAuthLoginDTO.Response registerOAuthMember(CustomOAuth2User oAuth2User, TermAgreementDTO.Request request) {

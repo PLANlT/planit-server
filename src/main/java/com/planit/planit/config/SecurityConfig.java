@@ -24,11 +24,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        //TODO: 배포 시 사용 범위 제한
-        http.authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests.anyRequest().permitAll() )
-                .cors(cors -> cors.disable()) //TODO: 배포 시 CORS 설정
+        http
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin())  // ✅ 최신 방식으로 iframe 허용
+                )
                 .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .anyRequest().permitAll()
+                )
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
@@ -39,4 +43,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }
