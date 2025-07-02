@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -99,5 +99,43 @@ class MemberServiceImplTest {
         verify(jwtProvider).createAccessToken(any(), any(), any(), any());
         verify(jwtProvider).createRefreshToken(any(), any(), any(), any());
     }
+
+    @Nested
+    @DisplayName("signOut 메서드는")
+    class Logout {
+
+        @Test
+        @DisplayName("정상적으로 로그아웃 처리가 된다면 예외 없이 동작한다")
+        void logout_success_doesNotThrow() {
+            // given
+            Long memberId = 1L;
+
+            // when & then
+            assertThatCode(() -> memberServiceImpl.signOut(memberId))
+                    .doesNotThrowAnyException();
+        }
+
+        @Test
+        @DisplayName("로그아웃 도중 예외가 발생하면 그대로 전파된다")
+        void logout_throwsException_ifRepositoryFails() {
+            // given
+            Long memberId = 2L;
+
+            // RefreshTokenRepository가 있다면 예: mock으로 설정
+            RefreshTokenRepository refreshTokenRepository = mock(RefreshTokenRepository.class);
+            memberServiceImpl = new MemberServiceImpl(memberRepository, jwtProvider, refreshTokenRepository); // 생성자 주입 방식일 경우
+
+            // 예외 발생 설정
+            Mockito.doThrow(new RuntimeException("DB 오류"))
+                    .when(refreshTokenRepository).deleteById(memberId);
+
+            // when & then
+            assertThatThrownBy(() -> memberServiceImpl.logout(memberId))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("DB 오류");
+        }
+    }
+
+
 }
 
