@@ -13,8 +13,8 @@ spring:
 
           kakao:
             client-id: ${OAUTH2_KAKAO_CLIENT_ID}
-            client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET:}
-            redirect-uri: "{baseUrl}/login/oauth2/code/kakao"
+#            client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET:}
+            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
             authorization-grant-type: authorization_code
             client-authentication-method: POST
             scope:
@@ -24,7 +24,7 @@ spring:
           naver:
             client-id: ${OAUTH2_NAVER_CLIENT_ID}
             client-secret: ${OAUTH2_NAVER_CLIENT_SECRET}
-            redirect-uri: "{baseUrl}/login/oauth2/code/naver"
+            redirect-uri: "http://localhost:8080/login/oauth2/code/naver"
             authorization-grant-type: authorization_code
             scope:
               - name
