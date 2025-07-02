@@ -36,15 +36,6 @@ public class TaskResponseDTO {
     @Getter
     @Builder
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class TodayTaskListDTO {
-        private final LocalDate date;
-        private final DayOfWeek dayOfWeek;
-        private final List<TaskStatusDTO> tasks;
-    }
-
-    @Getter
-    @Builder
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static class TaskStatusDTO {
         private final Long taskId;
         private final String title;

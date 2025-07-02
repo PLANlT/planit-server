@@ -14,11 +14,14 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.planit.planit.member.enums.Role;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -47,16 +50,16 @@ public class Member extends BaseEntity {
     private DailyCondition dailyCondition;
 
     @Column
-    private LocalDateTime lastAttendanceDate;           // 마지막 출석일
+    private LocalDate lastAttendanceDate;               // 최근 출석일
 
     @Column
-    private Integer currentConsecutiveDays;             // 현재 연속일
+    private LocalDate attendanceStartedAt;              // 연속 출석 시작일
+
+    @Column
+    private LocalDate lastGuiltyFreeDate;               // 최근 길티프리 실행일
 
     @Column(nullable = false)
-    private Integer maxConsecutiveDays;                 // 연속일 최고기록
-
-    @Column(nullable = false)
-    private Integer perfectConsecutiveDays;             // 완벽 연속일
+    private Long maxConsecutiveDays;                    // 연속일 최고기록
 
     @Column
     private LocalDateTime inactive;
@@ -68,9 +71,11 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Setter
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private GuiltyFree guiltyFree;
 
+    @Setter
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Term term;
 
@@ -107,9 +112,7 @@ public class Member extends BaseEntity {
         this.signType = signType;
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
-        this.currentConsecutiveDays = 0;
-        this.maxConsecutiveDays = 0;
-        this.perfectConsecutiveDays = 0;
+        this.maxConsecutiveDays = 0L;
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();
@@ -122,4 +125,54 @@ public class Member extends BaseEntity {
     public void inactivate() {
         this.inactive = LocalDateTime.now();
     }
+
+    public void activateGuiltyFree(GuiltyFreeReason reason, LocalDate today) {
+        // 길티프리 활성화
+        guiltyFree.activate(reason, today);
+        lastGuiltyFreeDate = today;
+
+        // 최대 연속일을 연장해야 하는 경우
+        long consecutiveDays = ChronoUnit.DAYS.between(attendanceStartedAt, today);
+        if (isConsecutiveAttendance(today) && consecutiveDays == maxConsecutiveDays) {
+            maxConsecutiveDays = maxConsecutiveDays + 1;
+        }
+    }
+
+    public void updateConsecutiveDays(LocalDate today) {
+
+        // 최초 출석인 경우
+        if (lastAttendanceDate == null || attendanceStartedAt == null) {
+            lastAttendanceDate = today;
+            attendanceStartedAt = today;
+            maxConsecutiveDays = 1L;
+            return ;
+        }
+
+        // 연속 출석인 경우
+        if (isConsecutiveAttendance(today)) {
+            // 현재까지의 기록이 최대 연속일인 경우 갱신
+            long consecutiveDays = ChronoUnit.DAYS.between(attendanceStartedAt, today);
+            if (consecutiveDays == maxConsecutiveDays) {
+                maxConsecutiveDays = maxConsecutiveDays + 1;
+            }
+        } else {
+            // 연속 출석 시작일을 오늘로 설정
+            attendanceStartedAt = today;
+        }
+
+        // 최근 출석일을 오늘로 업데이트
+        lastAttendanceDate = today;
+    }
+
+    private boolean isConsecutiveAttendance(LocalDate today) {
+        // 길티프리를 사용한 적이 있는 경우 길티프리 날짜 확인
+        if (lastGuiltyFreeDate != null) {
+            return lastAttendanceDate.plusDays(1).equals(today) || (
+                    lastAttendanceDate.plusDays(2).equals(today) &&
+                    lastGuiltyFreeDate.plusDays(1).equals(today));
+        }
+        return lastAttendanceDate.plusDays(1).equals(today);
+    }
+
+
 }

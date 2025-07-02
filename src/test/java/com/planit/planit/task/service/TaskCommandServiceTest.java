@@ -1,8 +1,11 @@
 package com.planit.planit.task.service;
 
+import com.planit.planit.common.api.plan.PlanHandler;
 import com.planit.planit.common.api.task.TaskHandler;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.association.GuiltyFree;
+import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
@@ -84,6 +87,12 @@ class TaskCommandServiceTest {
                 .password("password")
                 .guiltyFreeMode(false)
                 .build();
+
+        GuiltyFree guiltyFree = GuiltyFree.builder()
+                .member(member1)
+                .reason(GuiltyFreeReason.NONE)
+                .build();
+        member1.setGuiltyFree(guiltyFree);
     }
 
     private void initPlan() {
@@ -139,7 +148,7 @@ class TaskCommandServiceTest {
         when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         // when & then
-        assertThrows(TaskHandler.class, () ->
+        assertThrows(PlanHandler.class, () ->
                 taskCommandService.createTask(2L,1L, "작업1"));
     }
 
@@ -161,7 +170,7 @@ class TaskCommandServiceTest {
 
         // when
         TaskResponseDTO.TaskPreviewDTO result = taskCommandService
-                .updateTaskTitle(1L, 1L, 1L, "변경된 작업");
+                .updateTaskTitle(1L, 1L, "변경된 작업");
 
         // then
         assertNotNull(result);
@@ -179,7 +188,7 @@ class TaskCommandServiceTest {
 
         // when & then
         assertThrows(TaskHandler.class, () ->
-                taskCommandService.updateTaskTitle(1L, 1L, 1L, "변경된 작업"));
+                taskCommandService.updateTaskTitle(1L, 1L, "변경된 작업"));
     }
 
     @Test
@@ -191,6 +200,7 @@ class TaskCommandServiceTest {
                 .id(1L)
                 .title("작업1")
                 .member(member1)
+                .plan(plan)
                 .build();
 
         when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
@@ -198,7 +208,7 @@ class TaskCommandServiceTest {
 
         // when & then
         assertThrows(TaskHandler.class, () ->
-                taskCommandService.updateTaskTitle(2L, 1L, 1L, "변경된 작업"));
+                taskCommandService.updateTaskTitle(2L, 1L, "변경된 작업"));
     }
 
 /*------------------------------ 루틴 설정 ------------------------------*/
@@ -224,7 +234,7 @@ class TaskCommandServiceTest {
                 .build();
 
         // when
-        TaskResponseDTO.TaskRoutineDTO result = taskCommandService.setRoutine(1L, 1L, 1L, routineDTO);
+        TaskResponseDTO.TaskRoutineDTO result = taskCommandService.setRoutine(1L, 1L, routineDTO);
 
         // then
         assertNotNull(result);
@@ -249,7 +259,7 @@ class TaskCommandServiceTest {
 
         // when & then
         assertThrows(TaskHandler.class, () ->
-                taskCommandService.setRoutine(1L, 1L, 1L, routineDTO));
+                taskCommandService.setRoutine(1L, 1L, routineDTO));
     }
 
     @Test
@@ -275,7 +285,7 @@ class TaskCommandServiceTest {
 
         // when & then
         assertThrows(TaskHandler.class, () ->
-                taskCommandService.setRoutine(2L, 1L, 1L, routineDTO));
+                taskCommandService.setRoutine(2L, 1L, routineDTO));
     }
 
 /*------------------------------ 작업 삭제 ------------------------------*/
@@ -295,7 +305,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
         // when
-        TaskResponseDTO.TaskPreviewDTO result = taskCommandService.deleteTask(1L, 1L, 1L);
+        TaskResponseDTO.TaskPreviewDTO result = taskCommandService.deleteTask(1L, 1L);
 
         // then
         assertNotNull(result);
@@ -310,7 +320,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(1L, 1L));
     }
 
     @Test
@@ -329,16 +339,19 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.deleteTask(2L, 1L));
     }
 
 /*------------------------------ 작업 완료 ------------------------------*/
 
     @Test
-    @DisplayName("작업 완료 (성공)")
-    void completeTask_Success() {
+    @DisplayName("작업 완료 - 연속 출석한 경우 (성공)")
+    void completeTask_Consecutive_Success() {
 
         // given
+        member1.updateConsecutiveDays(LocalDate.of(2025, 1, 1));
+        member1.updateConsecutiveDays(LocalDate.of(2025, 1, 2));
+
         task = Task.builder()
                 .id(1L)
                 .title("작업1")
@@ -346,25 +359,163 @@ class TaskCommandServiceTest {
                 .plan(plan)
                 .build();
 
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 3).getDayOfWeek(), null);
+
         completedTask = CompletedTask.builder()
                 .task(task)
-                .completedAt(LocalDate.of(2025, 1, 1))
+                .completedAt(LocalDate.of(2025, 1, 3))
                 .build();
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
         when(completedTaskRepository.save(any(CompletedTask.class))).thenReturn(completedTask);
-        when(completedTaskRepository.findAllByTaskIdAndCompletedAt(1L, LocalDate.of(2025, 1, 1)))
+        when(completedTaskRepository.findAllByTaskIdAndCompletedAt(1L, LocalDate.of(2025, 1, 3)))
                 .thenReturn(List.of());
 
         // when
-        TaskResponseDTO.CompletedTaskDTO result = taskCommandService.completeTask(1L, 1L, 1L);
+        TaskResponseDTO.CompletedTaskDTO result = taskCommandService.completeTask(1L, 1L,LocalDate.of(2025, 1, 3));
 
         // then
         assertNotNull(result);
         assertThat(result.getTaskId()).isEqualTo(1L);
-        assertThat(result.getDate()).isEqualTo(LocalDate.of(2025, 1, 1));
+        assertThat(result.getDate()).isEqualTo(LocalDate.of(2025, 1, 3));
         assertThat(result.getIsCompleted()).isEqualTo(true);
+        assertThat(member1.getLastAttendanceDate()).isEqualTo(LocalDate.of(2025, 1, 3));
+        assertThat(member1.getLastGuiltyFreeDate()).isNull();
+        assertThat(member1.getAttendanceStartedAt()).isEqualTo(LocalDate.of(2025, 1, 1));
+        assertThat(member1.getMaxConsecutiveDays()).isEqualTo(3L);
     }
+
+
+    @Test
+    @DisplayName("작업 완료 - 중간에 길티프리를 포함하여 연속 출석한 경우 (성공)")
+    void completeTask_ConsecutiveWithGuiltyFree_Success() {
+
+        // given
+        member1.updateConsecutiveDays(LocalDate.of(2025, 1, 1));
+        member1.activateGuiltyFree(
+                GuiltyFreeReason.LACK_OF_MOTIVATION,
+                LocalDate.of(2025, 1, 2)
+        );
+
+        task = Task.builder()
+                .id(1L)
+                .title("작업1")
+                .member(member1)
+                .plan(plan)
+                .build();
+
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 3).getDayOfWeek(), null);
+
+        completedTask = CompletedTask.builder()
+                .task(task)
+                .completedAt(LocalDate.of(2025, 1, 3))
+                .build();
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+        when(completedTaskRepository.save(any(CompletedTask.class))).thenReturn(completedTask);
+        when(completedTaskRepository.findAllByTaskIdAndCompletedAt(1L, LocalDate.of(2025, 1, 3)))
+                .thenReturn(List.of());
+
+        // when
+        TaskResponseDTO.CompletedTaskDTO result = taskCommandService.completeTask(1L, 1L,LocalDate.of(2025, 1, 3));
+
+        // then
+        assertNotNull(result);
+        assertThat(result.getTaskId()).isEqualTo(1L);
+        assertThat(result.getDate()).isEqualTo(LocalDate.of(2025, 1, 3));
+        assertThat(result.getIsCompleted()).isEqualTo(true);
+        assertThat(member1.getLastAttendanceDate()).isEqualTo(LocalDate.of(2025, 1, 3));
+        assertThat(member1.getLastGuiltyFreeDate()).isEqualTo(LocalDate.of(2025, 1, 2));
+        assertThat(member1.getAttendanceStartedAt()).isEqualTo(LocalDate.of(2025, 1, 1));
+        assertThat(member1.getMaxConsecutiveDays()).isEqualTo(3L);
+    }
+
+    @Test
+    @DisplayName("작업 완료 - 연속 출석이 끊긴 경우 (성공)")
+    void completeTask_NotConsecutive_Success() {
+
+        // given
+        member1.updateConsecutiveDays(LocalDate.of(2025, 1, 1));
+        member1.updateConsecutiveDays(LocalDate.of(2025, 1, 2));
+
+        task = Task.builder()
+                .id(1L)
+                .title("작업1")
+                .member(member1)
+                .plan(plan)
+                .build();
+
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 4).getDayOfWeek(), null);
+
+        completedTask = CompletedTask.builder()
+                .task(task)
+                .completedAt(LocalDate.of(2025, 1, 4))
+                .build();
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+        when(completedTaskRepository.save(any(CompletedTask.class))).thenReturn(completedTask);
+        when(completedTaskRepository.findAllByTaskIdAndCompletedAt(1L, LocalDate.of(2025, 1, 4)))
+                .thenReturn(List.of());
+
+        // when
+        TaskResponseDTO.CompletedTaskDTO result = taskCommandService.completeTask(1L, 1L,LocalDate.of(2025, 1, 4));
+
+        // then
+        assertNotNull(result);
+        assertThat(result.getTaskId()).isEqualTo(1L);
+        assertThat(result.getDate()).isEqualTo(LocalDate.of(2025, 1, 4));
+        assertThat(result.getIsCompleted()).isEqualTo(true);
+        assertThat(member1.getLastAttendanceDate()).isEqualTo(LocalDate.of(2025, 1, 4));
+        assertThat(member1.getLastGuiltyFreeDate()).isNull();
+        assertThat(member1.getAttendanceStartedAt()).isEqualTo(LocalDate.of(2025, 1, 4));
+        assertThat(member1.getMaxConsecutiveDays()).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("작업 완료 - 중간에 길티프리를 포함하고 연속 출석이 끊긴 경우 (성공)")
+    void completeTask_NotConsecutiveWithGuiltyFree_Success() {
+
+        // given
+        member1.updateConsecutiveDays(LocalDate.of(2025, 1, 1));
+        member1.updateConsecutiveDays(LocalDate.of(2025, 1, 2));
+        member1.activateGuiltyFree(
+                GuiltyFreeReason.LACK_OF_MOTIVATION,
+                LocalDate.of(2025, 1, 3)
+        );
+
+        task = Task.builder()
+                .id(1L)
+                .title("작업1")
+                .member(member1)
+                .plan(plan)
+                .build();
+
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 5).getDayOfWeek(), null);
+
+        completedTask = CompletedTask.builder()
+                .task(task)
+                .completedAt(LocalDate.of(2025, 1, 5))
+                .build();
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+        when(completedTaskRepository.save(any(CompletedTask.class))).thenReturn(completedTask);
+        when(completedTaskRepository.findAllByTaskIdAndCompletedAt(1L, LocalDate.of(2025, 1, 5)))
+                .thenReturn(List.of());
+
+        // when
+        TaskResponseDTO.CompletedTaskDTO result = taskCommandService.completeTask(1L, 1L,LocalDate.of(2025, 1, 5));
+
+        // then
+        assertNotNull(result);
+        assertThat(result.getTaskId()).isEqualTo(1L);
+        assertThat(result.getDate()).isEqualTo(LocalDate.of(2025, 1, 5));
+        assertThat(result.getIsCompleted()).isEqualTo(true);
+        assertThat(member1.getLastAttendanceDate()).isEqualTo(LocalDate.of(2025, 1, 5));
+        assertThat(member1.getLastGuiltyFreeDate()).isEqualTo(LocalDate.of(2025, 1, 3));
+        assertThat(member1.getAttendanceStartedAt()).isEqualTo(LocalDate.of(2025, 1, 5));
+        assertThat(member1.getMaxConsecutiveDays()).isEqualTo(3L);
+    }
+
 
     @Test
     @DisplayName("작업 완료 - 존재하지 않는 작업 (실패)")
@@ -374,7 +525,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(1L, 1L, LocalDate.of(2025, 1, 3)));
 
     }
 
@@ -396,7 +547,7 @@ class TaskCommandServiceTest {
                 .thenReturn(List.of());
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(2L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(2L, 1L, LocalDate.of(2025, 1, 1)));
     }
 
     @Test
@@ -411,6 +562,8 @@ class TaskCommandServiceTest {
                 .plan(plan)
                 .build();
 
+        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 5).getDayOfWeek(), null);
+
         completedTask = CompletedTask.builder()
                 .task(task)
                 .completedAt(LocalDate.of(2025, 1, 1))
@@ -421,7 +574,7 @@ class TaskCommandServiceTest {
                 .thenReturn(List.of(completedTask));
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.completeTask(1L, 1L, LocalDate.of(2025, 1, 1)));
     }
 
 /*------------------------------ 작업 완료 취소 ------------------------------*/
@@ -442,6 +595,7 @@ class TaskCommandServiceTest {
                 .task(task)
                 .completedAt(LocalDate.of(2025, 1, 1))
                 .build();
+        task.addCompletedTask(completedTask);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
         when(completedTaskRepository.findAllByTaskIdAndCompletedAt(1L, LocalDate.of(2025, 1, 1)))
@@ -449,7 +603,7 @@ class TaskCommandServiceTest {
 
         // when
         TaskResponseDTO.CompletedTaskDTO result = taskCommandService
-                .cancelTaskCompletion(1L, 1L, 1L);
+                .cancelTaskCompletion(1L, 1L, LocalDate.of(2025, 1, 1));
 
         // then
         assertNotNull(result);
@@ -466,7 +620,7 @@ class TaskCommandServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(1L, 1L, LocalDate.of(2025, 1, 1)));
     }
 
     @Test
@@ -485,6 +639,7 @@ class TaskCommandServiceTest {
                 .task(task)
                 .completedAt(LocalDate.of(2025, 1, 1))
                 .build();
+        task.addCompletedTask(completedTask);
 
         when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
@@ -493,7 +648,7 @@ class TaskCommandServiceTest {
 
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(2L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(2L,  1L, LocalDate.of(2025, 1, 1)));
     }
 
     @Test
@@ -519,7 +674,7 @@ class TaskCommandServiceTest {
 
 
         // when & then
-        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(1L, 1L, 1L));
+        assertThrows(TaskHandler.class, () -> taskCommandService.cancelTaskCompletion(1L, 1L, LocalDate.of(2025, 1, 1)));
 
     }
 }

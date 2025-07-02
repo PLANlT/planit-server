@@ -27,10 +27,11 @@ public class TaskConverter {
                 .build();
     }
 
-    public static TaskResponseDTO.TodayTaskListDTO toTodayTaskListDTO(Plan plan, LocalDate today) {
-
-        List<TaskResponseDTO.TaskStatusDTO> todayTasks = plan.getTasks().stream()
-                // 플랜에서 오늘 루틴에 해당하는 작업만 필터링
+    public static List<TaskResponseDTO.TaskStatusDTO> toTodayTaskList(Plan plan, LocalDate today) {
+        return plan.getTasks().stream()
+                // 삭제되지 않은 작업만 필터링
+                .filter(task -> task.getDeletedAt() == null)
+                // 오늘 루틴에 해당하는 작업만 필터링
                 .filter(task -> task.getRoutineDay().equals(today.getDayOfWeek()))
                 // 오늘 완료된 작업이 있으면 true로 표시
                 .map(task -> {
@@ -41,11 +42,6 @@ public class TaskConverter {
                     return toTaskStatusDTO(task, !tasks.isEmpty());
                 })
                 .toList();
-
-        return TaskResponseDTO.TodayTaskListDTO.builder()
-                .date(today)
-                .dayOfWeek(today.getDayOfWeek())
-                .build();
     }
 
     public static TaskResponseDTO.TaskStatusDTO toTaskStatusDTO(Task task, Boolean isCompleted) {
@@ -57,11 +53,12 @@ public class TaskConverter {
                 .build();
     }
 
-    public static TaskResponseDTO.CompletedTaskDTO toCompletedTaskDTO(CompletedTask completedTask) {
+    public static TaskResponseDTO.CompletedTaskDTO toCompletedTaskDTO(CompletedTask completedTask, Boolean isCompleted) {
         return TaskResponseDTO.CompletedTaskDTO.builder()
                 .taskId(completedTask.getTask().getId())
                 .title(completedTask.getTask().getTitle())
                 .date(completedTask.getCompletedAt())
+                .isCompleted(isCompleted)
                 .build();
     }
 }

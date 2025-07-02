@@ -1,6 +1,8 @@
 package com.planit.planit.web.dto.task;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.planit.planit.task.enums.TaskType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +20,9 @@ public class TaskRequestDTO {
     public static class RoutineDTO {
         private final TaskType taskType;
         private final DayOfWeek routineDay;
+
+        @Schema(type = "string", pattern = "HH:mm", example = "14:00")
+        @JsonFormat(pattern = "HH:mm")
         private final LocalTime routineTime;
     }
 }
