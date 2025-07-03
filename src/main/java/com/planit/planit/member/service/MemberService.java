@@ -18,4 +18,6 @@ public interface MemberService {
     OAuthLoginDTO.Response checkOAuthMember(OAuth2User oAuth2User, SignType signType);
 
     OAuthLoginDTO.Response registerOAuthMember(CustomOAuth2User oAuth2User, TermAgreementDTO.Request request);
+
+    void signOut(Object any);
 }
