@@ -1,5 +1,7 @@
 package com.planit.planit.config.redis;
 
+import com.planit.planit.redis.entity.RefreshTokenRedisEntity;
+import com.planit.planit.redis.repository.RefreshTokenRedisRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
