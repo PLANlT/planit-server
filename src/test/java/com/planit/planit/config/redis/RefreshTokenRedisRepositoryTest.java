@@ -7,17 +7,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataRedisTest
+@DataRedisTest(excludeAutoConfiguration = {HibernateJpaAutoConfiguration.class})
 class RefreshTokenRedisRepositoryTest {
 
     @Autowired
     private RefreshTokenRedisRepository refreshTokenRedisRepository;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    
 
     @Test
     @DisplayName("refresh:{refreshToken} 키로 memberId 저장/조회 성공")
