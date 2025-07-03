@@ -7,7 +7,6 @@ import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
-import com.planit.planit.redis.repository.RefreshTokenRedisRepository;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.redis.service.RefreshTokenRedisService;
 import com.planit.planit.redis.service.BlacklistTokenRedisService;
@@ -41,9 +40,6 @@ class MemberServiceImplTest {
 
     @Mock
     private JwtProvider jwtProvider;
-
-    @Mock
-    private RefreshTokenRedisRepository refreshTokenRedisRepository;
 
     @Mock
     private TermRepository termRepository;
