@@ -12,7 +12,8 @@ import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
-import com.planit.planit.redis.repository.RefreshTokenRedisRepository;
+import com.planit.planit.redis.service.RefreshTokenRedisService;
+import com.planit.planit.redis.service.BlacklistTokenRedisService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,8 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final TermRepository termRepository;
     private final JwtProvider jwtProvider;
-    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+    private final RefreshTokenRedisService refreshTokenRedisService;
+    private final BlacklistTokenRedisService blacklistTokenRedisService;
 
     //로그인인지 회원가입인지 감지
     @Override
@@ -68,10 +70,7 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    @Override
-    public OAuthLoginDTO.Response checkOAuthMember(OAuth2User oAuth2User, SignType signType) {
-        return null;
-    }
+
 
     @Override
     public OAuthLoginDTO.Response registerOAuthMember(CustomOAuth2User oAuth2User, TermAgreementDTO.Request request) {
@@ -119,7 +118,10 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void signOut(Object any) {
-
+    public void signOut(Long memberId, String accessToken) {
+        // accessToken 남은 만료시간 계산
+        long ttl = jwtProvider.getRemainingValidity(accessToken);
+        blacklistTokenRedisService.blacklistAccessToken(accessToken, ttl);
+        refreshTokenRedisService.deleteByMemberId(memberId);
     }
 }
