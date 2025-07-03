@@ -1,4 +1,4 @@
-package com.planit.planit.web.dto.auth.login.converter;
+package com.planit.planit.web.dto.auth.login;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -11,9 +11,10 @@ import com.planit.planit.member.association.Term;
 import com.planit.planit.member.association.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
-import com.planit.planit.web.dto.auth.login.converter.OAuthLoginDTO;
+import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

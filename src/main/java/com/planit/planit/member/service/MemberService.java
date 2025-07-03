@@ -3,7 +3,7 @@ package com.planit.planit.member.service;
 import com.planit.planit.config.oauth.CustomOAuth2User;
 import com.planit.planit.member.MemberRepository;
 import com.planit.planit.member.enums.SignType;
-import com.planit.planit.web.dto.auth.login.converter.OAuthLoginDTO;
+import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.user.OAuth2User;

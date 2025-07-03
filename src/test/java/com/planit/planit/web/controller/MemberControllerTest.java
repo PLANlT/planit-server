@@ -5,7 +5,8 @@ import com.planit.planit.member.MemberRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.member.service.MemberServiceImpl;
-import com.planit.planit.web.dto.auth.login.converter.OAuthLoginDTO;
+import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
+
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

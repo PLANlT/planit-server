@@ -8,7 +8,8 @@ import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
-import com.planit.planit.web.dto.auth.login.converter.OAuthLoginDTO;
+import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
