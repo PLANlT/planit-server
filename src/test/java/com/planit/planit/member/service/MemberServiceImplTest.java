@@ -11,6 +11,8 @@ import com.planit.planit.member.enums.SignType;
 import com.planit.planit.redis.entity.RefreshTokenRedisEntity;
 import com.planit.planit.redis.repository.RefreshTokenRedisRepository;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
+import com.planit.planit.redis.service.RefreshTokenRedisService;
+import com.planit.planit.redis.service.BlacklistTokenRedisService;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,99 +52,111 @@ class MemberServiceImplTest {
     @Mock
     private TermRepository termRepository;
 
-    @Test
-    @Order(1)
-    @DisplayName("신규 회원이면 회원가입 처리되고 isNewMember = true 를 반환한다-성공")
-    void register_newMember_returnsTrue() {
-        // given
-        Map<String, Object> attributes = Map.of(
-                "email", "newbie@gmail.com",
-                "name", "뉴비"
-        );
-        FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
+    @Mock
+    private RefreshTokenRedisService refreshTokenRedisService;
 
-        given(memberRepository.findByEmail("newbie@gmail.com"))
-                .willReturn(Optional.empty());
+    @Mock
+    private BlacklistTokenRedisService blacklistTokenRedisService;
 
-        // when
-        var response = memberServiceImpl.checkOAuthMember(user);
+    @Nested
+    @DisplayName("OAuth 로그인/회원가입")
+    class OAuthLogin {
+        @Test
+        @Order(1)
+        @DisplayName("신규 회원이면 회원가입 처리되고 isNewMember = true 를 반환한다-성공")
+        void register_newMember_returnsTrue() {
+            // given
+            Map<String, Object> attributes = Map.of(
+                    "email", "newbie@gmail.com",
+                    "name", "뉴비"
+            );
+            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
 
-        // then
-        assertThat(response.isNewMember()).isTrue();
-        assertThat(response.getEmail()).isEqualTo("newbie@gmail.com");
+            given(memberRepository.findByEmail("newbie@gmail.com"))
+                    .willReturn(Optional.empty());
 
-    }
+            // when
+            OAuthLoginDTO.Response response = memberServiceImpl.checkOAuthMember(user);
 
-    @Test
-    @Order(2)
-    @DisplayName("기존 회원이면 isNewMember = false 를 반환한다-성공")
-    void register_existingMember_returnsFalse() {
-        // given
-        Map<String, Object> attributes = Map.of(
-                "email", "exist@planit.com",
-                "name", "플래닛"
-        );
-        var user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
+            // then
+            assertThat(response.isNewMember()).isTrue();
+            assertThat(response.getEmail()).isEqualTo("newbie@gmail.com");
+        }
 
-        var existing = Member.builder()
-                .email("exist@planit.com")
-                .memberName("플래닛")
-                .role(Role.USER)
-                .signType(SignType.GOOGLE)
-                .guiltyFreeMode(false)
-                .build();
+        @Test
+        @Order(2)
+        @DisplayName("기존 회원이면 isNewMember = false 를 반환한다-성공")
+        void register_existingMember_returnsFalse() {
+            // given
+            Map<String, Object> attributes = Map.of(
+                    "email", "exist@planit.com",
+                    "name", "플래닛"
+            );
+            var user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
 
-        given(memberRepository.findByEmail("exist@planit.com"))
-                .willReturn(Optional.of(existing));
+            var existing = Member.builder()
+                    .email("exist@planit.com")
+                    .memberName("플래닛")
+                    .role(Role.USER)
+                    .signType(SignType.GOOGLE)
+                    .guiltyFreeMode(false)
+                    .password("")
+                    .build();
 
-        given(jwtProvider.createAccessToken(any(), any(), any(), any()))
-                .willReturn("access-token");
+            given(memberRepository.findByEmail("exist@planit.com"))
+                    .willReturn(Optional.of(existing));
 
-        given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
-                .willReturn("refresh-token");
+            given(jwtProvider.createAccessToken(any(), any(), any(), any()))
+                    .willReturn("access-token");
 
-        // when
-        var response = memberServiceImpl.checkOAuthMember(user);
+            given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
+                    .willReturn("refresh-token");
 
-        // then
-        assertThat(response.isNewMember()).isFalse();
-        assertThat(response.getEmail()).isEqualTo("exist@planit.com");
-        verify(jwtProvider).createAccessToken(any(), any(), any(), any());
-        verify(jwtProvider).createRefreshToken(any(), any(), any(), any());
+            // when
+            OAuthLoginDTO.Response response = memberServiceImpl.checkOAuthMember(user);
+
+            // then
+            assertThat(response.isNewMember()).isFalse();
+            assertThat(response.getEmail()).isEqualTo("exist@planit.com");
+            verify(jwtProvider).createAccessToken(any(), any(), any(), any());
+            verify(jwtProvider).createRefreshToken(any(), any(), any(), any());
+        }
     }
 
     @Nested
-    @DisplayName("signOut 메서드는")
+    @DisplayName("로그아웃")
     class Logout {
+        @Test
+        @DisplayName("로그아웃 시 accessToken 블랙리스트 저장 및 refreshToken 양방향 삭제가 호출된다")
+        void logout_callsBlacklistAndRefreshTokenDelete() {
+            // given
+            Long memberId = 1L;
+            String accessToken = "access-token";
+            long ttl = 1000L;
+            given(jwtProvider.getRemainingValidity(accessToken)).willReturn(ttl);
+
+            // when
+            memberServiceImpl.signOut(memberId, accessToken);
+
+            // then
+            verify(jwtProvider).getRemainingValidity(accessToken);
+            verify(blacklistTokenRedisService).blacklistAccessToken(accessToken, ttl);
+            verify(refreshTokenRedisService).deleteByMemberId(memberId);
+        }
 
         @Test
         @DisplayName("정상적으로 로그아웃 처리가 된다면 예외 없이 동작한다")
         void logout_success_doesNotThrow() {
             // given
             Long memberId = 1L;
+            String accessToken = "access-token";
+            given(jwtProvider.getRemainingValidity(accessToken)).willReturn(1000L);
 
             // when & then
-            assertThatCode(() -> memberServiceImpl.signOut(memberId))
+            assertThatCode(() -> memberServiceImpl.signOut(memberId, accessToken))
                     .doesNotThrowAnyException();
         }
 
-//        @Test
-//        @DisplayName("로그아웃 도중 예외가 발생하면 그대로 전파된다")
-//        void logout_throwsException_ifRepositoryFails() {
-//            // given
-//            Long memberId = 2L;
-//
-//            // 예외 발생 설정
-//            Mockito.doThrow(new RuntimeException("DB 오류"))
-//                    .when(refreshTokenRedisRepository).deleteById(any());
-//
-//            // when & then
-//            assertThatThrownBy(() -> memberServiceImpl.signOut(memberId))
-//                    .isInstanceOf(RuntimeException.class)
-//                    .hasMessage("DB 오류");
-//        }
     }
-
-
 }
 
