@@ -1,6 +1,5 @@
 package com.planit.planit.member.service;
 
-
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
 import com.planit.planit.config.jwt.JwtProvider;
@@ -13,10 +12,11 @@ import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
-import lombok.RequiredArgsConstructor;
+import com.planit.planit.redis.repository.RefreshTokenRedisRepository;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
@@ -28,6 +28,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final TermRepository termRepository;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
     //로그인인지 회원가입인지 감지
     @Override

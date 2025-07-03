@@ -1,6 +1,7 @@
 package com.planit.planit.web.controller;
 
 
+import com.planit.planit.config.jwt.UserPrincipal;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 
@@ -18,6 +19,10 @@ public class MemberController {
 
     public ResponseEntity<OAuthLoginDTO.Response> signIn(OAuthLoginDTO.Request request) {
 
+        return null;
+    }
+
+    public ResponseEntity<Void> signOut(UserPrincipal principal) {
         return null;
     }
 }

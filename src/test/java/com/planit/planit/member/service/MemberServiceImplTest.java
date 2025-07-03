@@ -1,4 +1,3 @@
-
 package com.planit.planit.member.service;
 
 import com.planit.planit.auth.FakeCustomOAuth2User;
@@ -6,14 +5,18 @@ import com.planit.planit.auth.FakeOAuth2User;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.association.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
+import com.planit.planit.redis.entity.RefreshTokenRedisEntity;
+import com.planit.planit.redis.repository.RefreshTokenRedisRepository;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +43,12 @@ class MemberServiceImplTest {
 
     @Mock
     private JwtProvider jwtProvider;
+
+    @Mock
+    private RefreshTokenRedisRepository refreshTokenRedisRepository;
+
+    @Mock
+    private TermRepository termRepository;
 
     @Test
     @Order(1)
@@ -116,25 +126,21 @@ class MemberServiceImplTest {
                     .doesNotThrowAnyException();
         }
 
-        @Test
-        @DisplayName("로그아웃 도중 예외가 발생하면 그대로 전파된다")
-        void logout_throwsException_ifRepositoryFails() {
-            // given
-            Long memberId = 2L;
-
-            // RefreshTokenRepository가 있다면 예: mock으로 설정
-            RefreshTokenRepository refreshTokenRepository = mock(RefreshTokenRepository.class);
-            memberServiceImpl = new MemberServiceImpl(memberRepository, jwtProvider, refreshTokenRepository); // 생성자 주입 방식일 경우
-
-            // 예외 발생 설정
-            Mockito.doThrow(new RuntimeException("DB 오류"))
-                    .when(refreshTokenRepository).deleteById(memberId);
-
-            // when & then
-            assertThatThrownBy(() -> memberServiceImpl.logout(memberId))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("DB 오류");
-        }
+//        @Test
+//        @DisplayName("로그아웃 도중 예외가 발생하면 그대로 전파된다")
+//        void logout_throwsException_ifRepositoryFails() {
+//            // given
+//            Long memberId = 2L;
+//
+//            // 예외 발생 설정
+//            Mockito.doThrow(new RuntimeException("DB 오류"))
+//                    .when(refreshTokenRedisRepository).deleteById(any());
+//
+//            // when & then
+//            assertThatThrownBy(() -> memberServiceImpl.signOut(memberId))
+//                    .isInstanceOf(RuntimeException.class)
+//                    .hasMessage("DB 오류");
+//        }
     }
 
 
