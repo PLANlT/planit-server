@@ -82,5 +82,12 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    public long getRemainingValidity(String token) {
+        Date expiration = getClaims(token).getExpiration();
+        long now = System.currentTimeMillis();
+        long diff = (expiration.getTime() - now) / 1000; // 초 단위
+        return Math.max(diff, 0);
+    }
 }
 
