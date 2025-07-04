@@ -31,9 +31,8 @@ public class MemberServiceImpl implements MemberService {
     private final RefreshTokenRedisService refreshTokenRedisService;
     private final BlacklistTokenRedisService blacklistTokenRedisService;
 
-    //로그인인지 회원가입인지 감지
-    @Override
-    public OAuthLoginDTO.Response checkOAuthMember(CustomOAuth2User oAuth2User) {
+    // 로그인/회원가입/약관동의 통합 signIn 메서드
+    public OAuthLoginDTO.Response signIn(CustomOAuth2User oAuth2User, TermAgreementDTO.Request termRequest) {
         String email = (String) oAuth2User.getAttributes().get("email");
         String name = (String) oAuth2User.getAttributes().get("name");
 
@@ -41,15 +40,12 @@ public class MemberServiceImpl implements MemberService {
 
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
-
             String accessToken = jwtProvider.createAccessToken(
                     member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
             );
-
             String refreshToken = jwtProvider.createRefreshToken(
                     member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
             );
-
             return OAuthLoginDTO.Response.builder()
                     .email(member.getEmail())
                     .name(member.getMemberName())
@@ -59,34 +55,22 @@ public class MemberServiceImpl implements MemberService {
                     .build();
         }
 
-        // 신규 회원 → 약관 동의 필요
-        return OAuthLoginDTO.Response.builder()
-                .email(email)
-                .name(name)
-                .accessToken(null)
-                .refreshToken(null)
-                .isNewMember(true)
-                .build();
-    }
-
-
-
-    @Override
-    public OAuthLoginDTO.Response registerOAuthMember(CustomOAuth2User oAuth2User, TermAgreementDTO.Request request) {
-        String email = (String) oAuth2User.getAttributes().get("email");
-        String name = (String) oAuth2User.getAttributes().get("name");
-        SignType signType = oAuth2User.getSignType();
-
-
-        //혹시 오류 생길까봐 넣긴 했는데, 중복 확인이라 고민입니다
-        if (memberRepository.findByEmail(email).isPresent()) {
-            throw new MemberHandler(MemberErrorStatus.MEMBER_ALREADY_EXISTS);
+        // 신규 회원
+        if (termRequest == null || termRequest.getTermOfUse() == null || termRequest.getTermOfPrivacy() == null) {
+            // 약관 동의가 안 됨 → 동의 필요 안내
+            return OAuthLoginDTO.Response.builder()
+                    .email(email)
+                    .name(name)
+                    .accessToken(null)
+                    .refreshToken(null)
+                    .isNewMember(true)
+                    .build();
         }
-
+        // 약관 동의 완료 → 회원가입 처리
         Member member = Member.builder()
                 .email(email)
                 .memberName(name)
-                .signType(SignType.GOOGLE)  // 또는 매개변수로 받아도 됨
+                .signType(SignType.GOOGLE) // 또는 oAuth2User에서 추출
                 .guiltyFreeMode(false)
                 .role(Role.USER)
                 .build();
@@ -94,25 +78,23 @@ public class MemberServiceImpl implements MemberService {
 
         Term term = Term.builder()
                 .member(member)
-                .termOfUse(request.getTermOfUse())
-                .termOfPrivacy(request.getTermOfPrivacy())
+                .termOfUse(termRequest.getTermOfUse())
+                .termOfPrivacy(termRequest.getTermOfPrivacy())
                 .build();
         termRepository.save(term);
 
         String accessToken = jwtProvider.createAccessToken(
                 member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
         );
-
         String refreshToken = jwtProvider.createRefreshToken(
                 member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
         );
-
         return OAuthLoginDTO.Response.builder()
                 .email(member.getEmail())
                 .name(member.getMemberName())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .isNewMember(true)
+                .isNewMember(false)
                 .build();
     }
 
