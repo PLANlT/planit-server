@@ -41,8 +41,8 @@ class MemberControllerTest {
     class SignIn {
 
         @Test
-        @DisplayName("기존 회원이면 isNewMember=false와 토큰을 반환한다")
-        void signIn_existingMember_returnsTokenAndIsNewFalse() {
+        @DisplayName("기존 회원이면 200 OK와 body를 반환한다")
+        void signIn_existingMember_returnsOkAndBody() {
             // given
             OAuthLoginDTO.Request request = OAuthLoginDTO.Request.builder()
                     .oauthProvider("google")
@@ -57,20 +57,19 @@ class MemberControllerTest {
                     .refreshToken("refresh-token-def")
                     .build();
 
-            given(memberService.checkOAuthMember(any())).willReturn(response);
+            given(memberService.signIn(any(), any())).willReturn(response);
 
             // when
             ResponseEntity<OAuthLoginDTO.Response> result = memberController.signIn(request);
 
             // then
             assertEquals(HttpStatus.OK, result.getStatusCode());
-            assertFalse(result.getBody().isNewMember());
-            assertEquals("test@example.com", result.getBody().getEmail());
+            assertNotNull(result.getBody());
         }
 
         @Test
-        @DisplayName("신규 회원이면 isNewMember=true만 반환하고 토큰은 null이다")
-        void signIn_newMember_returnsIsNewTrueWithoutToken() {
+        @DisplayName("신규 회원이면 200 OK와 body를 반환한다")
+        void signIn_newMember_returnsOkAndBody() {
             // given
             OAuthLoginDTO.Request request = OAuthLoginDTO.Request.builder()
                     .oauthProvider("google")
@@ -85,15 +84,14 @@ class MemberControllerTest {
                     .refreshToken(null)
                     .build();
 
-            given(memberService.checkOAuthMember(any())).willReturn(response);
+            given(memberService.signIn(any(), any())).willReturn(response);
 
             // when
             ResponseEntity<OAuthLoginDTO.Response> result = memberController.signIn(request);
 
             // then
             assertEquals(HttpStatus.OK, result.getStatusCode());
-            assertTrue(result.getBody().isNewMember());
-            assertNull(result.getBody().getAccessToken());
+            assertNotNull(result.getBody());
         }
 
         @Test
@@ -105,7 +103,7 @@ class MemberControllerTest {
                     .oauthAccessToken("token")
                     .build();
 
-            given(memberService.checkOAuthMember(any()))
+            given(memberService.signIn(any(), any()))
                     .willThrow(new IllegalArgumentException("지원하지 않는 provider"));
 
             // when & then
@@ -123,7 +121,7 @@ class MemberControllerTest {
                     .oauthAccessToken("token")
                     .build();
 
-            given(memberService.checkOAuthMember(any()))
+            given(memberService.signIn(any(), any()))
                     .willThrow(new RuntimeException("DB 오류"));
 
             // when & then
@@ -131,6 +129,29 @@ class MemberControllerTest {
                 memberController.signIn(request);
             });
             assertEquals("DB 오류", e.getMessage());
+        }
+
+        @Test
+        @DisplayName("이미 가입된 회원이면 MemberHandler 예외와 ApiResponse 에러코드를 반환한다")
+        void signIn_existingEmail_throwsMemberHandler() {
+            // given
+            OAuthLoginDTO.Request request = OAuthLoginDTO.Request.builder()
+                    .oauthProvider("google")
+                    .oauthAccessToken("duplicated-token")
+                    .build();
+
+            var errorStatus = com.planit.planit.common.api.member.status.MemberErrorStatus.MEMBER_ALREADY_EXISTS;
+            given(memberService.signIn(any(), any()))
+                    .willThrow(new com.planit.planit.common.api.member.MemberHandler(errorStatus));
+
+            // when & then
+            com.planit.planit.common.api.member.MemberHandler ex = assertThrows(
+                com.planit.planit.common.api.member.MemberHandler.class,
+                () -> memberController.signIn(request)
+            );
+            assertEquals(errorStatus, ex.getStatus());
+            assertEquals(errorStatus.getCode(), ex.getStatus().getCode());
+            assertEquals(errorStatus.getMessage(), ex.getStatus().getMessage());
         }
     }
 
@@ -169,9 +190,10 @@ class MemberControllerTest {
         void signOut_serviceError_propagatesException() {
             // given
             Long memberId = 2L;
+            String accessToken = "access-token";
             UserPrincipal principal = new UserPrincipal(memberId, "test@example.com", "홍길동", Role.USER);
 
-            doThrow(new RuntimeException("로그아웃 실패")).when(memberService).signOut(any());
+            doThrow(new RuntimeException("로그아웃 실패")).when(memberService).signOut(memberId, accessToken);
 
             // when & then
             RuntimeException e = assertThrows(RuntimeException.class, () -> {
