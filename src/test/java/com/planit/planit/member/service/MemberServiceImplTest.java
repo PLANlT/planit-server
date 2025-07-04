@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,12 +52,47 @@ class MemberServiceImplTest {
     private BlacklistTokenRedisService blacklistTokenRedisService;
 
     @Nested
-    @DisplayName("OAuth 로그인/회원가입")
-    class OAuthLogin {
+    @DisplayName("signIn 메서드")
+    class SignIn {
         @Test
-        @Order(1)
-        @DisplayName("신규 회원이면 회원가입 처리되고 isNewMember = true 를 반환한다-성공")
-        void register_newMember_returnsTrue() {
+        @DisplayName("기존 회원이면 isNewMember=false와 토큰을 반환한다")
+        void signIn_existingMember_returnsTokenAndIsNewFalse() {
+            // given
+            Map<String, Object> attributes = Map.of(
+                    "email", "exist@planit.com",
+                    "name", "플래닛"
+            );
+            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
+
+            Member existing = Member.builder()
+                    .email("exist@planit.com")
+                    .memberName("플래닛")
+                    .role(Role.USER)
+                    .signType(SignType.GOOGLE)
+                    .guiltyFreeMode(false)
+                    .password("")
+                    .build();
+
+            given(memberRepository.findByEmail("exist@planit.com"))
+                    .willReturn(Optional.of(existing));
+            given(jwtProvider.createAccessToken(any(), any(), any(), any()))
+                    .willReturn("access-token");
+            given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
+                    .willReturn("refresh-token");
+
+            // when
+            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, null);
+
+            // then
+            assertThat(response.isNewMember()).isFalse();
+            assertThat(response.getEmail()).isEqualTo("exist@planit.com");
+            assertThat(response.getAccessToken()).isEqualTo("access-token");
+            assertThat(response.getRefreshToken()).isEqualTo("refresh-token");
+        }
+
+        @Test
+        @DisplayName("신규 회원이 약관 동의 없이 로그인 시도하면 isNewMember=true만 반환한다")
+        void signIn_newMemberWithoutAgreement_returnsIsNewTrue() {
             // given
             Map<String, Object> attributes = Map.of(
                     "email", "newbie@gmail.com",
@@ -68,50 +104,56 @@ class MemberServiceImplTest {
                     .willReturn(Optional.empty());
 
             // when
-            OAuthLoginDTO.Response response = memberServiceImpl.checkOAuthMember(user);
+            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, null);
 
             // then
             assertThat(response.isNewMember()).isTrue();
             assertThat(response.getEmail()).isEqualTo("newbie@gmail.com");
+            assertThat(response.getAccessToken()).isNull();
+            assertThat(response.getRefreshToken()).isNull();
         }
 
         @Test
-        @Order(2)
-        @DisplayName("기존 회원이면 isNewMember = false 를 반환한다-성공")
-        void register_existingMember_returnsFalse() {
+        @DisplayName("신규 회원이 약관 동의 후 로그인 시도하면 회원가입 처리 및 토큰을 반환한다")
+        void signIn_newMemberWithAgreement_registersAndReturnsToken() {
             // given
             Map<String, Object> attributes = Map.of(
-                    "email", "exist@planit.com",
-                    "name", "플래닛"
+                    "email", "newbie2@gmail.com",
+                    "name", "뉴비2"
             );
-            var user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
+            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
 
-            var existing = Member.builder()
-                    .email("exist@planit.com")
-                    .memberName("플래닛")
+            given(memberRepository.findByEmail("newbie2@gmail.com"))
+                    .willReturn(Optional.empty());
+
+            Member saved = Member.builder()
+                    .email("newbie2@gmail.com")
+                    .memberName("뉴비2")
                     .role(Role.USER)
                     .signType(SignType.GOOGLE)
                     .guiltyFreeMode(false)
                     .password("")
                     .build();
-
-            given(memberRepository.findByEmail("exist@planit.com"))
-                    .willReturn(Optional.of(existing));
+            given(memberRepository.save(any(Member.class))).willReturn(saved);
 
             given(jwtProvider.createAccessToken(any(), any(), any(), any()))
-                    .willReturn("access-token");
-
+                    .willReturn("access-token2");
             given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
-                    .willReturn("refresh-token");
+                    .willReturn("refresh-token2");
+
+            var agreement = com.planit.planit.web.dto.member.term.TermAgreementDTO.Request.builder()
+                    .termOfUse(LocalDateTime.now())
+                    .termOfPrivacy(LocalDateTime.now())
+                    .build();
 
             // when
-            OAuthLoginDTO.Response response = memberServiceImpl.checkOAuthMember(user);
+            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, agreement);
 
             // then
             assertThat(response.isNewMember()).isFalse();
-            assertThat(response.getEmail()).isEqualTo("exist@planit.com");
-            verify(jwtProvider).createAccessToken(any(), any(), any(), any());
-            verify(jwtProvider).createRefreshToken(any(), any(), any(), any());
+            assertThat(response.getEmail()).isEqualTo("newbie2@gmail.com");
+            assertThat(response.getAccessToken()).isEqualTo("access-token2");
+            assertThat(response.getRefreshToken()).isEqualTo("refresh-token2");
         }
     }
 
