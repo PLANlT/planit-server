@@ -11,6 +11,7 @@ import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
 import com.planit.planit.task.association.CompletedTask;
+import com.planit.planit.task.converter.RoutineConverter;
 import com.planit.planit.task.enums.TaskType;
 import com.planit.planit.task.repository.CompletedTaskRepository;
 import com.planit.planit.task.repository.TaskRepository;
@@ -229,7 +230,7 @@ class TaskCommandServiceTest {
 
         TaskRequestDTO.RoutineDTO routineDTO = TaskRequestDTO.RoutineDTO.builder()
                 .taskType(TaskType.SLOW)
-                .routineDay(DayOfWeek.SATURDAY)
+                .routineDay(List.of(DayOfWeek.SATURDAY))
                 .routineTime(LocalTime.of(14, 0))
                 .build();
 
@@ -240,7 +241,7 @@ class TaskCommandServiceTest {
         assertNotNull(result);
         assertThat(result.getTaskId()).isEqualTo(1L);
         assertThat(result.getTaskType()).isEqualTo(TaskType.SLOW);
-        assertThat(result.getRoutineDay()).isEqualTo(DayOfWeek.SATURDAY);
+        assertThat(result.getRoutineDay()).isEqualTo(List.of(DayOfWeek.SATURDAY));
         assertThat(result.getRoutineTime()).isEqualTo(LocalTime.of(14, 0));
     }
 
@@ -253,7 +254,7 @@ class TaskCommandServiceTest {
 
         TaskRequestDTO.RoutineDTO routineDTO = TaskRequestDTO.RoutineDTO.builder()
                 .taskType(TaskType.SLOW)
-                .routineDay(DayOfWeek.SATURDAY)
+                .routineDay(List.of(DayOfWeek.SATURDAY))
                 .routineTime(LocalTime.of(14, 0))
                 .build();
 
@@ -279,7 +280,7 @@ class TaskCommandServiceTest {
 
         TaskRequestDTO.RoutineDTO routineDTO = TaskRequestDTO.RoutineDTO.builder()
                 .taskType(TaskType.SLOW)
-                .routineDay(DayOfWeek.SATURDAY)
+                .routineDay(List.of(DayOfWeek.SATURDAY))
                 .routineTime(LocalTime.of(14, 0))
                 .build();
 
@@ -359,7 +360,11 @@ class TaskCommandServiceTest {
                 .plan(plan)
                 .build();
 
-        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 3).getDayOfWeek(), null);
+        task.setRoutine(
+                TaskType.ALL,
+                RoutineConverter.routineDaysToByte(List.of(LocalDate.of(2025, 1, 3).getDayOfWeek())),
+                null
+        );
 
         completedTask = CompletedTask.builder()
                 .task(task)
@@ -404,7 +409,10 @@ class TaskCommandServiceTest {
                 .plan(plan)
                 .build();
 
-        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 3).getDayOfWeek(), null);
+        task.setRoutine(TaskType.ALL,
+                RoutineConverter.routineDaysToByte(List.of(LocalDate.of(2025, 1, 3).getDayOfWeek())),
+                null
+        );
 
         completedTask = CompletedTask.builder()
                 .task(task)
@@ -445,7 +453,11 @@ class TaskCommandServiceTest {
                 .plan(plan)
                 .build();
 
-        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 4).getDayOfWeek(), null);
+        task.setRoutine(
+                TaskType.ALL,
+                RoutineConverter.routineDaysToByte(List.of(LocalDate.of(2025, 1, 4).getDayOfWeek())),
+                null
+        );
 
         completedTask = CompletedTask.builder()
                 .task(task)
@@ -490,7 +502,11 @@ class TaskCommandServiceTest {
                 .plan(plan)
                 .build();
 
-        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 5).getDayOfWeek(), null);
+        task.setRoutine(
+                TaskType.ALL,
+                RoutineConverter.routineDaysToByte(List.of(LocalDate.of(2025, 1, 5).getDayOfWeek())),
+                null
+        );
 
         completedTask = CompletedTask.builder()
                 .task(task)
@@ -562,7 +578,10 @@ class TaskCommandServiceTest {
                 .plan(plan)
                 .build();
 
-        task.setRoutine(TaskType.ALL, LocalDate.of(2025, 1, 5).getDayOfWeek(), null);
+        task.setRoutine(
+                TaskType.ALL,
+                RoutineConverter.routineDaysToByte(List.of(LocalDate.of(2025, 1, 5).getDayOfWeek())),
+                null);
 
         completedTask = CompletedTask.builder()
                 .task(task)
