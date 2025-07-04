@@ -58,8 +58,9 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core'
 	testImplementation 'org.mockito:mockito-junit-jupiter'
 
-
-
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.apache.commons:commons-pool2'
 }
 
 tasks.named('test') {

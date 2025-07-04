@@ -1,8 +1,10 @@
 package com.planit.planit.web.controller;
 
 
+import com.planit.planit.config.jwt.UserPrincipal;
 import com.planit.planit.member.service.MemberService;
-import com.planit.planit.web.dto.auth.login.converter.OAuthLoginDTO;
+import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,10 @@ public class MemberController {
 
     public ResponseEntity<OAuthLoginDTO.Response> signIn(OAuthLoginDTO.Request request) {
 
+        return null;
+    }
+
+    public ResponseEntity<Void> signOut(UserPrincipal principal) {
         return null;
     }
 }
