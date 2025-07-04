@@ -3,6 +3,7 @@ package com.planit.planit.web.dto.task.converter;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.task.Task;
 import com.planit.planit.task.association.CompletedTask;
+import com.planit.planit.task.converter.RoutineConverter;
 import com.planit.planit.web.dto.task.TaskResponseDTO;
 
 import java.time.LocalDate;
@@ -22,7 +23,7 @@ public class TaskConverter {
         return TaskResponseDTO.TaskRoutineDTO.builder()
                 .taskId(task.getId())
                 .taskType(task.getTaskType())
-                .routineDay(task.getRoutineDay())
+                .routineDay(RoutineConverter.byteToRoutineDays(task.getRoutine()))
                 .routineTime(task.getRoutineTime())
                 .build();
     }
@@ -32,7 +33,8 @@ public class TaskConverter {
                 // 삭제되지 않은 작업만 필터링
                 .filter(task -> task.getDeletedAt() == null)
                 // 오늘 루틴에 해당하는 작업만 필터링
-                .filter(task -> task.getRoutineDay().equals(today.getDayOfWeek()))
+                .filter(task -> RoutineConverter.byteToRoutineDays(task.getRoutine()).stream()
+                        .anyMatch(day -> day.equals(today.getDayOfWeek())))
                 // 오늘 완료된 작업이 있으면 true로 표시
                 .map(task -> {
                     List<Task> tasks = task.getCompletedTasks().stream()

@@ -29,7 +29,7 @@ public class TaskResponseDTO {
     public static class TaskRoutineDTO {
         private final Long taskId;
         private final TaskType taskType;
-        private final DayOfWeek routineDay;
+        private final List<DayOfWeek> routineDay;
         private final LocalTime routineTime;
     }
 

@@ -12,6 +12,7 @@ import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
 import com.planit.planit.task.association.CompletedTask;
+import com.planit.planit.task.converter.RoutineConverter;
 import com.planit.planit.task.repository.CompletedTaskRepository;
 import com.planit.planit.task.repository.TaskRepository;
 import com.planit.planit.web.dto.task.TaskRequestDTO;
@@ -106,7 +107,7 @@ public class TaskCommandServiceImpl implements TaskCommandService {
         // 루틴 설정
         task.setRoutine(
                 routineDTO.getTaskType(),
-                routineDTO.getRoutineDay(),
+                RoutineConverter.routineDaysToByte(routineDTO.getRoutineDay()),
                 routineDTO.getRoutineTime()
         );
 
@@ -158,7 +159,10 @@ public class TaskCommandServiceImpl implements TaskCommandService {
         }
 
         // 오늘 루틴에 해당하는 작업인지 확인
-        if (!task.getRoutineDay().equals(today.getDayOfWeek())) {
+        boolean isTodayRoutine = RoutineConverter.byteToRoutineDays(task.getRoutine())
+                .stream().anyMatch(day -> day.equals(today.getDayOfWeek()));
+
+        if (!isTodayRoutine) {
             throw new TaskHandler(TaskErrorStatus.NOT_ROUTINE_OF_TODAY);
         }
 
