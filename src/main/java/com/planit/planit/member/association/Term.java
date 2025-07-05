@@ -25,7 +25,13 @@ public class Term {
     @Column(nullable = false)
     private LocalDateTime termOfPrivacy;
 
-/*------------------------------ CONSTRUCTOR ------------------------------*/
+    @Column(nullable = false)
+    private LocalDateTime termOfInfo;
+
+    @Column(nullable = false)
+    private LocalDateTime overFourteen;
+
+    /*------------------------------ CONSTRUCTOR ------------------------------*/
 
     protected Term() {}
 
@@ -33,11 +39,14 @@ public class Term {
     public Term(
             Member member,
             LocalDateTime termOfUse,
-            LocalDateTime termOfPrivacy
+            LocalDateTime termOfPrivacy,
+            LocalDateTime termOfInfo,
+            LocalDateTime overFourteen
     ) {
-        this.memberId = member.getId();
         this.member = member;
         this.termOfUse = termOfUse;
         this.termOfPrivacy = termOfPrivacy;
+        this.termOfInfo = termOfInfo;
+        this.overFourteen = overFourteen;
     }
 }
