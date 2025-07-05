@@ -2,6 +2,7 @@ package com.planit.planit.web.dto.plan.converter;
 
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
+import com.planit.planit.task.enums.TaskType;
 import com.planit.planit.web.dto.plan.PlanRequestDTO;
 import com.planit.planit.web.dto.plan.PlanResponseDTO;
 import com.planit.planit.web.dto.task.converter.TaskConverter;
@@ -48,13 +49,13 @@ public class PlanConverter {
                 .build();
     }
 
-    public static PlanResponseDTO.TodayPlanDTO toTodayPlanDTO(Plan plan, LocalDate today) {
+    public static PlanResponseDTO.TodayPlanDTO toTodayPlanDTO(Plan plan, TaskType taskType, LocalDate today) {
         String dDay = formatDDay(LocalDate.now(), plan.getFinishedAt());
         return PlanResponseDTO.TodayPlanDTO.builder()
                 .planId(plan.getId())
                 .title(plan.getTitle())
                 .dDay(dDay)
-                .tasks(TaskConverter.toTodayTaskList(plan, today))
+                .tasks(TaskConverter.toTodayTaskList(plan, taskType, today))
                 .build();
     }
 
@@ -62,8 +63,11 @@ public class PlanConverter {
         return PlanResponseDTO.TodayPlanListDTO.builder()
                 .todayDate(todayDate)
                 .dayOfWeek(todayDate.getDayOfWeek())
-                .plans(plans.stream()
-                        .map(plan -> PlanConverter.toTodayPlanDTO(plan, todayDate))
+                .slowPlans(plans.stream()
+                        .map(plan -> PlanConverter.toTodayPlanDTO(plan, TaskType.SLOW, todayDate))
+                        .toList())
+                .passionatePlans(plans.stream()
+                        .map(plan -> PlanConverter.toTodayPlanDTO(plan, TaskType.PASSIONATE, todayDate))
                         .toList())
                 .build();
     }
