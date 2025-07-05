@@ -12,7 +12,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -30,9 +29,8 @@ public class Task extends BaseEntity {
     @Column(nullable = false, length = 30)
     private String title;
 
-    @Enumerated(EnumType.STRING)
-    @Column
-    private DayOfWeek routineDay;
+    @Column(nullable = false)
+    private Byte routine;
 
     @Column
     private LocalTime routineTime;
@@ -72,7 +70,7 @@ public class Task extends BaseEntity {
         this.id = id;
         this.title = title;
         this.taskType = TaskType.ALL;
-        this.routineDay = DayOfWeek.MONDAY;
+        this.routine = 0;
         this.member = member;
         this.plan = plan;
         this.completedTasks = new ArrayList<>();
@@ -86,11 +84,11 @@ public class Task extends BaseEntity {
 
     public void setRoutine(
             TaskType taskType,
-            DayOfWeek routineDay,
+            Byte routine,
             @Nullable LocalTime routineTime
     ) {
         this.taskType = taskType;
-        this.routineDay = routineDay;
+        this.routine = routine;
         this.routineTime = routineTime;
     }
 

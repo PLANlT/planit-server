@@ -7,6 +7,7 @@ import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
+import com.planit.planit.task.converter.RoutineConverter;
 import com.planit.planit.task.enums.TaskType;
 import com.planit.planit.task.repository.TaskRepository;
 import com.planit.planit.web.dto.task.TaskResponseDTO;
@@ -22,6 +23,7 @@ import org.mockito.quality.Strictness;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -102,7 +104,7 @@ class TaskQueryServiceTest {
 
         task.setRoutine(
                 TaskType.PASSIONATE,
-                DayOfWeek.FRIDAY,
+                RoutineConverter.routineDaysToByte(List.of(DayOfWeek.FRIDAY)),
                 LocalTime.of(19, 0)
         );
 
@@ -115,7 +117,7 @@ class TaskQueryServiceTest {
         assertNotNull(result);
         assertThat(result.getTaskId()).isEqualTo(1L);
         assertThat(result.getTaskType()).isEqualTo(TaskType.PASSIONATE);
-        assertThat(result.getRoutineDay()).isEqualTo(DayOfWeek.FRIDAY);
+        assertThat(result.getRoutineDay()).isEqualTo(List.of(DayOfWeek.FRIDAY));
         assertThat(result.getRoutineTime()).isEqualTo(LocalTime.of(19, 0));
     }
 
@@ -144,7 +146,7 @@ class TaskQueryServiceTest {
 
         task.setRoutine(
                 TaskType.PASSIONATE,
-                DayOfWeek.FRIDAY,
+                RoutineConverter.routineDaysToByte(List.of(DayOfWeek.FRIDAY)),
                 LocalTime.of(19, 0)
         );
 

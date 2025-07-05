@@ -8,6 +8,7 @@ import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
 import com.planit.planit.task.association.CompletedTask;
+import com.planit.planit.task.converter.RoutineConverter;
 import com.planit.planit.task.enums.TaskType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,14 +186,18 @@ class TaskRepositoryTest {
         task1 = taskRepository.save(task1);
 
         // when
-        task1.setRoutine(TaskType.SLOW, DayOfWeek.WEDNESDAY, LocalTime.of(13,0));
+        task1.setRoutine(
+                TaskType.SLOW,
+                RoutineConverter.routineDaysToByte(List.of(DayOfWeek.WEDNESDAY)),
+                LocalTime.of(13,0)
+        );
 
         // then
         Task result = taskRepository.findById(task1.getId()).get();
         assertNotNull(result);
         assertThat(result.getId()).isEqualTo(task1.getId());
         assertThat(result.getTaskType()).isEqualTo(TaskType.SLOW);
-        assertThat(result.getRoutineDay()).isEqualTo(DayOfWeek.WEDNESDAY);
+        assertThat(result.getRoutine()).isEqualTo(RoutineConverter.routineDaysToByte(List.of(DayOfWeek.WEDNESDAY)));
         assertThat(result.getRoutineTime()).isEqualTo(LocalTime.of(13, 0));
     }
 

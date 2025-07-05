@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 public class TaskRequestDTO {
@@ -19,7 +20,7 @@ public class TaskRequestDTO {
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static class RoutineDTO {
         private final TaskType taskType;
-        private final DayOfWeek routineDay;
+        private final List<DayOfWeek> routineDay;
 
         @Schema(type = "string", pattern = "HH:mm", example = "14:00")
         @JsonFormat(pattern = "HH:mm")
