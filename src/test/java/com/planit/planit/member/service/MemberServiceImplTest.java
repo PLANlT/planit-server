@@ -11,6 +11,7 @@ import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.redis.service.RefreshTokenRedisService;
 import com.planit.planit.redis.service.BlacklistTokenRedisService;
 
+import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -141,7 +142,7 @@ class MemberServiceImplTest {
             given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
                     .willReturn("refresh-token2");
 
-            var agreement = com.planit.planit.web.dto.member.term.TermAgreementDTO.Request.builder()
+            TermAgreementDTO.Request agreement = TermAgreementDTO.Request.builder()
                     .termOfUse(LocalDateTime.now())
                     .termOfPrivacy(LocalDateTime.now())
                     .build();
@@ -154,6 +155,78 @@ class MemberServiceImplTest {
             assertThat(response.getEmail()).isEqualTo("newbie2@gmail.com");
             assertThat(response.getAccessToken()).isEqualTo("access-token2");
             assertThat(response.getRefreshToken()).isEqualTo("refresh-token2");
+        }
+
+        @Test
+        @DisplayName("기존 회원 로그인 시 refreshToken이 Redis에 이미 있으면 조회만 하고 저장하지 않는다")
+        void signIn_existingMember_refreshTokenExists() {
+            // given
+            Map<String, Object> attributes = Map.of(
+                    "email", "exist2@planit.com",
+                    "name", "플래닛2"
+            );
+            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
+
+            Member existing = Member.builder()
+                    .email("exist2@planit.com")
+                    .memberName("플래닛2")
+                    .role(Role.USER)
+                    .signType(SignType.GOOGLE)
+                    .guiltyFreeMode(false)
+                    .password("")
+                    .build();
+
+            given(memberRepository.findByEmail("exist2@planit.com"))
+                    .willReturn(Optional.of(existing));
+            given(jwtProvider.createAccessToken(any(), any(), any(), any()))
+                    .willReturn("access-token-exist2");
+            given(refreshTokenRedisService.getRefreshTokenByMemberId(any()))
+                    .willReturn("redis-refresh-token");
+
+            // when
+            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, null);
+
+            // then
+            assertThat(response.getRefreshToken()).isEqualTo("redis-refresh-token");
+            verify(refreshTokenRedisService).getRefreshTokenByMemberId(any());
+            verify(refreshTokenRedisService, Mockito.never()).saveRefreshToken(any(), any());
+        }
+
+        @Test
+        @DisplayName("기존 회원 로그인 시 refreshToken이 Redis에 없으면 새로 발급 및 저장한다")
+        void signIn_existingMember_refreshTokenNotExists() {
+            // given
+            Map<String, Object> attributes = Map.of(
+                    "email", "exist3@planit.com",
+                    "name", "플래닛3"
+            );
+            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
+
+            Member existing = Member.builder()
+                    .email("exist3@planit.com")
+                    .memberName("플래닛3")
+                    .role(Role.USER)
+                    .signType(SignType.GOOGLE)
+                    .guiltyFreeMode(false)
+                    .password("")
+                    .build();
+
+            given(memberRepository.findByEmail("exist3@planit.com"))
+                    .willReturn(Optional.of(existing));
+            given(jwtProvider.createAccessToken(any(), any(), any(), any()))
+                    .willReturn("access-token-exist3");
+            given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
+                    .willReturn("new-refresh-token");
+            given(refreshTokenRedisService.getRefreshTokenByMemberId(any()))
+                    .willReturn(null);
+
+            // when
+            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, null);
+
+            // then
+            assertThat(response.getRefreshToken()).isEqualTo("new-refresh-token");
+            verify(refreshTokenRedisService).getRefreshTokenByMemberId(any());
+            verify(refreshTokenRedisService).saveRefreshToken(any(), any());
         }
     }
 
