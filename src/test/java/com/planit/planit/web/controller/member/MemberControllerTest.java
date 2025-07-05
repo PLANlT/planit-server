@@ -108,7 +108,7 @@ class MemberControllerTest {
         }
 
         @Test
-        @DisplayName("신규 회원이면 200 OK와 isNewMember=true인 body를 반환한다")
+        @DisplayName("약관 동의 안한 신규 멤버는 2003을 반환한다.")
         void signIn_newMember_returnsOkAndBody() throws Exception {
             // given
             TermAgreementDTO.Request termRequest = null; // 신규 회원이지만 아직 약관 동의하지 않음
@@ -135,8 +135,8 @@ class MemberControllerTest {
                             .requestAttr("oauthUser", fakeUser))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.isSuccess").value(true))
-                    .andExpect(jsonPath("$.code").value("MEMBER2001"))
-                    .andExpect(jsonPath("$.message").value("회원가입이 완료되었습니다."))
+                    .andExpect(jsonPath("$.code").value("MEMBER2003"))
+                    .andExpect(jsonPath("$.message").value("약관 동의가 필요합니다."))
                     .andExpect(jsonPath("$.data.isNewMember").value(true))
                     .andExpect(jsonPath("$.data.isSignUpCompleted").value(false))
                     .andExpect(jsonPath("$.data.email").value("new@example.com"))

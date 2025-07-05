@@ -9,6 +9,7 @@ public enum MemberSuccessStatus implements SuccessResponse {
     SIGN_IN_SUCCESS(HttpStatus.OK, "MEMBER2000", "로그인이 완료되었습니다."),
     SIGN_UP_SUCCESS(HttpStatus.CREATED, "MEMBER2001", "회원가입이 완료되었습니다."),
     SIGN_OUT_SUCCESS(HttpStatus.OK, "MEMBER2002", "로그아웃이 완료되었습니다."),
+    TERMS_AGREEMENT_REQUIRED(HttpStatus.OK, "MEMBER2003", "약관 동의가 필요합니다."),
 
     // 길티프리
     GUILTY_FREE_SET(HttpStatus.OK, "MEMBER2010", "길티프리를 활성화하였습니다."),

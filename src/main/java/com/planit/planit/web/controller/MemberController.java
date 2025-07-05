@@ -40,7 +40,7 @@ public class MemberController {
             return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_UP_SUCCESS, response);
         } else if (response.isNewMember()) {
             // 신규 회원이지만 약관 동의가 필요한 경우
-            return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_UP_SUCCESS, response);
+            return ApiResponse.onSuccess(MemberSuccessStatus.TERMS_AGREEMENT_REQUIRED, response);
         } else {
             // 기존 회원 로그인
             return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, response);
