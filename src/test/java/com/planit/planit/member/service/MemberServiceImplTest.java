@@ -1,14 +1,12 @@
 package com.planit.planit.member.service;
 
 import com.planit.planit.auth.FakeCustomOAuth2User;
-import com.planit.planit.auth.FakeOAuth2User;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.MemberRepository;
-import com.planit.planit.member.association.TermRepository;
+import com.planit.planit.member.repository.MemberRepository;
+import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
-import com.planit.planit.redis.entity.RefreshTokenRedisEntity;
 import com.planit.planit.redis.repository.RefreshTokenRedisRepository;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.redis.service.RefreshTokenRedisService;
@@ -18,9 +16,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;

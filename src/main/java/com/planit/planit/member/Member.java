@@ -55,7 +55,7 @@ public class Member extends BaseEntity {
     @Column
     private LocalDate attendanceStartedAt;              // 연속 출석 시작일
 
-    @Column
+    @Column(nullable = false)
     private LocalDate lastGuiltyFreeDate;               // 최근 길티프리 실행일
 
     @Column(nullable = false)
@@ -71,9 +71,8 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Setter
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private GuiltyFree guiltyFree;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GuiltyFree> guiltyFrees;
 
     @Setter
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -113,6 +112,8 @@ public class Member extends BaseEntity {
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
         this.maxConsecutiveDays = 0L;
+        this.lastGuiltyFreeDate = LocalDate.MIN;
+        this.guiltyFrees = new ArrayList<>();
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();
@@ -126,14 +127,15 @@ public class Member extends BaseEntity {
         this.inactive = LocalDateTime.now();
     }
 
-    public void activateGuiltyFree(GuiltyFreeReason reason, LocalDate today) {
+    public void activateGuiltyFree(GuiltyFree guiltyFree) {
+
         // 길티프리 활성화
-        guiltyFree.activate(reason, today);
-        lastGuiltyFreeDate = today;
+        lastGuiltyFreeDate = guiltyFree.getActive();
+        guiltyFrees.add(guiltyFree);
 
         // 최대 연속일을 연장해야 하는 경우
-        long consecutiveDays = ChronoUnit.DAYS.between(attendanceStartedAt, today);
-        if (isConsecutiveAttendance(today) && consecutiveDays == maxConsecutiveDays) {
+        long consecutiveDays = ChronoUnit.DAYS.between(attendanceStartedAt, lastGuiltyFreeDate);
+        if (isConsecutiveAttendance(lastGuiltyFreeDate) && consecutiveDays == maxConsecutiveDays) {
             maxConsecutiveDays = maxConsecutiveDays + 1;
         }
     }

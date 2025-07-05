@@ -3,7 +3,7 @@ package com.planit.planit.task.service;
 import com.planit.planit.common.api.plan.PlanHandler;
 import com.planit.planit.common.api.task.TaskHandler;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.association.GuiltyFree;
 import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.plan.Plan;
@@ -88,12 +88,6 @@ class TaskCommandServiceTest {
                 .password("password")
                 .guiltyFreeMode(false)
                 .build();
-
-        GuiltyFree guiltyFree = GuiltyFree.builder()
-                .member(member1)
-                .reason(GuiltyFreeReason.NONE)
-                .build();
-        member1.setGuiltyFree(guiltyFree);
     }
 
     private void initPlan() {
@@ -385,7 +379,6 @@ class TaskCommandServiceTest {
         assertThat(result.getDate()).isEqualTo(LocalDate.of(2025, 1, 3));
         assertThat(result.getIsCompleted()).isEqualTo(true);
         assertThat(member1.getLastAttendanceDate()).isEqualTo(LocalDate.of(2025, 1, 3));
-        assertThat(member1.getLastGuiltyFreeDate()).isNull();
         assertThat(member1.getAttendanceStartedAt()).isEqualTo(LocalDate.of(2025, 1, 1));
         assertThat(member1.getMaxConsecutiveDays()).isEqualTo(3L);
     }
@@ -397,9 +390,10 @@ class TaskCommandServiceTest {
 
         // given
         member1.updateConsecutiveDays(LocalDate.of(2025, 1, 1));
-        member1.activateGuiltyFree(
+        member1.activateGuiltyFree(GuiltyFree.of(
+                member1,
                 GuiltyFreeReason.LACK_OF_MOTIVATION,
-                LocalDate.of(2025, 1, 2)
+                LocalDate.of(2025, 1, 2))
         );
 
         task = Task.builder()
@@ -478,7 +472,6 @@ class TaskCommandServiceTest {
         assertThat(result.getDate()).isEqualTo(LocalDate.of(2025, 1, 4));
         assertThat(result.getIsCompleted()).isEqualTo(true);
         assertThat(member1.getLastAttendanceDate()).isEqualTo(LocalDate.of(2025, 1, 4));
-        assertThat(member1.getLastGuiltyFreeDate()).isNull();
         assertThat(member1.getAttendanceStartedAt()).isEqualTo(LocalDate.of(2025, 1, 4));
         assertThat(member1.getMaxConsecutiveDays()).isEqualTo(2L);
     }
@@ -490,9 +483,10 @@ class TaskCommandServiceTest {
         // given
         member1.updateConsecutiveDays(LocalDate.of(2025, 1, 1));
         member1.updateConsecutiveDays(LocalDate.of(2025, 1, 2));
-        member1.activateGuiltyFree(
+        member1.activateGuiltyFree(GuiltyFree.of(
+                member1,
                 GuiltyFreeReason.LACK_OF_MOTIVATION,
-                LocalDate.of(2025, 1, 3)
+                LocalDate.of(2025, 1, 3))
         );
 
         task = Task.builder()
