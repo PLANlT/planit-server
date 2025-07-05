@@ -1,24 +1,29 @@
 package com.planit.planit.web.controller.member;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.planit.planit.auth.FakeCustomOAuth2User;
 import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.config.oauth.CustomOAuth2UserService;
-import com.planit.planit.member.MemberRepository;
 import com.planit.planit.member.enums.SignType;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.web.controller.MemberController;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -55,6 +60,12 @@ class MemberControllerTest {
     @MockBean
     private MemberRepository memberRepository;
 
+    @BeforeEach
+    void setUp() {
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
     @Nested
     @DisplayName("signIn API는")
     class SignIn {
@@ -67,6 +78,7 @@ class MemberControllerTest {
 
             OAuthLoginDTO.Response response = OAuthLoginDTO.Response.builder()
                     .isNewMember(false)
+                    .isSignUpCompleted(false)
                     .email("test@example.com")
                     .name("홍길동")
                     .accessToken("access-token-abc")
@@ -85,10 +97,14 @@ class MemberControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .requestAttr("oauthUser", fakeUser))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.email").value("test@example.com"))
-                    .andExpect(jsonPath("$.isNewMember").value(false))
-                    .andExpect(jsonPath("$.accessToken").value("access-token-abc"))
-                    .andExpect(jsonPath("$.refreshToken").value("refresh-token-def"));
+                    .andExpect(jsonPath("$.isSuccess").value(true))
+                    .andExpect(jsonPath("$.code").value("MEMBER2000"))
+                    .andExpect(jsonPath("$.message").value("로그인이 완료되었습니다."))
+                    .andExpect(jsonPath("$.data.email").value("test@example.com"))
+                    .andExpect(jsonPath("$.data.isNewMember").value(false))
+                    .andExpect(jsonPath("$.data.isSignUpCompleted").value(false))
+                    .andExpect(jsonPath("$.data.accessToken").value("access-token-abc"))
+                    .andExpect(jsonPath("$.data.refreshToken").value("refresh-token-def"));
         }
 
         @Test
@@ -99,6 +115,7 @@ class MemberControllerTest {
 
             OAuthLoginDTO.Response response = OAuthLoginDTO.Response.builder()
                     .isNewMember(true)
+                    .isSignUpCompleted(false)
                     .email("new@example.com")
                     .name("새 유저")
                     .accessToken(null)
@@ -117,9 +134,13 @@ class MemberControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .requestAttr("oauthUser", fakeUser))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.isNewMember").value(true))
-                    .andExpect(jsonPath("$.email").value("new@example.com"))
-                    .andExpect(jsonPath("$.name").value("새 유저"));
+                    .andExpect(jsonPath("$.isSuccess").value(true))
+                    .andExpect(jsonPath("$.code").value("MEMBER2001"))
+                    .andExpect(jsonPath("$.message").value("회원가입이 완료되었습니다."))
+                    .andExpect(jsonPath("$.data.isNewMember").value(true))
+                    .andExpect(jsonPath("$.data.isSignUpCompleted").value(false))
+                    .andExpect(jsonPath("$.data.email").value("new@example.com"))
+                    .andExpect(jsonPath("$.data.name").value("새 유저"));
         }
 
         @Test
@@ -129,10 +150,13 @@ class MemberControllerTest {
             TermAgreementDTO.Request termRequest = TermAgreementDTO.Request.builder()
                     .termOfUse(LocalDateTime.now())
                     .termOfPrivacy(LocalDateTime.now())
+                    .termOfInfo(LocalDateTime.now())
+                    .overFourteen(LocalDateTime.now())
                     .build();
 
             OAuthLoginDTO.Response response = OAuthLoginDTO.Response.builder()
-                    .isNewMember(true)  // 약관 동의로 회원가입 완료
+                    .isNewMember(true)  // 신규 회원이지만 회원가입 완료
+                    .isSignUpCompleted(true)
                     .email("new@example.com")
                     .name("새 유저")
                     .accessToken("access-token-xyz")
@@ -149,11 +173,17 @@ class MemberControllerTest {
             // when & then
             mockMvc.perform(post("/members/sign-in")
                             .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(termRequest))
                             .requestAttr("oauthUser", fakeUser))
+                    .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.isNewMember").value(true))
-                    .andExpect(jsonPath("$.accessToken").value("access-token-xyz"))
-                    .andExpect(jsonPath("$.refreshToken").value("refresh-token-xyz"));
+                    .andExpect(jsonPath("$.isSuccess").value(true))
+                    .andExpect(jsonPath("$.code").value("MEMBER2001"))
+                    .andExpect(jsonPath("$.message").value("회원가입이 완료되었습니다."))
+                    .andExpect(jsonPath("$.data.isNewMember").value(true))
+                    .andExpect(jsonPath("$.data.isSignUpCompleted").value(true))
+                    .andExpect(jsonPath("$.data.accessToken").value("access-token-xyz"))
+                    .andExpect(jsonPath("$.data.refreshToken").value("refresh-token-xyz"));
         }
 
         @Test

@@ -5,8 +5,8 @@ import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.config.jwt.UserPrincipal;
 import com.planit.planit.config.oauth.CustomOAuth2UserService;
-import com.planit.planit.member.MemberRepository;
 import com.planit.planit.member.enums.Role;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.web.controller.MemberController;
 import org.junit.jupiter.api.*;
@@ -98,7 +98,9 @@ class MemberControllerSignOutTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(status().isOk())
-                    .andExpect(content().string(""));
+                    .andExpect(jsonPath("$.code").value("MEMBER2002"))
+                    .andExpect(jsonPath("$.message").value("로그아웃이 완료되었습니다."))
+                    .andExpect(jsonPath("$.success").value(true));
         }
 
         @Test

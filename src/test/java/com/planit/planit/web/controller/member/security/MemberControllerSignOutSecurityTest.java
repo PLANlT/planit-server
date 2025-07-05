@@ -1,7 +1,7 @@
 package com.planit.planit.web.controller.member.security;
 
 import com.planit.planit.config.SecurityConfig;
-import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.config.oauth.CustomOAuth2UserService;
