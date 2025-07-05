@@ -3,7 +3,7 @@ package com.planit.planit.task.repository;
 import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;

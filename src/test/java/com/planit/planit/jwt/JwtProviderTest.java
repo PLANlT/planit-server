@@ -44,7 +44,7 @@ class JwtProviderTest {
         assertThat(jwtProvider.getId(token)).isEqualTo(userId);
         assertThat(jwtProvider.getEmail(token)).isEqualTo(email);
         assertThat(jwtProvider.getMemberName(token)).isEqualTo(memberName);
-        assertThat(jwtProvider.getRole(token)).isEqualTo(role);
+        assertThat(jwtProvider.getRole(token)).isEqualTo(role.toString());
     }
 
     @Test
@@ -79,7 +79,7 @@ class JwtProviderTest {
         assertThat(jwtProvider.getId(refreshToken)).isEqualTo(userId);
         assertThat(jwtProvider.getEmail(refreshToken)).isEqualTo(email);
         assertThat(jwtProvider.getMemberName(refreshToken)).isEqualTo(memberName);
-        assertThat(jwtProvider.getRole(refreshToken)).isEqualTo(role);
+        assertThat(jwtProvider.getRole(refreshToken)).isEqualTo(role.toString());
     }
 
 }

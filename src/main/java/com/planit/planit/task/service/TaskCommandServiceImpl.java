@@ -7,7 +7,7 @@ import com.planit.planit.common.api.plan.status.PlanErrorStatus;
 import com.planit.planit.common.api.task.TaskHandler;
 import com.planit.planit.common.api.task.status.TaskErrorStatus;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;

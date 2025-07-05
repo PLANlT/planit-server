@@ -5,7 +5,7 @@ import com.planit.planit.common.api.member.status.MemberErrorStatus;
 import com.planit.planit.common.api.plan.PlanHandler;
 import com.planit.planit.common.api.plan.status.PlanErrorStatus;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;

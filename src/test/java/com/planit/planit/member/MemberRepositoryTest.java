@@ -2,8 +2,8 @@ package com.planit.planit.member;
 
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
+import com.planit.planit.member.repository.MemberRepository;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

@@ -2,7 +2,7 @@ package com.planit.planit.task.service;
 
 import com.planit.planit.common.api.task.TaskHandler;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
