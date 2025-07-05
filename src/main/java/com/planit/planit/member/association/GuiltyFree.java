@@ -16,10 +16,11 @@ import java.time.LocalDateTime;
 public class GuiltyFree {
 
     @Id
-    private Long memberId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
+    private Long id;
 
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
@@ -27,23 +28,25 @@ public class GuiltyFree {
     @Column
     private GuiltyFreeReason reason;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate active;
 
 /*------------------------------ CONSTRUCTOR ------------------------------*/
 
     protected GuiltyFree() {}
 
-    @Builder
-    public GuiltyFree(
+    private GuiltyFree(
             Member member,
             GuiltyFreeReason reason,
-            @Nullable LocalDate active
+            LocalDate active
     ) {
-        this.memberId = member.getId();
         this.member = member;
         this.reason = reason;
         this.active = active;
+    }
+
+    public static GuiltyFree of(Member member, GuiltyFreeReason reason, LocalDate active) {
+        return new GuiltyFree(member, reason, active);
     }
 
 /*------------------------------ METHOD ------------------------------*/

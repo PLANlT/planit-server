@@ -30,9 +30,9 @@ public class GuiltyFreeController {
 
     @Operation(summary = "[GUILTY-FREE] 길티프리 활성일 조회하기")
     @GetMapping("/guilty-free")
-    public ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeActivationDTO> getGuiltyFreeStatus() {
+    public ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeStatusDTO> getGuiltyFreeStatus() {
         Long memberId = 1L; // 인증 기능 구현 이후 변경
-        GuiltyFreeResponseDTO.GuiltyFreeActivationDTO guiltyFreeActivationDTO = guiltyFreeService.getGuiltyFreeStatus(memberId);
+        GuiltyFreeResponseDTO.GuiltyFreeStatusDTO guiltyFreeActivationDTO = guiltyFreeService.getGuiltyFreeStatus(memberId);
         return ApiResponse.onSuccess(MemberSuccessStatus.GUILTY_FREE_FOUND, guiltyFreeActivationDTO);
     }
 }

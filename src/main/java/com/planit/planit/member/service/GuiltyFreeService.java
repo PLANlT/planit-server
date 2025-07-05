@@ -7,5 +7,5 @@ public interface GuiltyFreeService {
 
     GuiltyFreeResponseDTO.GuiltyFreeActivationDTO activateGuiltyFree(Long memberId, GuiltyFreeReason reason);
 
-    GuiltyFreeResponseDTO.GuiltyFreeActivationDTO getGuiltyFreeStatus(Long memberId);
+    GuiltyFreeResponseDTO.GuiltyFreeStatusDTO getGuiltyFreeStatus(Long memberId);
 }
