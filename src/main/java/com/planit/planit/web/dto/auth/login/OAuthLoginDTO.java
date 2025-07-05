@@ -13,10 +13,7 @@ public class OAuthLoginDTO {
     public static class Request {
         private String oauthProvider;
         private String oauthAccessToken;
-        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private java.time.LocalDateTime termOfUse;
-        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private java.time.LocalDateTime termOfPrivacy;
+
     }
 
     @Getter
@@ -28,5 +25,7 @@ public class OAuthLoginDTO {
         private String refreshToken;
         @JsonProperty("isNewMember")
         private boolean isNewMember;
+        @JsonProperty("isSignUpCompleted")
+        private boolean isSignUpCompleted;
     }
 }

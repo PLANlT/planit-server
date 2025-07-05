@@ -38,12 +38,15 @@ public class MemberServiceImpl implements MemberService {
 
         Optional<Member> optionalMember = memberRepository.findByEmail(email);
 
+        //있는지 없는지부터 확인
         if (optionalMember.isPresent()) {
+            //있으면 -> 로그인 -> 리프레시 토큰 찾는다
             Member member = optionalMember.get();
             String accessToken = jwtProvider.createAccessToken(
                     member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
             );
             String refreshToken = refreshTokenRedisService.getRefreshTokenByMemberId(member.getId());
+            // 없으면 만든다
             if (refreshToken == null) {
                 refreshToken = jwtProvider.createRefreshToken(
                         member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
@@ -56,11 +59,16 @@ public class MemberServiceImpl implements MemberService {
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .isNewMember(false)
+                    .isSignUpCompleted(false)
                     .build();
         }
 
         // 신규 회원
-        if (termRequest == null || termRequest.getTermOfUse() == null || termRequest.getTermOfPrivacy() == null) {
+        if (termRequest == null || 
+            termRequest.getTermOfUse() == null || 
+            termRequest.getTermOfPrivacy() == null ||
+            termRequest.getTermOfInfo() == null ||
+            termRequest.getOverFourteen() == null) {
             // 약관 동의가 안 됨 → 동의 필요 안내
             return OAuthLoginDTO.Response.builder()
                     .email(email)
@@ -68,8 +76,10 @@ public class MemberServiceImpl implements MemberService {
                     .accessToken(null)
                     .refreshToken(null)
                     .isNewMember(true)
+                    .isSignUpCompleted(false)
                     .build();
         }
+        
         // 약관 동의 완료 → 회원가입 처리
         Member member = Member.builder()
                 .email(email)
@@ -84,6 +94,8 @@ public class MemberServiceImpl implements MemberService {
                 .member(member)
                 .termOfUse(termRequest.getTermOfUse())
                 .termOfPrivacy(termRequest.getTermOfPrivacy())
+                .termOfInfo(termRequest.getTermOfInfo())
+                .overFourteen(termRequest.getOverFourteen())
                 .build();
         termRepository.save(term);
 
@@ -99,7 +111,8 @@ public class MemberServiceImpl implements MemberService {
                 .name(member.getMemberName())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .isNewMember(false)
+                .isNewMember(true)
+                .isSignUpCompleted(true)
                 .build();
     }
 

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -145,13 +147,16 @@ class MemberServiceImplTest {
             TermAgreementDTO.Request agreement = TermAgreementDTO.Request.builder()
                     .termOfUse(LocalDateTime.now())
                     .termOfPrivacy(LocalDateTime.now())
+                    .termOfInfo(LocalDateTime.now())
+                    .overFourteen(LocalDateTime.now())
                     .build();
 
             // when
             OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, agreement);
 
             // then
-            assertThat(response.isNewMember()).isFalse();
+            assertThat(response.isNewMember()).isTrue();
+            assertThat(response.isSignUpCompleted()).isTrue();
             assertThat(response.getEmail()).isEqualTo("newbie2@gmail.com");
             assertThat(response.getAccessToken()).isEqualTo("access-token2");
             assertThat(response.getRefreshToken()).isEqualTo("refresh-token2");
