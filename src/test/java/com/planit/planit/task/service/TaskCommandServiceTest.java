@@ -3,7 +3,7 @@ package com.planit.planit.task.service;
 import com.planit.planit.common.api.plan.PlanHandler;
 import com.planit.planit.common.api.task.TaskHandler;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.association.GuiltyFree;
 import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.plan.Plan;

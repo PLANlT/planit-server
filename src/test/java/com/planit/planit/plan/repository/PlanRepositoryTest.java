@@ -1,7 +1,7 @@
 package com.planit.planit.plan.repository;
 
 import com.planit.planit.member.Member;
-import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;

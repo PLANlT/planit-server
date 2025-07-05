@@ -5,7 +5,7 @@ import com.planit.planit.config.jwt.JwtProperties;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.config.jwt.UserPrincipal;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.MemberRepository;
+import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.enums.DailyCondition;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
