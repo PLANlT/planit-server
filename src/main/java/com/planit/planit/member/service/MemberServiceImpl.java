@@ -43,9 +43,13 @@ public class MemberServiceImpl implements MemberService {
             String accessToken = jwtProvider.createAccessToken(
                     member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
             );
-            String refreshToken = jwtProvider.createRefreshToken(
-                    member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-            );
+            String refreshToken = refreshTokenRedisService.getRefreshTokenByMemberId(member.getId());
+            if (refreshToken == null) {
+                refreshToken = jwtProvider.createRefreshToken(
+                        member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
+                );
+                refreshTokenRedisService.saveRefreshToken(member.getId(), refreshToken);
+            }
             return OAuthLoginDTO.Response.builder()
                     .email(member.getEmail())
                     .name(member.getMemberName())
@@ -89,6 +93,7 @@ public class MemberServiceImpl implements MemberService {
         String refreshToken = jwtProvider.createRefreshToken(
                 member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
         );
+        refreshTokenRedisService.saveRefreshToken(member.getId(), refreshToken);
         return OAuthLoginDTO.Response.builder()
                 .email(member.getEmail())
                 .name(member.getMemberName())

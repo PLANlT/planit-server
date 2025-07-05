@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public interface MemberService {
 
     // 로그인/회원가입/약관동의 통합 signIn 메서드
-    OAuthLoginDTO.Response signIn(CustomOAuth2User oAuth2User, com.planit.planit.web.dto.member.term.TermAgreementDTO.Request termRequest);
+    OAuthLoginDTO.Response signIn(CustomOAuth2User oAuth2User, TermAgreementDTO.Request termRequest);
 
     void signOut(Long memberId, String accessToken);
 }
