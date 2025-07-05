@@ -28,9 +28,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
-        // Authorization 헤더가 없거나, Bearer 형식이 아닐 경우 필터 체인 계속 진행
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            response.setStatus(ErrorStatus.UNAUTHORIZED.getErrorStatus().value());
+            response.getWriter().write(ErrorStatus.UNAUTHORIZED.getMessage());
             return;
         }
 
