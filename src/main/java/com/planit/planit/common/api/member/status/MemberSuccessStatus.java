@@ -8,6 +8,7 @@ public enum MemberSuccessStatus implements SuccessResponse {
     // 길티프리
     GUILTY_FREE_SET(HttpStatus.OK, "MEMBER2001", "길티프리를 활성화하였습니다."),
     GUILTY_FREE_FOUND(HttpStatus.OK, "MEMBER2002", "길티프리 활성일을 조회하였습니다."),
+    GUILTY_FREE_REASON_LIST_FOUND(HttpStatus.OK, "MEMBER2003", "길티프리 사유 목록을 조회하였습니다."),
 
     ;
 

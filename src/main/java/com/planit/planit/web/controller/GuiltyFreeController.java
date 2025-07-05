@@ -35,4 +35,12 @@ public class GuiltyFreeController {
         GuiltyFreeResponseDTO.GuiltyFreeStatusDTO guiltyFreeActivationDTO = guiltyFreeService.getGuiltyFreeStatus(memberId);
         return ApiResponse.onSuccess(MemberSuccessStatus.GUILTY_FREE_FOUND, guiltyFreeActivationDTO);
     }
+
+    @Operation(summary = "[GUILTY-FREE] 길티프리 사유 목록 조회하기")
+    @GetMapping("/guilty-free/list")
+    public ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeReasonListDTO> getGuiltyFreeReasons() {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        GuiltyFreeResponseDTO.GuiltyFreeReasonListDTO guiltyFreeReasonListDTO = guiltyFreeService.getGuiltyFreeReasons(memberId);
+        return ApiResponse.onSuccess(MemberSuccessStatus.GUILTY_FREE_REASON_LIST_FOUND, guiltyFreeReasonListDTO);
+    }
 }

@@ -58,4 +58,11 @@ public class GuiltyFreeServiceImpl implements GuiltyFreeService {
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
         return GuiltyFreeResponseDTO.GuiltyFreeStatusDTO.of(member);
     }
+
+    @Override
+    public GuiltyFreeResponseDTO.GuiltyFreeReasonListDTO getGuiltyFreeReasons(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        return GuiltyFreeResponseDTO.GuiltyFreeReasonListDTO.of(member);
+    }
 }
