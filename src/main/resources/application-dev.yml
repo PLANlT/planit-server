@@ -13,6 +13,10 @@ spring:
   logging:
     level:
       root: DEBUG
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 jwt:
   expirationMs: 3600000 # 1시간 (밀리초)
