@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   redis:
     image: redis:7.0
 
   app:
-    image: sy8389b/planit:latest
+    image: ${DOCKERHUB_USERNAME}/planit:latest
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
