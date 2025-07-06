@@ -24,6 +24,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -56,6 +57,8 @@ jobs:
       - prod-1
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Execute docker compose down
         run: sudo docker compose down
 
