@@ -2,7 +2,7 @@ name: Production Build Test
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
 
 jobs:
   build:
