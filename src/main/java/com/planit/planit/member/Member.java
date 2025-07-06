@@ -6,7 +6,6 @@ import com.planit.planit.dream.Dream;
 import com.planit.planit.member.association.GuiltyFree;
 import com.planit.planit.member.association.Term;
 import com.planit.planit.member.enums.DailyCondition;
-import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.task.Task;
