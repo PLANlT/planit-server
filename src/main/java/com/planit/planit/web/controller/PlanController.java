@@ -2,6 +2,7 @@ package com.planit.planit.web.controller;
 
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.plan.status.PlanSuccessStatus;
+import com.planit.planit.member.enums.DailyCondition;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.service.PlanCommandService;
 import com.planit.planit.plan.service.PlanQueryService;
@@ -88,7 +89,7 @@ public class PlanController {
 
     @Operation(summary = "[PLAN] 플랜 목록 조회하기")
     @GetMapping("/plans")
-    public ApiResponse<PlanResponseDTO.PlanListDTO> getTodayPlans(
+    public ApiResponse<PlanResponseDTO.PlanListDTO> getPlans(
             @RequestParam PlanStatus planStatus
     ) {
         Long memberId = 1L; // 인증 기능 구현 이후 변경

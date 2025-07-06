@@ -67,8 +67,8 @@ public class PlanResponseDTO {
     public static class TodayPlanListDTO {
         private final LocalDate todayDate;
         private final DayOfWeek dayOfWeek;
-        private final List<TodayPlanDTO> plans;
-
+        private final List<TodayPlanDTO> slowPlans;
+        private final List<TodayPlanDTO> passionatePlans;
     }
 
     @Getter
