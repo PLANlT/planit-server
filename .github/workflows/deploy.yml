@@ -76,7 +76,9 @@ jobs:
         run: sudo docker compose down
 
       - name: Execute docker compose up
-        run: sudo docker compose up -d
+        run: |
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/planit:latest
+          sudo docker compose up -d
 
       - name: Delete Old Docker Image
         run: sudo docker system prune -f
