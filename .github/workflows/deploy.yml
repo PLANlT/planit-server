@@ -2,7 +2,12 @@ name: Deploy
 
 on:
   pull_request:
-    branches: [ "main", "develop" ]
+    branches:
+      - main
+      - develop
+    types:
+      - reopened
+      - closed
 
 jobs:
   build-docker-image:
@@ -65,6 +70,12 @@ jobs:
           echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> .env
           echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> .env
           echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
+
+      - name: Sign in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Execute docker compose down
         run: sudo docker compose down
