@@ -14,3 +14,7 @@ spring:
   logging:
     level:
       root: WARN
+  data:
+    redis:
+      host: redis
+      port: 6379
