@@ -7,6 +7,7 @@ import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
+import com.planit.planit.task.enums.TaskType;
 import com.planit.planit.task.repository.TaskRepository;
 import com.planit.planit.task.association.CompletedTask;
 import com.planit.planit.web.dto.plan.PlanResponseDTO;
@@ -152,7 +153,9 @@ class PlanQueryServiceTest {
                 .member(member1)
                 .plan(planInProgress1)
                 .build();
-        CompletedTask completedTask = new CompletedTask(task2, LocalDate.now());
+
+        task1.setRoutine(TaskType.SLOW, (byte) 127, null);
+        task2.setRoutine(TaskType.PASSIONATE, (byte) 127, null);
 
         planInProgress1.addTask(task1);
         planInProgress1.addTask(task2);
@@ -176,11 +179,10 @@ class PlanQueryServiceTest {
         // then
         assertNotNull(result);
         assertThat(result.getTodayDate()).isEqualTo(LocalDate.now());
-        assertThat(result.getPlans().size()).isEqualTo(2);
-        assertThat(result.getPlans().get(0).getTitle()).isEqualTo("1");
-        assertThat(result.getPlans().get(0).getDDay()).isEqualTo("D-Day");
-        assertThat(result.getPlans().get(1).getTitle()).isEqualTo("2");
-        assertThat(result.getPlans().get(1).getDDay()).isEqualTo("D-1");
+        assertThat(result.getSlowPlans().get(0).getTitle()).isEqualTo("1");
+        assertThat(result.getSlowPlans().get(0).getDDay()).isEqualTo("D-Day");
+        assertThat(result.getPassionatePlans().get(1).getTitle()).isEqualTo("2");
+        assertThat(result.getPassionatePlans().get(1).getDDay()).isEqualTo("D-1");
     }
 
 /*------------------------------ 플랜 단건 조회 ------------------------------*/
