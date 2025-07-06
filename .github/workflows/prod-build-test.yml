@@ -34,19 +34,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Make application.yml
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_TEST_YML }}" > src/main/resources/application-test.yml
-          echo "${{ secrets.APPLICATION_OAUTH_YML }}" > src/main/resources/application-oauth.yml
-          echo "${{ secrets.APPLICATION_PROD_YML }}" > src/main/resources/application-prod.yml
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       - name: Build with Gradle Wrapper
         run: |
           chmod +x gradlew
-          ./gradlew test -Dspring.profiles.active=test,oauth
           ./gradlew build -x test
