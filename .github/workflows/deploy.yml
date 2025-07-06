@@ -66,6 +66,7 @@ jobs:
 
       - name: Create .env file
         run: |
+          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
           echo "SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }}" >> .env
           echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> .env
           echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> .env
@@ -81,7 +82,9 @@ jobs:
         run: sudo docker compose down
 
       - name: Execute docker compose up
-        run: sudo docker compose up
+        run: |
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/planit:latest
+          sudo docker compose up -d
 
       - name: Delete Old Docker Image
         run: sudo docker system prune -f
