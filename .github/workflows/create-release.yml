@@ -1,0 +1,63 @@
+name: Server Release Workflow
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    
+jobs:
+  create_release:
+    if: github.event.pull_request.merged == true && (contains(github.event.pull_request.labels.*.name, 'major') || contains(github.event.pull_request.labels.*.name, 'minor') || contains(github.event.pull_request.labels.*.name, 'patch'))
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.calculate_version.outputs.new_version }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_html_url: ${{ steps.create_release.outputs.html_url }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          # Get the latest tag or set 0.0.0 if none exists
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          
+      - name: Calculate new version
+        id: calculate_version
+        run: |
+          LATEST_TAG=${{ steps.get_latest_tag.outputs.latest_tag }}
+          
+          # Split the version into major, minor, patch
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_TAG"
+          
+          # Increment based on label
+          if [[ "${{ contains(github.event.pull_request.labels.*.name, 'major') }}" == "true" ]]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'minor') }}" == "true" ]]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'patch') }}" == "true" ]]; then
+            PATCH=$((PATCH + 1))
+          fi
+          
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.calculate_version.outputs.new_version }}
+          release_name: ${{ github.event.pull_request.title }}
+          body: ${{ github.event.pull_request.body }}
+          draft: false
+          prerelease: false

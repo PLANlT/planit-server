@@ -1,0 +1,100 @@
+package com.planit.planit.web.controller;
+
+import com.planit.planit.common.api.ApiResponse;
+import com.planit.planit.common.api.task.status.TaskSuccessStatus;
+import com.planit.planit.task.service.TaskCommandService;
+import com.planit.planit.task.service.TaskQueryService;
+import com.planit.planit.web.dto.task.TaskRequestDTO;
+import com.planit.planit.web.dto.task.TaskResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/planit")
+@Tag(name = "TASK", description = "작업 관련 API")
+public class TaskController {
+
+    private final TaskQueryService taskQueryService;
+    private final TaskCommandService taskCommandService;
+
+    @Operation(summary = "[TASK] 작업 생성하기")
+    @PostMapping("/tasks")
+    public ApiResponse<TaskResponseDTO.TaskPreviewDTO> createTask(
+            @RequestParam Long planId,
+            @RequestParam String title
+    ) {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService.createTask(memberId, planId, title);
+        return ApiResponse.onSuccess(TaskSuccessStatus.TASK_CREATED, taskPreviewDTO);
+    }
+
+    @Operation(summary = "[TASK] 작업명 수정하기")
+    @PatchMapping("/tasks/{taskId}/title")
+    public ApiResponse<TaskResponseDTO.TaskPreviewDTO> updateTask(
+            @PathVariable Long taskId,
+            @RequestParam String title
+    ) {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService.updateTaskTitle(memberId, taskId, title);
+        return ApiResponse.onSuccess(TaskSuccessStatus.TASK_TITLE_UPDATED, taskPreviewDTO);
+    }
+
+    @Operation(summary = "[TASK] 루틴 설정하기")
+    @PatchMapping("/tasks/{taskId}/routine")
+    public ApiResponse<TaskResponseDTO.TaskRoutineDTO> setRoutine(
+            @PathVariable Long taskId,
+            @RequestBody TaskRequestDTO.RoutineDTO routineDTO
+    ) {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        TaskResponseDTO.TaskRoutineDTO taskRoutineDTO = taskCommandService.setRoutine(memberId, taskId, routineDTO);
+        return ApiResponse.onSuccess(TaskSuccessStatus.TASK_ROUTINE_SET, taskRoutineDTO);
+    }
+
+    @Operation(summary = "[TASK] 작업 삭제하기")
+    @PatchMapping("/tasks/{taskId}/delete")
+    public ApiResponse<TaskResponseDTO.TaskPreviewDTO> deleteTask(
+            @PathVariable Long taskId
+    ) {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService.deleteTask(memberId, taskId);
+        return ApiResponse.onSuccess(TaskSuccessStatus.TASK_DELETED, taskPreviewDTO);
+    }
+
+    @Operation(summary = "[TASK] 작업 완료하기")
+    @PostMapping("/tasks/{taskId}/complete")
+    public ApiResponse<TaskResponseDTO.CompletedTaskDTO> completeTask(
+            @PathVariable Long taskId
+    ) {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        LocalDate today = LocalDate.now();
+        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService.completeTask(memberId, taskId, today);
+        return ApiResponse.onSuccess(TaskSuccessStatus.TASK_COMPLETED, completedTaskDTO);
+    }
+
+    @Operation(summary = "[TASK] 작업 완료 취소하기")
+    @PatchMapping("/tasks/{taskId}/cancel-completion")
+    public ApiResponse<TaskResponseDTO.CompletedTaskDTO> cancelTaskCompletion(
+            @PathVariable Long taskId
+    ) {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        LocalDate today = LocalDate.now();
+        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService.cancelTaskCompletion(memberId, taskId, today);
+        return ApiResponse.onSuccess(TaskSuccessStatus.TASK_COMPLETION_CANCELED, completedTaskDTO);
+    }
+
+    @Operation(summary = "[TASK] 루틴 조회하기")
+    @GetMapping("/tasks/{taskId}/routine")
+    public ApiResponse<TaskResponseDTO.TaskRoutineDTO> getCurrentRoutine(
+            @PathVariable Long taskId
+    ) {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        TaskResponseDTO.TaskRoutineDTO taskRoutineDTO = taskQueryService.getCurrentRoutine(memberId, taskId);
+        return ApiResponse.onSuccess(TaskSuccessStatus.TASK_ROUTINE_FOUND, taskRoutineDTO);
+    }
+}

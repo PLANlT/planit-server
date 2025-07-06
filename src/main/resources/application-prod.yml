@@ -5,7 +5,16 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        jdbc:
+          time_zone: UTC
   logging:
     level:
       root: WARN
+  data:
+    redis:
+      host: redis
+      port: 6379

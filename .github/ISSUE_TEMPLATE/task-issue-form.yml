@@ -1,0 +1,38 @@
+name: '작업 생성'
+description: '깃허브 이슈와 지라 티켓(작업)을 생성합니다'
+labels: [feat]
+title: '이슈 이름을 작성해주세요'
+body:
+  - type: input
+    id: templateTag
+    attributes:
+      label: '템플릿 태그 (Template Tag)'
+      description: 'task를 기입해주세요 (! 태그가 잘못되면 지라에 작업이 생성되지 않습니다 !)'
+      value: 'task'
+    validations:
+      required: true
+  
+  - type: input
+    id: parentKey
+    attributes:
+      label: '상위 에픽 (Ticket Number)'
+      description: '에픽의 Ticket Number를 기입해주세요'
+      placeholder: 'PL'
+    validations:
+      required: true
+
+  - type: input
+    id: branch
+    attributes:
+      label: '브랜치명 (Branch)'
+      description: '영어로 컨벤션/브랜치명을 작성해주세요. ex) feature/login'
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: '세부 작업 (Subtasks)'
+      description: '세부 작업에 대해서 간략히 설명해주세요'
+    validations:
+      required: true
