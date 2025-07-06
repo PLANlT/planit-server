@@ -48,5 +48,5 @@ jobs:
           OAUTH2_NAVER_CLIENT_SECRET: ${{ secrets.OAUTH2_NAVER_CLIENT_SECRET }}
         run: |
           chmod +x gradlew
-          ./gradlew clean test -Dspring.profiles.active=test
-          ./gradlew clean build -x test
+          ./gradlew test -i
+          ./gradlew build -x test
