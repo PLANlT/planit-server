@@ -26,6 +26,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
+      - name: Run Tests
+        run: |
+          chmod +x gradlew
+          ./gradlew clean test
+          
       - name: Build with Gradle Wrapper
         env:
           SPRING_PROFILES_ACTIVE: ${{ secrets.SPRING_PROFILES_ACTIVE }}
@@ -34,4 +39,4 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew build
+          ./gradlew clean build -x test
