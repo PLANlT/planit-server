@@ -48,4 +48,5 @@ jobs:
       - name: Build with Gradle Wrapper
         run: |
           chmod +x gradlew
+          ./gradlew test -Dspring.profiles.active=test,oauth
           ./gradlew build -x test
