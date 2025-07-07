@@ -43,89 +43,43 @@ public class MemberServiceImpl implements MemberService {
     private final BlacklistTokenRedisService blacklistTokenRedisService;
     private final SocialTokenVerifier  socialTokenVerifier;
 
-    // 로그인/회원가입/약관동의 통합 signIn 메서드
-    public OAuthLoginDTO.Response signIn(CustomOAuth2User oAuth2User, TermAgreementDTO.Request termRequest) {
-        String email = (String) oAuth2User.getAttributes().get("email");
-        String name = (String) oAuth2User.getAttributes().get("name");
-
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
-
-        //있는지 없는지부터 확인
-        if (optionalMember.isPresent()) {
-            //있으면 -> 로그인 -> 리프레시 토큰 찾는다
-            Member member = optionalMember.get();
-            String accessToken = jwtProvider.createAccessToken(
-                    member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-            );
-            String refreshToken = refreshTokenRedisService.getRefreshTokenByMemberId(member.getId());
-            // 없으면 만든다
-            if (refreshToken == null) {
-                refreshToken = jwtProvider.createRefreshToken(
-                        member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-                );
-                refreshTokenRedisService.saveRefreshToken(member.getId(), refreshToken);
-            }
-            return OAuthLoginDTO.Response.builder()
-                    .email(member.getEmail())
-                    .name(member.getMemberName())
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .isNewMember(false)
-                    .isSignUpCompleted(false)
-                    .build();
+    @Override
+    public OAuthLoginDTO.Response signIn(OAuthLoginDTO.Request request) {
+        SocialTokenVerifier.SocialUserInfo userInfo;
+        try {
+            userInfo = socialTokenVerifier.verify(request.getOauthProvider(), request.getOauthToken());
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.INVALID_ID_TOKEN);
         }
-
-        // 신규 회원
-        if (termRequest == null || 
-            termRequest.getTermOfUse() == null || 
-            termRequest.getTermOfPrivacy() == null ||
-            termRequest.getTermOfInfo() == null ||
-            termRequest.getOverFourteen() == null) {
-            // 약관 동의가 안 됨 → 동의 필요 안내
-            return OAuthLoginDTO.Response.builder()
-                    .email(email)
-                    .name(name)
-                    .accessToken(null)
-                    .refreshToken(null)
-                    .isNewMember(true)
-                    .isSignUpCompleted(false)
-                    .build();
-        }
-        
-        // 약관 동의 완료 → 회원가입 처리
-        Member member = Member.builder()
-                .email(email)
-                .memberName(name)
-                .signType(SignType.GOOGLE) // 또는 oAuth2User에서 추출
+        Optional<Member> memberOpt = memberRepository.findByEmail(userInfo.email);
+        final boolean isNewMember;
+        final Member member;
+        if (memberOpt.isPresent()) {
+            member = memberOpt.get();
+            isNewMember = false;
+        } else {
+            member = Member.builder()
+                .email(userInfo.email)
+                .memberName(userInfo.name)
+                .password(UUID.randomUUID().toString().substring(0, 10))
+                .signType(SignType.valueOf(request.getOauthProvider().toUpperCase()))
                 .guiltyFreeMode(false)
+                .dailyCondition(null)
                 .role(Role.USER)
                 .build();
-        memberRepository.save(member);
-
-        Term term = Term.builder()
-                .member(member)
-                .termOfUse(termRequest.getTermOfUse())
-                .termOfPrivacy(termRequest.getTermOfPrivacy())
-                .termOfInfo(termRequest.getTermOfInfo())
-                .overFourteen(termRequest.getOverFourteen())
-                .build();
-        termRepository.save(term);
-
-        String accessToken = jwtProvider.createAccessToken(
-                member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-        );
-        String refreshToken = jwtProvider.createRefreshToken(
-                member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-        );
-        refreshTokenRedisService.saveRefreshToken(member.getId(), refreshToken);
+            memberRepository.save(member);
+            isNewMember = true;
+        }
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
         return OAuthLoginDTO.Response.builder()
-                .email(member.getEmail())
-                .name(member.getMemberName())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .isNewMember(true)
-                .isSignUpCompleted(true)
-                .build();
+            .email(member.getEmail())
+            .name(member.getMemberName())
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .isNewMember(isNewMember)
+            .isSignUpCompleted(true)
+            .build();
     }
 
     @Override

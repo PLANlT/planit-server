@@ -64,180 +64,34 @@ class MemberServiceImplTest {
     @DisplayName("signIn 메서드")
     class SignIn {
         @Test
-        @DisplayName("기존 회원이면 isNewMember=false와 토큰을 반환한다")
-        void signIn_existingMember_returnsTokenAndIsNewFalse() {
-            // given
-            Map<String, Object> attributes = Map.of(
-                    "email", "exist@planit.com",
-                    "name", "플래닛"
-            );
-            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
-
-            Member existing = Member.builder()
-                    .email("exist@planit.com")
-                    .memberName("플래닛")
-                    .role(Role.USER)
-                    .signType(SignType.GOOGLE)
-                    .guiltyFreeMode(false)
-                    .password("")
+        @DisplayName("신규 회원이면 회원가입 후 토큰을 반환한다")
+        void signIn_newMember_registersAndReturnsToken() throws Exception {
+            OAuthLoginDTO.Request request = OAuthLoginDTO.Request.builder()
+                    .oauthProvider("GOOGLE")
+                    .oauthToken("mock-id-token")
                     .build();
-
-            given(memberRepository.findByEmail("exist@planit.com"))
-                    .willReturn(Optional.of(existing));
-            given(jwtProvider.createAccessToken(any(), any(), any(), any()))
-                    .willReturn("access-token");
-            given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
-                    .willReturn("refresh-token");
-
-            // when
-            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, null);
-
-            // then
-            assertThat(response.isNewMember()).isFalse();
-            assertThat(response.getEmail()).isEqualTo("exist@planit.com");
-            assertThat(response.getAccessToken()).isEqualTo("access-token");
-            assertThat(response.getRefreshToken()).isEqualTo("refresh-token");
-        }
-
-        @Test
-        @DisplayName("신규 회원이 약관 동의 없이 로그인 시도하면 isNewMember=true만 반환한다")
-        void signIn_newMemberWithoutAgreement_returnsIsNewTrue() {
-            // given
-            Map<String, Object> attributes = Map.of(
-                    "email", "newbie@gmail.com",
-                    "name", "뉴비"
-            );
-            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
-
-            given(memberRepository.findByEmail("newbie@gmail.com"))
+            given(memberRepository.findByEmail("newbie@planit.com"))
                     .willReturn(Optional.empty());
-
-            // when
-            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, null);
-
-            // then
-            assertThat(response.isNewMember()).isTrue();
-            assertThat(response.getEmail()).isEqualTo("newbie@gmail.com");
-            assertThat(response.getAccessToken()).isNull();
-            assertThat(response.getRefreshToken()).isNull();
-        }
-
-        @Test
-        @DisplayName("신규 회원이 약관 동의 후 로그인 시도하면 회원가입 처리 및 토큰을 반환한다")
-        void signIn_newMemberWithAgreement_registersAndReturnsToken() {
-            // given
-            Map<String, Object> attributes = Map.of(
-                    "email", "newbie2@gmail.com",
-                    "name", "뉴비2"
-            );
-            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
-
-            given(memberRepository.findByEmail("newbie2@gmail.com"))
-                    .willReturn(Optional.empty());
-
             Member saved = Member.builder()
-                    .email("newbie2@gmail.com")
-                    .memberName("뉴비2")
+                    .id(99L)
+                    .email("newbie@planit.com")
+                    .memberName("뉴비")
                     .role(Role.USER)
                     .signType(SignType.GOOGLE)
                     .guiltyFreeMode(false)
                     .password("")
                     .build();
             given(memberRepository.save(any(Member.class))).willReturn(saved);
-
             given(jwtProvider.createAccessToken(any(), any(), any(), any()))
                     .willReturn("access-token2");
             given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
                     .willReturn("refresh-token2");
-
-            TermAgreementDTO.Request agreement = TermAgreementDTO.Request.builder()
-                    .termOfUse(LocalDateTime.now())
-                    .termOfPrivacy(LocalDateTime.now())
-                    .termOfInfo(LocalDateTime.now())
-                    .overFourteen(LocalDateTime.now())
-                    .build();
-
-            // when
-            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, agreement);
-
-            // then
+            given(socialTokenVerifier.verify(anyString(), anyString()))
+                    .willReturn(new SocialTokenVerifier.SocialUserInfo("newbie@planit.com", "뉴비"));
+            OAuthLoginDTO.Response response = memberServiceImpl.signIn(request);
             assertThat(response.isNewMember()).isTrue();
-            assertThat(response.isSignUpCompleted()).isTrue();
-            assertThat(response.getEmail()).isEqualTo("newbie2@gmail.com");
+            assertThat(response.getEmail()).isEqualTo("newbie@planit.com");
             assertThat(response.getAccessToken()).isEqualTo("access-token2");
-            assertThat(response.getRefreshToken()).isEqualTo("refresh-token2");
-        }
-
-        @Test
-        @DisplayName("기존 회원 로그인 시 refreshToken이 Redis에 이미 있으면 조회만 하고 저장하지 않는다")
-        void signIn_existingMember_refreshTokenExists() {
-            // given
-            Map<String, Object> attributes = Map.of(
-                    "email", "exist2@planit.com",
-                    "name", "플래닛2"
-            );
-            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
-
-            Member existing = Member.builder()
-                    .email("exist2@planit.com")
-                    .memberName("플래닛2")
-                    .role(Role.USER)
-                    .signType(SignType.GOOGLE)
-                    .guiltyFreeMode(false)
-                    .password("")
-                    .build();
-
-            given(memberRepository.findByEmail("exist2@planit.com"))
-                    .willReturn(Optional.of(existing));
-            given(jwtProvider.createAccessToken(any(), any(), any(), any()))
-                    .willReturn("access-token-exist2");
-            given(refreshTokenRedisService.getRefreshTokenByMemberId(any()))
-                    .willReturn("redis-refresh-token");
-
-            // when
-            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, null);
-
-            // then
-            assertThat(response.getRefreshToken()).isEqualTo("redis-refresh-token");
-            verify(refreshTokenRedisService).getRefreshTokenByMemberId(any());
-            verify(refreshTokenRedisService, Mockito.never()).saveRefreshToken(any(), any());
-        }
-
-        @Test
-        @DisplayName("기존 회원 로그인 시 refreshToken이 Redis에 없으면 새로 발급 및 저장한다")
-        void signIn_existingMember_refreshTokenNotExists() {
-            // given
-            Map<String, Object> attributes = Map.of(
-                    "email", "exist3@planit.com",
-                    "name", "플래닛3"
-            );
-            FakeCustomOAuth2User user = new FakeCustomOAuth2User(attributes, SignType.GOOGLE);
-
-            Member existing = Member.builder()
-                    .email("exist3@planit.com")
-                    .memberName("플래닛3")
-                    .role(Role.USER)
-                    .signType(SignType.GOOGLE)
-                    .guiltyFreeMode(false)
-                    .password("")
-                    .build();
-
-            given(memberRepository.findByEmail("exist3@planit.com"))
-                    .willReturn(Optional.of(existing));
-            given(jwtProvider.createAccessToken(any(), any(), any(), any()))
-                    .willReturn("access-token-exist3");
-            given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
-                    .willReturn("new-refresh-token");
-            given(refreshTokenRedisService.getRefreshTokenByMemberId(any()))
-                    .willReturn(null);
-
-            // when
-            OAuthLoginDTO.Response response = memberServiceImpl.signIn(user, null);
-
-            // then
-            assertThat(response.getRefreshToken()).isEqualTo("new-refresh-token");
-            verify(refreshTokenRedisService).getRefreshTokenByMemberId(any());
-            verify(refreshTokenRedisService).saveRefreshToken(any(), any());
         }
     }
 

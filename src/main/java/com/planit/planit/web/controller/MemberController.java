@@ -7,8 +7,6 @@ import com.planit.planit.config.jwt.UserPrincipal;
 import com.planit.planit.config.oauth.CustomOAuth2UserService;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
-import com.planit.planit.config.oauth.CustomOAuth2User;
-import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,24 +27,13 @@ public class MemberController {
     private final MemberService memberService;
 
 
-    @Operation(summary = "OAuth 로그인/회원가입", description = "OAuth 인증 후 로그인 또는 회원가입을 처리합니다.")
+    @Operation(summary = "idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
     @PostMapping("/sign-in")
-    public ApiResponse<OAuthLoginDTO.Response> signIn(
-            @RequestAttribute(name = "oauthUser") CustomOAuth2User oAuth2User,
-            @RequestBody(required = false) TermAgreementDTO.Request termRequest
-    ) {
-        OAuthLoginDTO.Response response = memberService.signIn(oAuth2User, termRequest);
-        
-        if (response.isNewMember() && response.isSignUpCompleted()) {
-            // 신규 회원이 회원가입을 완료한 경우
-            return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_UP_SUCCESS, response);
-        } else if (response.isNewMember()) {
-            // 신규 회원이지만 약관 동의가 필요한 경우
-            return ApiResponse.onSuccess(MemberSuccessStatus.TERMS_AGREEMENT_REQUIRED, response);
-        } else {
-            // 기존 회원 로그인
-            return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, response);
-        }
+    public ApiResponse<OAuthLoginDTO.Response> signIn(@RequestBody OAuthLoginDTO.Request request) {
+        OAuthLoginDTO.Response response = memberService.signIn(request);
+        log.info("✅ 로그인 or 회원가입 성공 - email: {}, name: {}, isNewMember: {}, 약관 동의여부: {}",
+                response.getEmail(), response.getName(), response.isNewMember(), response.isSignUpCompleted());
+        return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, response);
     }
 
     @Operation(summary = "로그아웃", description = "사용자 로그아웃을 처리하고 토큰을 블랙리스트에 추가합니다.")
@@ -60,15 +47,5 @@ public class MemberController {
             log.info("✅ 로그아웃 성공 - id: {}, accessToken: {}...", principal.getId(), accessToken.substring(0, 10));
         }
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_OUT_SUCCESS, null);
-    }
-
-    @Operation(summary = "idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
-    @PostMapping("/sign-in-with-token")
-    public ApiResponse<OAuthLoginDTO.Response> signInWithToken(@RequestBody OAuthLoginDTO.Request request) {
-        // request.oauthProvider, request.oauthAccessToken(idToken)
-        OAuthLoginDTO.Response response = memberService.signInWithIdToken(request);
-        log.info("✅ 로그인 or 회원가입 성공 - email: {}, name: {}, isNewMember: {}, 약관 동의여부: {}",
-                response.getEmail(), response.getName(), response.isNewMember(), response.isSignUpCompleted());
-        return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, response);
     }
 }
