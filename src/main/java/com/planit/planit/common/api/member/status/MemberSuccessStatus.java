@@ -10,6 +10,9 @@ public enum MemberSuccessStatus implements SuccessResponse {
     GUILTY_FREE_FOUND(HttpStatus.OK, "MEMBER2002", "길티프리 활성일을 조회하였습니다."),
     GUILTY_FREE_REASON_LIST_FOUND(HttpStatus.OK, "MEMBER2003", "길티프리 사유 목록을 조회하였습니다."),
 
+    // 연속일
+    CONSECUTIVE_DAYS_FOUND(HttpStatus.OK, "MEMBER2004", "연속일을 조회하였습니다."),
+
     ;
 
     private final HttpStatus httpStatus;

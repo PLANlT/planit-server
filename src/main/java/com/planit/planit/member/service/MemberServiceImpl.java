@@ -11,6 +11,7 @@ import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
+import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import com.planit.planit.redis.service.RefreshTokenRedisService;
 import com.planit.planit.redis.service.BlacklistTokenRedisService;
@@ -122,5 +123,13 @@ public class MemberServiceImpl implements MemberService {
         long ttl = jwtProvider.getRemainingValidity(accessToken);
         blacklistTokenRedisService.blacklistAccessToken(accessToken, ttl);
         refreshTokenRedisService.deleteByMemberId(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberResponseDTO.ConsecutiveDaysDTO getConsecutiveDays(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        return MemberResponseDTO.ConsecutiveDaysDTO.of(member);
     }
 }
