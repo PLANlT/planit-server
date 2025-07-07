@@ -2,3 +2,6 @@ oauth:
   google:
     client-id: ${GOOGLE_CLIENT_ID}
     playground-client-id: ${GOOGLE_PLAYGROUND_CLIENT_ID}
+    
+  kakao:
+    client-id: ${KAKAO_REST_API_KEY}
