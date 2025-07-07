@@ -14,6 +14,7 @@ public enum MemberErrorStatus implements ErrorResponse {
     INVALID_ADVICE_REQUEST(HttpStatus.BAD_REQUEST, "MEMBER4004", "길티프리 조언을 요청할 수 없습니다."),
     LAST_GUILTY_FREE_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4005", "최근 길티프리 정보를 조회할 수 없습니다."),
 
+    DIFFERENT_SIGN_TYPE(HttpStatus.BAD_REQUEST, "MEMBER4006", "이미 다른 소셜 계정으로 가입된 이메일입니다."),
 
     ;
 

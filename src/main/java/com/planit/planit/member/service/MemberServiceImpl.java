@@ -55,13 +55,16 @@ public class MemberServiceImpl implements MemberService {
         try {
             userInfo = socialTokenVerifier.verify(request.getOauthProvider(), request.getOauthToken());
         } catch (Exception e) {
-            throw new TokenHandler(TokenErrorStatus.INVALID_ID_TOKEN);
+            throw new GeneralException(TokenErrorStatus.INVALID_ID_TOKEN);
         }
         Optional<Member> memberOpt = memberRepository.findByEmail(userInfo.email);
         final boolean isNewMember;
         final Member member;
         if (memberOpt.isPresent()) {
             member = memberOpt.get();
+            if (!member.getSignType().name().equalsIgnoreCase(request.getOauthProvider())) {
+                throw new GeneralException(MemberErrorStatus.DIFFERENT_SIGN_TYPE);
+            }
             isNewMember = false;
         } else {
             member = Member.builder()
@@ -105,7 +108,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public MemberResponseDTO.ConsecutiveDaysDTO getConsecutiveDays(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(MemberErrorStatus.MEMBER_NOT_FOUND));
         return MemberResponseDTO.ConsecutiveDaysDTO.of(member);
     }
 

@@ -5,3 +5,7 @@ oauth:
     
   kakao:
     client-id: ${KAKAO_REST_API_KEY}
+    
+  naver:
+    client-id: ${NAVER_CLIENT_ID}
+    client-secret: ${NAVER_CLIENT_SECRET}
