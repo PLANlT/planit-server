@@ -14,6 +14,7 @@ import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
+import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import com.planit.planit.redis.service.RefreshTokenRedisService;
 import com.planit.planit.redis.service.BlacklistTokenRedisService;
@@ -92,47 +93,10 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public OAuthLoginDTO.Response signInWithIdToken(OAuthLoginDTO.Request request) {
-        SocialTokenVerifier.SocialUserInfo userInfo;
-        try {
-            userInfo = socialTokenVerifier.verify(request.getOauthProvider(), request.getOauthToken()); // ✅ 인스턴스 메서드 사용
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.INVALID_ID_TOKEN);
-        }
-
-        // 1. 회원 조회 또는 생성 (isNewMember 플래그 분리)
-        Optional<Member> memberOpt = memberRepository.findByEmail(userInfo.email);
-        final boolean isNewMember;
-        final Member member;
-        if (memberOpt.isPresent()) {
-            member = memberOpt.get();
-            isNewMember = false;
-        } else {
-            member = Member.builder()
-                .email(userInfo.email)
-                .memberName(userInfo.name)
-                .password(UUID.randomUUID().toString().substring(0, 10))
-                .signType(SignType.valueOf(request.getOauthProvider().toUpperCase()))
-                .guiltyFreeMode(false) // 기본값 예시
-                .dailyCondition(null)  // 필요시 설정
-                .role(Role.USER)       // 기본 USER 권한
-                .build();
-            memberRepository.save(member);
-            isNewMember = true;
-        }
-
-        // 2. JWT 발급
-        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
-        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
-
-        // 3. 응답 반환
-        return OAuthLoginDTO.Response.builder()
-            .email(member.getEmail())
-            .name(member.getMemberName())
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .isNewMember(isNewMember)
-            .isSignUpCompleted(true) // 약관 등 추가 로직 필요시 수정
-            .build();
+    @Transactional(readOnly = true)
+    public MemberResponseDTO.ConsecutiveDaysDTO getConsecutiveDays(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        return MemberResponseDTO.ConsecutiveDaysDTO.of(member);
     }
 }

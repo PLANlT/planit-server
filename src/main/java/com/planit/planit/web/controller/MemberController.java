@@ -9,6 +9,9 @@ import com.planit.planit.member.service.MemberService;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 
 import jakarta.servlet.http.HttpServletRequest;
+import com.planit.planit.web.dto.member.MemberResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -24,6 +30,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("/members")
 @Tag(name = "Member", description = "회원 관련 API")
 public class MemberController {
+
     private final MemberService memberService;
 
 
@@ -47,5 +54,13 @@ public class MemberController {
             log.info("✅ 로그아웃 성공 - id: {}, accessToken: {}...", principal.getId(), accessToken.substring(0, 10));
         }
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_OUT_SUCCESS, null);
+    }
+
+    @Operation(summary = "[MEMBER] 연속일 조회하기")
+    @GetMapping("/members/consecutive-days")
+    public ApiResponse<MemberResponseDTO.ConsecutiveDaysDTO> getConsecutiveDays() {
+        Long memberId = 1L; // 인증 기능 구현 이후 변경
+        MemberResponseDTO.ConsecutiveDaysDTO consecutiveDaysDTO = memberService.getConsecutiveDays(memberId);
+        return ApiResponse.onSuccess(MemberSuccessStatus.CONSECUTIVE_DAYS_FOUND, consecutiveDaysDTO);
     }
 }

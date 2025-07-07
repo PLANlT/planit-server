@@ -6,7 +6,6 @@ import com.planit.planit.dream.Dream;
 import com.planit.planit.member.association.GuiltyFree;
 import com.planit.planit.member.association.Term;
 import com.planit.planit.member.enums.DailyCondition;
-import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.task.Task;
@@ -49,10 +48,10 @@ public class Member extends BaseEntity {
     @Column
     private DailyCondition dailyCondition;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate lastAttendanceDate;               // 최근 출석일
 
-    @Column
+    @Column(nullable = false)
     private LocalDate attendanceStartedAt;              // 연속 출석 시작일
 
     @Column(nullable = false)
@@ -111,8 +110,10 @@ public class Member extends BaseEntity {
         this.signType = signType;
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
-        this.maxConsecutiveDays = 0L;
+        this.lastAttendanceDate = LocalDate.MIN;
+        this.attendanceStartedAt = LocalDate.MIN;
         this.lastGuiltyFreeDate = LocalDate.MIN;
+        this.maxConsecutiveDays = 0L;
         this.guiltyFrees = new ArrayList<>();
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
@@ -143,7 +144,7 @@ public class Member extends BaseEntity {
     public void updateConsecutiveDays(LocalDate today) {
 
         // 최초 출석인 경우
-        if (lastAttendanceDate == null || attendanceStartedAt == null) {
+        if (lastAttendanceDate.equals(LocalDate.MIN) || attendanceStartedAt.equals(LocalDate.MIN)) {
             lastAttendanceDate = today;
             attendanceStartedAt = today;
             maxConsecutiveDays = 1L;
@@ -166,9 +167,9 @@ public class Member extends BaseEntity {
         lastAttendanceDate = today;
     }
 
-    private boolean isConsecutiveAttendance(LocalDate today) {
+    public boolean isConsecutiveAttendance(LocalDate today) {
         // 길티프리를 사용한 적이 있는 경우 길티프리 날짜 확인
-        if (lastGuiltyFreeDate != null) {
+        if (!lastGuiltyFreeDate.equals(LocalDate.MIN)) {
             return lastAttendanceDate.plusDays(1).equals(today) || (
                     lastAttendanceDate.plusDays(2).equals(today) &&
                     lastGuiltyFreeDate.plusDays(1).equals(today));
