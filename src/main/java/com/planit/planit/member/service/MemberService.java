@@ -12,4 +12,6 @@ public interface MemberService {
     OAuthLoginDTO.Response signIn(CustomOAuth2User oAuth2User, TermAgreementDTO.Request termRequest);
 
     void signOut(Long memberId, String accessToken);
+
+    OAuthLoginDTO.Response signInWithIdToken(OAuthLoginDTO.Request request);
 }

@@ -12,6 +12,7 @@ import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/members")
@@ -55,7 +57,18 @@ public class MemberController {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String accessToken = authHeader.substring("Bearer ".length());
             memberService.signOut(principal.getId(), accessToken);
+            log.info("✅ 로그아웃 성공 - id: {}, accessToken: {}...", principal.getId(), accessToken.substring(0, 10));
         }
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_OUT_SUCCESS, null);
+    }
+
+    @Operation(summary = "idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
+    @PostMapping("/sign-in-with-token")
+    public ApiResponse<OAuthLoginDTO.Response> signInWithToken(@RequestBody OAuthLoginDTO.Request request) {
+        // request.oauthProvider, request.oauthAccessToken(idToken)
+        OAuthLoginDTO.Response response = memberService.signInWithIdToken(request);
+        log.info("✅ 로그인 or 회원가입 성공 - email: {}, name: {}, isNewMember: {}, 약관 동의여부: {}",
+                response.getEmail(), response.getName(), response.isNewMember(), response.isSignUpCompleted());
+        return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, response);
     }
 }

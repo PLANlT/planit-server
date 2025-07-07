@@ -10,9 +10,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-  logging:
-    level:
-      root: DEBUG
+
+logging:
+  level:
+    com.planit: DEBUG
+    org.springframework.web: INFO
 
 jwt:
   expirationMs: 3600000 # 1시간 (밀리초)

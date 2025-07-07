@@ -28,8 +28,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
 
-        // swagger
-        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.startsWith("/swagger-resources") || path.startsWith("/swagger-ui.html")) {
+        // 로그인 관련 URL은 필터 패스
+        if (path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-resources") ||
+                path.startsWith("/swagger-ui.html") ||
+                path.startsWith("/h2-console") ||
+                path.equals("/members/sign-in-with-token")) {
+
             filterChain.doFilter(request, response);
             return;
         }
