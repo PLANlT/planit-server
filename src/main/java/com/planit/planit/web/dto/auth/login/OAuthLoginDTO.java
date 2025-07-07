@@ -17,19 +17,45 @@ public class OAuthLoginDTO {
         private String oauthToken; //클라이언트에서 전달한 소셜 토큰 (ID Token 또는 Access Token)
     }
 
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Builder
     public static class Response {
 
-        private String email;
-        private String name;
-        private String accessToken;
-        private String refreshToken;
+        private final String email;
+        private final String name;
+        private final String accessToken;
+        private final String refreshToken;
+
+        private final boolean isNewMember;
+        private final boolean isSignUpCompleted;
+
+        @JsonProperty("email")
+        public String getEmail() {
+            return email;
+        }
+
+        @JsonProperty("name")
+        public String getName() {
+            return name;
+        }
+
+        @JsonProperty("accessToken")
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        @JsonProperty("refreshToken")
+        public String getRefreshToken() {
+            return refreshToken;
+        }
+
         @JsonProperty("isNewMember")
-        private boolean isNewMember;
+        public boolean isNewMember() {
+            return isNewMember;
+        }
+
         @JsonProperty("isSignUpCompleted")
-        private boolean isSignUpCompleted;
+        public boolean isSignUpCompleted() {
+            return isSignUpCompleted;
+        }
     }
 }
