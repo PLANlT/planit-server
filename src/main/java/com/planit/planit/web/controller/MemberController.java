@@ -31,8 +31,8 @@ public class MemberController {
     @PostMapping("/sign-in")
     public ApiResponse<OAuthLoginDTO.Response> signIn(@RequestBody OAuthLoginDTO.Request request) {
         OAuthLoginDTO.Response response = memberService.signIn(request);
-        log.info("✅ 로그인 or 회원가입 성공 - email: {}, name: {}, isNewMember: {}, 약관 동의여부: {}",
-                response.getEmail(), response.getName(), response.isNewMember(), response.isSignUpCompleted());
+        log.info("✅ 로그인 or 회원가입 성공 - id: {}, email: {}, name: {}, isNewMember: {}, 약관 동의여부: {}",
+                response.getId(),response.getEmail(), response.getName(), response.isNewMember(), response.isSignUpCompleted());
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, response);
     }
 

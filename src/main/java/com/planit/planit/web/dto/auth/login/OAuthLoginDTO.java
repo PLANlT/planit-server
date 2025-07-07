@@ -20,6 +20,7 @@ public class OAuthLoginDTO {
     @Builder
     public static class Response {
 
+        private final Long id;
         private final String email;
         private final String name;
         private final String accessToken;
@@ -27,6 +28,11 @@ public class OAuthLoginDTO {
 
         private final boolean isNewMember;
         private final boolean isSignUpCompleted;
+
+        @JsonProperty("id")
+        public Long getId() {
+            return id;
+        }
 
         @JsonProperty("email")
         public String getEmail() {
