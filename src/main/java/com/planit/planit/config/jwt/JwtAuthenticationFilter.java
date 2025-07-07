@@ -34,7 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 path.startsWith("/swagger-resources") ||
                 path.startsWith("/swagger-ui.html") ||
                 path.startsWith("/h2-console") ||
-                path.startsWith("/members/sign-in")) {
+                path.startsWith("/members/sign-in") ||
+                path.startsWith("/auth")){
 
             filterChain.doFilter(request, response);
             return;
@@ -58,10 +59,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         Long id = jwtProvider.getId(token);
+        logger.info("JWT token validated successfully" + id);
         Member member = memberRepository.findById(id).orElseThrow(() -> {
             response.setStatus(MemberErrorStatus.MEMBER_NOT_FOUND.getErrorStatus().value());
             return new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND);
         });
+        logger.info("Member validated successfully" + member);
 
         // UserPrincipal을 생성하고, 인증 정보를 SecurityContextHolder에 설정
         UserPrincipal userPrincipal = new UserPrincipal(

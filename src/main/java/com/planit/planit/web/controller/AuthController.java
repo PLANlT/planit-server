@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.planit.planit.common.api.token.status.TokenSuccessStatus.REFRESH_SUCCESS;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -23,6 +25,6 @@ public class AuthController {
     @PostMapping("/refresh")
     public ApiResponse<TokenRefreshDTO.Response> refreshToken(@RequestBody TokenRefreshDTO.Request request) {
         TokenRefreshDTO.Response response = memberService.refreshAccessToken(request.getRefreshToken());
-        return ApiResponse.onSuccess(SuccessStatus.REFRESH_SUCCESS, response);
+        return ApiResponse.onSuccess(REFRESH_SUCCESS, null);
     }
 }
