@@ -13,6 +13,7 @@ import com.planit.planit.member.association.Term;
 import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
+import com.planit.planit.redis.service.RefreshTokenRedisServiceImpl;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
@@ -44,6 +45,7 @@ public class MemberServiceImpl implements MemberService {
     private final BlacklistTokenRedisService blacklistTokenRedisService;
     private final SocialTokenVerifier  socialTokenVerifier;
 
+
     @Override
     public OAuthLoginDTO.Response signIn(OAuthLoginDTO.Request request) {
         SocialTokenVerifier.SocialUserInfo userInfo;
@@ -72,7 +74,11 @@ public class MemberServiceImpl implements MemberService {
             isNewMember = true;
         }
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
-        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
+        String refreshToken = refreshTokenRedisService.getRefreshTokenByMemberId(member.getId());
+        if (refreshToken == null) {
+            refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
+            refreshTokenRedisService.saveRefreshToken(member.getId(), refreshToken);
+        }
         return OAuthLoginDTO.Response.builder()
             .id(member.getId())
             .email(member.getEmail())

@@ -27,8 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -89,6 +88,9 @@ class MemberServiceImplTest {
             given(socialTokenVerifier.verify(anyString(), anyString()))
                     .willReturn(new SocialTokenVerifier.SocialUserInfo("newbie@planit.com", "뉴비"));
             OAuthLoginDTO.Response response = memberServiceImpl.signIn(request);
+
+            //then
+            verify(refreshTokenRedisService).saveRefreshToken(null, "refresh-token2");  //영속성 때문에 저장 안됨
             assertThat(response.isNewMember()).isTrue();
             assertThat(response.getEmail()).isEqualTo("newbie@planit.com");
             assertThat(response.getAccessToken()).isEqualTo("access-token2");
@@ -132,7 +134,7 @@ class MemberServiceImplTest {
     }
 
     @Nested
-    @DisplayName("signInWithIdToken 메서드")
+    @DisplayName("signIn 메서드")
     class SignInWithIdToken {
         @Test
         @DisplayName("신규 회원이면 회원가입 후 토큰을 반환한다")
@@ -147,7 +149,7 @@ class MemberServiceImplTest {
                     .willReturn(Optional.empty());
 
             Member saved = Member.builder()
-                    .id(99L) // ✅ ID 설정이 있어야 isNewMember = true 정상 동작
+                    .id(99L) //
                     .email("newbie@planit.com")
                     .memberName("뉴비")
                     .role(Role.USER)
@@ -166,7 +168,7 @@ class MemberServiceImplTest {
                     .willReturn(new SocialTokenVerifier.SocialUserInfo("newbie@planit.com", "뉴비"));
 
             // when
-            OAuthLoginDTO.Response response = memberServiceImpl.signInWithIdToken(request);
+            OAuthLoginDTO.Response response = memberServiceImpl.signIn(request);
 
             // then
             assertThat(response.isNewMember()).isTrue();
