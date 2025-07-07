@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 public enum SuccessStatus implements SuccessResponse {
 
     OK(HttpStatus.OK,"COMMON2000", "요청이 성공적으로 처리되었습니다."),
-    CREATED(HttpStatus.CREATED, "COMMON2001", "새 리소스가 생성되었습니다.")
+    CREATED(HttpStatus.CREATED, "COMMON2001", "새 리소스가 생성되었습니다."),
+    REFRESH_SUCCESS(HttpStatus.OK, "COMMON2002", "리프레시 토큰이 성공적으로 갱신되었습니다.")
+
 
     ;
 

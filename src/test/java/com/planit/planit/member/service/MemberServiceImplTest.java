@@ -1,6 +1,7 @@
 package com.planit.planit.member.service;
 
 import com.planit.planit.auth.FakeCustomOAuth2User;
+import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.repository.MemberRepository;
@@ -11,6 +12,7 @@ import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.redis.service.RefreshTokenRedisService;
 import com.planit.planit.redis.service.BlacklistTokenRedisService;
 import com.planit.planit.config.oauth.SocialTokenVerifier;
+import com.planit.planit.web.dto.auth.login.TokenRefreshDTO;
 import org.mockito.MockedStatic;
 
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
@@ -134,47 +136,77 @@ class MemberServiceImplTest {
     }
 
     @Nested
-    @DisplayName("signIn 메서드")
-    class SignInWithIdToken {
+    @DisplayName("refreshAccessToken 메서드")
+    class RefreshAccessToken {
+
+        private final String validRefreshToken = "valid.refresh.token";
+        private final Long memberId = 99L;
+        private final Member member = Member.builder()
+                .id(memberId)
+                .email("test@example.com")
+                .memberName("홍길동")
+                .role(Role.USER)
+                .build();
+
         @Test
-        @DisplayName("신규 회원이면 회원가입 후 토큰을 반환한다")
-        void signInWithIdToken_newMember_registersAndReturnsToken() throws Exception {
+        @DisplayName("유효한 리프레시 토큰이면 액세스 토큰을 새로 발급한다")
+        void refreshAccessToken_validToken_returnsNewAccessToken() {
             // given
-            OAuthLoginDTO.Request request = OAuthLoginDTO.Request.builder()
-                    .oauthProvider("GOOGLE")
-                    .oauthToken("mock-id-token")
-                    .build();
-
-            given(memberRepository.findByEmail("newbie@planit.com"))
-                    .willReturn(Optional.empty());
-
-            Member saved = Member.builder()
-                    .id(99L) //
-                    .email("newbie@planit.com")
-                    .memberName("뉴비")
-                    .role(Role.USER)
-                    .signType(SignType.GOOGLE)
-                    .guiltyFreeMode(false)
-                    .password("")
-                    .build();
-            given(memberRepository.save(any(Member.class))).willReturn(saved);
-
-            given(jwtProvider.createAccessToken(any(), any(), any(), any()))
-                    .willReturn("access-token2");
-            given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
-                    .willReturn("refresh-token2");
-
-            given(socialTokenVerifier.verify(anyString(), anyString()))
-                    .willReturn(new SocialTokenVerifier.SocialUserInfo("newbie@planit.com", "뉴비"));
+            given(jwtProvider.validateToken(validRefreshToken)).willReturn(true);
+            given(jwtProvider.getId(validRefreshToken)).willReturn(memberId);
+            given(refreshTokenRedisService.getRefreshTokenByMemberId(memberId)).willReturn(validRefreshToken);
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+            given(jwtProvider.createAccessToken(
+                    member.getId(), member.getEmail(), member.getMemberName(), member.getRole())
+            ).willReturn("newAccessToken");
 
             // when
-            OAuthLoginDTO.Response response = memberServiceImpl.signIn(request);
+            TokenRefreshDTO.Response response = memberServiceImpl.refreshAccessToken(validRefreshToken);
 
             // then
-            assertThat(response.isNewMember()).isTrue();
-            assertThat(response.getEmail()).isEqualTo("newbie@planit.com");
-            assertThat(response.getAccessToken()).isEqualTo("access-token2");
-            assertThat(response.getRefreshToken()).isEqualTo("refresh-token2");
+            assertThat(response.getAccessToken()).isEqualTo("newAccessToken");
+            assertThat(response.getRefreshToken()).isEqualTo(validRefreshToken);
+        }
+
+        @Test
+        @DisplayName("만료되었거나 잘못된 리프레시 토큰이면 예외가 발생한다")
+        void refreshAccessToken_invalidToken_throwsException() {
+            // given
+            given(jwtProvider.validateToken(validRefreshToken)).willReturn(false);
+
+            // when & then
+            assertThatThrownBy(() -> memberServiceImpl.refreshAccessToken(validRefreshToken))
+                    .isInstanceOf(GeneralException.class)
+                    .hasMessageContaining("4005");
+        }
+
+        @Test
+        @DisplayName("Redis에 저장된 토큰과 일치하지 않으면 예외가 발생한다")
+        void refreshAccessToken_mismatchStoredToken_throwsException() {
+            // given
+            given(jwtProvider.validateToken(validRefreshToken)).willReturn(true);
+            given(jwtProvider.getId(validRefreshToken)).willReturn(memberId);
+            given(refreshTokenRedisService.getRefreshTokenByMemberId(memberId)).willReturn("differentToken");
+
+            // when & then
+            assertThatThrownBy(() -> memberServiceImpl.refreshAccessToken(validRefreshToken))
+                    .isInstanceOf(GeneralException.class)
+                    .hasMessageContaining("COMMON");
+        }
+
+        @Test
+        @DisplayName("Member가 존재하지 않으면 예외가 발생한다")
+        void refreshAccessToken_memberNotFound_throwsException() {
+            // given
+            given(jwtProvider.validateToken(validRefreshToken)).willReturn(true);
+            given(jwtProvider.getId(validRefreshToken)).willReturn(memberId);
+            given(refreshTokenRedisService.getRefreshTokenByMemberId(memberId)).willReturn(validRefreshToken);
+            given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> memberServiceImpl.refreshAccessToken(validRefreshToken))
+                    .isInstanceOf(GeneralException.class)
+                    .hasMessageContaining("MEMBER");
         }
     }
 

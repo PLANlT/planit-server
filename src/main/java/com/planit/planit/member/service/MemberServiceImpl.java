@@ -15,6 +15,7 @@ import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.redis.service.RefreshTokenRedisServiceImpl;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
+import com.planit.planit.web.dto.auth.login.TokenRefreshDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import com.planit.planit.redis.service.RefreshTokenRedisService;
@@ -127,6 +128,32 @@ public class MemberServiceImpl implements MemberService {
 
         // 저장
         memberRepository.save(member);
+    }
+
+    @Override
+    public TokenRefreshDTO.Response refreshAccessToken(String refreshToken) {
+        if (!jwtProvider.validateToken(refreshToken)) {
+            throw new GeneralException(ErrorStatus.INVALID_REFRESH_TOKEN);
+        }
+
+        Long memberId = jwtProvider.getId(refreshToken);
+
+        String savedToken = refreshTokenRedisService.getRefreshTokenByMemberId(memberId);
+        if (!refreshToken.equals(savedToken)) {
+            throw new GeneralException(ErrorStatus.INVALID_REFRESH_TOKEN);
+        }
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        String newAccessToken = jwtProvider.createAccessToken(
+                member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
+        );
+
+        return TokenRefreshDTO.Response.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken) // 또는 새로 발급한 refreshToken
+                .build();
     }
 
 
