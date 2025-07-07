@@ -2,6 +2,8 @@ package com.planit.planit.member.service;
 
 import com.planit.planit.auth.FakeCustomOAuth2User;
 import com.planit.planit.common.api.general.GeneralException;
+import com.planit.planit.common.api.token.TokenHandler;
+import com.planit.planit.common.api.token.status.TokenErrorStatus;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.repository.MemberRepository;
@@ -152,7 +154,6 @@ class MemberServiceImplTest {
         @DisplayName("유효한 리프레시 토큰이면 액세스 토큰을 새로 발급한다")
         void refreshAccessToken_validToken_returnsNewAccessToken() {
             // given
-            given(jwtProvider.validateToken(validRefreshToken)).willReturn(true);
             given(jwtProvider.getId(validRefreshToken)).willReturn(memberId);
             given(refreshTokenRedisService.getRefreshTokenByMemberId(memberId)).willReturn(validRefreshToken);
             given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
@@ -169,40 +170,37 @@ class MemberServiceImplTest {
         }
 
         @Test
-        @DisplayName("만료되었거나 잘못된 리프레시 토큰이면 예외가 발생한다")
+        @DisplayName("만료된 리프레시 토큰이면 예외가 발생한다")
         void refreshAccessToken_invalidToken_throwsException() {
             // given
-            given(jwtProvider.validateToken(validRefreshToken)).willReturn(false);
+            given(jwtProvider.isTokenExpired(validRefreshToken)).willReturn(false);
 
             // when & then
             assertThatThrownBy(() -> memberServiceImpl.refreshAccessToken(validRefreshToken))
-                    .isInstanceOf(GeneralException.class)
-                    .hasMessageContaining("4005");
+                    .isInstanceOf(TokenHandler.class)
+                    .hasMessageContaining("4003");
         }
 
         @Test
-        @DisplayName("Redis에 저장된 토큰과 일치하지 않으면 예외가 발생한다")
+        @DisplayName("Redis에 저장된 토큰과 일치하지 않으면 4003 예외가 발생한다")
         void refreshAccessToken_mismatchStoredToken_throwsException() {
             // given
-            given(jwtProvider.validateToken(validRefreshToken)).willReturn(true);
             given(jwtProvider.getId(validRefreshToken)).willReturn(memberId);
             given(refreshTokenRedisService.getRefreshTokenByMemberId(memberId)).willReturn("differentToken");
 
             // when & then
             assertThatThrownBy(() -> memberServiceImpl.refreshAccessToken(validRefreshToken))
-                    .isInstanceOf(GeneralException.class)
-                    .hasMessageContaining("COMMON");
+                    .isInstanceOf(TokenHandler.class)
+                    .hasMessageContaining("4003");
         }
 
         @Test
         @DisplayName("Member가 존재하지 않으면 예외가 발생한다")
         void refreshAccessToken_memberNotFound_throwsException() {
             // given
-            given(jwtProvider.validateToken(validRefreshToken)).willReturn(true);
             given(jwtProvider.getId(validRefreshToken)).willReturn(memberId);
             given(refreshTokenRedisService.getRefreshTokenByMemberId(memberId)).willReturn(validRefreshToken);
             given(memberRepository.findById(memberId)).willReturn(Optional.empty());
-
             // when & then
             assertThatThrownBy(() -> memberServiceImpl.refreshAccessToken(validRefreshToken))
                     .isInstanceOf(GeneralException.class)
