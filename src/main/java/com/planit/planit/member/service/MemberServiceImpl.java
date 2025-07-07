@@ -78,7 +78,7 @@ public class MemberServiceImpl implements MemberService {
             .accessToken(accessToken)
             .refreshToken(refreshToken)
             .isNewMember(isNewMember)
-            .isSignUpCompleted(true)
+            .isSignUpCompleted(false)
             .build();
     }
 
