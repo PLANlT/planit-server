@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class TermAgreementDTO {
 
 
-    @Data // => Getter + Setter + EqualsAndHashCode + toString + RequiredArgsConstructor
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
