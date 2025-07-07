@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class Term {
 
     @Id
-    private Long memberId;
+    private Long id; // 식별자 필드
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
@@ -37,13 +37,13 @@ public class Term {
 
     @Builder
     public Term(
-            Long memberId,
+            Member member,
             LocalDateTime termOfUse,
             LocalDateTime termOfPrivacy,
             LocalDateTime termOfInfo,
             LocalDateTime overFourteen
     ) {
-        this.memberId = memberId;
+        this.member = member;
         this.termOfUse = termOfUse;
         this.termOfPrivacy = termOfPrivacy;
         this.termOfInfo = termOfInfo;

@@ -4,6 +4,8 @@ import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
+import com.planit.planit.common.api.token.TokenHandler;
+import com.planit.planit.common.api.token.status.TokenErrorStatus;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.config.oauth.CustomOAuth2User;
 import com.planit.planit.config.oauth.SocialTokenVerifier;
@@ -53,7 +55,7 @@ public class MemberServiceImpl implements MemberService {
         try {
             userInfo = socialTokenVerifier.verify(request.getOauthProvider(), request.getOauthToken());
         } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.INVALID_ID_TOKEN);
+            throw new TokenHandler(TokenErrorStatus.INVALID_ID_TOKEN);
         }
         Optional<Member> memberOpt = memberRepository.findByEmail(userInfo.email);
         final boolean isNewMember;
@@ -76,7 +78,7 @@ public class MemberServiceImpl implements MemberService {
         }
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
         String refreshToken = refreshTokenRedisService.getRefreshTokenByMemberId(member.getId());
-        if (refreshToken == null) {
+        if (refreshToken == null || jwtProvider.isTokenExpired(refreshToken)) {
             refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
             refreshTokenRedisService.saveRefreshToken(member.getId(), refreshToken);
         }
@@ -114,7 +116,7 @@ public class MemberServiceImpl implements MemberService {
 
         // Term 저장
         Term term = Term.builder()
-                .memberId(member.getId())
+                .member(member)
                 .termOfUse(request.getTermOfUse())
                 .termOfPrivacy(request.getTermOfPrivacy())
                 .termOfInfo(request.getTermOfInfo())
@@ -132,15 +134,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public TokenRefreshDTO.Response refreshAccessToken(String refreshToken) {
-        if (!jwtProvider.validateToken(refreshToken)) {
-            throw new GeneralException(ErrorStatus.INVALID_REFRESH_TOKEN);
+        if(jwtProvider.isTokenExpired(refreshToken)) {
+            throw new TokenHandler(TokenErrorStatus.REFRESH_TOKEN_EXPIRED);
+        }
+
+        if (jwtProvider.isRefreshTokenTampered(refreshToken)) {
+            throw new TokenHandler(TokenErrorStatus.INVALID_REFRESH_TOKEN); // 진짜 위조된 경우만
         }
 
         Long memberId = jwtProvider.getId(refreshToken);
 
         String savedToken = refreshTokenRedisService.getRefreshTokenByMemberId(memberId);
         if (!refreshToken.equals(savedToken)) {
-            throw new GeneralException(ErrorStatus.INVALID_REFRESH_TOKEN);
+            throw new TokenHandler(TokenErrorStatus.INVALID_REFRESH_TOKEN);
         }
 
         Member member = memberRepository.findById(memberId)
@@ -152,7 +158,7 @@ public class MemberServiceImpl implements MemberService {
 
         return TokenRefreshDTO.Response.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(refreshToken) // 또는 새로 발급한 refreshToken
+                .refreshToken(refreshToken) // Refresh는 만료되면 로그인 다시해야함
                 .build();
     }
 
