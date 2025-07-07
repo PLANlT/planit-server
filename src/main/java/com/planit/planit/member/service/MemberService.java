@@ -16,4 +16,5 @@ public interface MemberService {
 
     MemberResponseDTO.ConsecutiveDaysDTO getConsecutiveDays(Long memberId);
 
+    void completeTermsAgreement(Long id, TermAgreementDTO.Request request);
 }

@@ -37,13 +37,13 @@ public class Term {
 
     @Builder
     public Term(
-            Member member,
+            Long memberId,
             LocalDateTime termOfUse,
             LocalDateTime termOfPrivacy,
             LocalDateTime termOfInfo,
             LocalDateTime overFourteen
     ) {
-        this.member = member;
+        this.memberId = memberId;
         this.termOfUse = termOfUse;
         this.termOfPrivacy = termOfPrivacy;
         this.termOfInfo = termOfInfo;

@@ -105,4 +105,29 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
         return MemberResponseDTO.ConsecutiveDaysDTO.of(member);
     }
+
+    @Transactional
+    public void completeTermsAgreement(Long memberId, TermAgreementDTO.Request request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        // Term 저장
+        Term term = Term.builder()
+                .memberId(member.getId())
+                .termOfUse(request.getTermOfUse())
+                .termOfPrivacy(request.getTermOfPrivacy())
+                .termOfInfo(request.getTermOfInfo())
+                .overFourteen(request.getOverFourteen())
+                .build();
+        termRepository.save(term);
+
+        // isSignUpCompleted 업데이트
+        member.setSignUpCompleted(true);
+        member.setTerm(term); // 양방향 매핑도 같이 갱신
+
+        // 저장
+        memberRepository.save(member);
+    }
+
+
 }

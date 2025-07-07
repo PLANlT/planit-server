@@ -8,6 +8,7 @@ import com.planit.planit.config.oauth.CustomOAuth2UserService;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 
+import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/members")
-@Tag(name = "Member", description = "회원 관련 API")
+@Tag(name = "MEMBER", description = "회원 관련 API")
 public class MemberController {
 
     private final MemberService memberService;
@@ -56,6 +57,18 @@ public class MemberController {
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_OUT_SUCCESS, null);
     }
 
+    @Operation(summary = "약관 동의 완료", description = "사용자가 약관에 동의했음을 저장하고 isSignUpCompleted를 true로 갱신합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @PostMapping("/terms")
+    public ApiResponse<Void> agreeTerms(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody TermAgreementDTO.Request request
+    ) {
+        memberService.completeTermsAgreement(principal.getId(), request);
+        return ApiResponse.onSuccess(MemberSuccessStatus.TERM_AGREEMENT_COMPLETED, null);
+    }
+
+
     @Operation(summary = "[MEMBER] 연속일 조회하기")
     @GetMapping("/members/consecutive-days")
     public ApiResponse<MemberResponseDTO.ConsecutiveDaysDTO> getConsecutiveDays() {
@@ -63,4 +76,6 @@ public class MemberController {
         MemberResponseDTO.ConsecutiveDaysDTO consecutiveDaysDTO = memberService.getConsecutiveDays(memberId);
         return ApiResponse.onSuccess(MemberSuccessStatus.CONSECUTIVE_DAYS_FOUND, consecutiveDaysDTO);
     }
+
+
 }
