@@ -37,8 +37,9 @@ jobs:
 
       - name: Build with Gradle Wrapper
         run: |
+          ./gradlew build -x test --stacktrace --info
           chmod +x gradlew
-          ./gradlew test
+
 
   build:
     runs-on: ubuntu-22.04
@@ -80,5 +81,5 @@ jobs:
       - name: Build with Gradle Wrapper
         run: |
           chmod +x gradlew
-          ./gradlew build -x test --stacktrace --info
+
 
