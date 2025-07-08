@@ -37,7 +37,7 @@ jobs:
 
       - name: Build with Gradle Wrapper
         run: |
-          ./gradlew build -x test --stacktrace --info
+          ./gradlew build -x test
           chmod +x gradlew
 
 
