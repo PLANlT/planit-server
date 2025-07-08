@@ -59,6 +59,7 @@ jobs:
       KAKAO_REST_API_KEY:  ${{ secrets.KAKAO_REST_API_KEY}}
       NAVER_CLIENT_ID:  ${{ secrets.NAVER_CLIENT_ID}}
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+      
     services:
       redis:
         image: redis:7.0
