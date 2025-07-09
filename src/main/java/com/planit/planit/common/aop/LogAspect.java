@@ -16,7 +16,7 @@ public class LogAspect {
 
     private final List<CustomAspectHandler> handlers;
 
-    @Around("execution(* com.planit.planit..*(..))")
+    @Around("@annotation(com.planit.planit.common.aop.LogExecutionTime)")
     public Object applyAspectHandlers(ProceedingJoinPoint joinPoint) throws Throwable {
         for (CustomAspectHandler handler : handlers) {
             if (handler.supports(joinPoint)) {
