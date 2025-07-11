@@ -13,6 +13,7 @@ import com.planit.planit.member.Member;
 import com.planit.planit.member.association.Notification;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.association.Term;
+import com.planit.planit.member.repository.NotificationRepository;
 import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
@@ -48,6 +49,7 @@ public class MemberServiceImpl implements MemberService {
     private final RefreshTokenRedisService refreshTokenRedisService;
     private final BlacklistTokenRedisService blacklistTokenRedisService;
     private final SocialTokenVerifier  socialTokenVerifier;
+    private final NotificationRepository notificationRepository;
 
 
     @Override
@@ -84,6 +86,7 @@ public class MemberServiceImpl implements MemberService {
                                 .build();
 
             memberRepository.save(member);
+            notificationRepository.save(notification);
             isNewMember = true;
         }
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());

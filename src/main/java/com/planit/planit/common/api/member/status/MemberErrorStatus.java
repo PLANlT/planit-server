@@ -16,6 +16,8 @@ public enum MemberErrorStatus implements ErrorResponse {
 
     DIFFERENT_SIGN_TYPE(HttpStatus.BAD_REQUEST, "MEMBER4006", "이미 다른 소셜 계정으로 가입된 이메일입니다."),
 
+    //알림 설정
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4007", "알림 설정이 존재하지 않습니다.")
     ;
 
     private final HttpStatus httpStatus;
