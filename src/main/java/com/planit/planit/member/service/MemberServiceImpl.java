@@ -10,6 +10,7 @@ import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.config.oauth.CustomOAuth2User;
 import com.planit.planit.config.oauth.SocialTokenVerifier;
 import com.planit.planit.member.Member;
+import com.planit.planit.member.association.Notification;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.association.Term;
 import com.planit.planit.member.repository.TermRepository;
@@ -60,6 +61,7 @@ public class MemberServiceImpl implements MemberService {
         Optional<Member> memberOpt = memberRepository.findByEmail(userInfo.email);
         final boolean isNewMember;
         final Member member;
+        final Notification notification;
         if (memberOpt.isPresent()) {
             member = memberOpt.get();
             if (!member.getSignType().name().equalsIgnoreCase(request.getOauthProvider())) {
@@ -76,6 +78,11 @@ public class MemberServiceImpl implements MemberService {
                 .dailyCondition(null)
                 .role(Role.USER)
                 .build();
+
+            notification = Notification.builder()
+                                .member(member)
+                                .build();
+
             memberRepository.save(member);
             isNewMember = true;
         }
