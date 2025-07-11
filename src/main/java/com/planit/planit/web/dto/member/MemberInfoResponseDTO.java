@@ -5,11 +5,7 @@ import com.planit.planit.member.Member;
 import com.planit.planit.member.enums.SignType;
 import lombok.Builder;
 import lombok.Getter;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDate;
 
 @Getter

@@ -24,7 +24,7 @@ public enum MemberSuccessStatus implements SuccessResponse {
     NOTIFICATION_SETTING_FETCHED(HttpStatus.OK, "MEMBER2020", "알림 설정 정보를 조회하였습니다."),
     NOTIFICATION_DAILY_TASK_TOGGLED(HttpStatus.OK, "MEMBER2021", "오늘의 할 일 알림 설정을 변경하였습니다."),
     NOTIFICATION_GUILTY_FREE_TOGGLED(HttpStatus.OK, "MEMBER2022", "길티프리 모드 알림 설정을 변경하였습니다."),
-    MEMBER_INFO_FETCHED(HttpStatus.FOUND,"MEMBER2023", "회원 정보가 성공적으로 조회되었습니다." );
+    MEMBER_INFO_FETCHED(HttpStatus.OK,"MEMBER2023", "회원 정보가 성공적으로 조회되었습니다." );
 
 
 
