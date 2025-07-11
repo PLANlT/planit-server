@@ -13,6 +13,11 @@ import java.util.Optional;
 public class AgreementServiceImpl implements AgreementService {
     private final AgreementConfig agreementConfig;
 
+    /**
+     * Retrieves a map of all agreement terms, each containing its version and a fully constructed URL.
+     *
+     * @return a map where each key is a term identifier and the value is a map with "version" and "url" entries for that term
+     */
     @Override
     public Map<String, Map<String, String>> getAllTermsUrls() {
         Map<String, Map<String, String>> termsInfo = new HashMap<>();

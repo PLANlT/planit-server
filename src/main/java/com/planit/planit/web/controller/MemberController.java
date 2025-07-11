@@ -39,6 +39,12 @@ public class MemberController {
     private final AgreementService agreementService;
 
 
+    /**
+     * Authenticates a user using an OAuth idToken and processes login or signup.
+     *
+     * @param request the OAuth login request containing the idToken from the mobile app
+     * @return an API response containing user information and signup status
+     */
     @Operation(summary = "idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
     @PostMapping("/sign-in")
     public ApiResponse<OAuthLoginDTO.Response> signIn(@RequestBody OAuthLoginDTO.Request request) {
@@ -61,6 +67,14 @@ public class MemberController {
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_OUT_SUCCESS, null);
     }
 
+    /**
+     * Records the user's agreement to terms and updates their signup completion status.
+     *
+     * Marks the user as having agreed to the required terms and sets their signup as completed.
+     *
+     * @param request the user's agreement details for the terms
+     * @return an API response indicating successful completion of terms agreement
+     */
     @Operation(summary = "약관 동의 완료", description = "사용자가 약관에 동의했음을 저장하고 isSignUpCompleted를 true로 갱신합니다.")
     @SecurityRequirement(name = "accessToken")
     @PostMapping("/terms")
@@ -72,6 +86,11 @@ public class MemberController {
         return ApiResponse.onSuccess(MemberSuccessStatus.TERM_AGREEMENT_COMPLETED, null);
     }
 
+    /**
+     * Retrieves the URLs and versions of all current terms and conditions.
+     *
+     * @return an ApiResponse containing a map of terms categories to their corresponding URLs and versions
+     */
     @Operation(summary = "모든 약관 URL 조회", description = "최신 약관 HTML 파일들의 URL과 버전을 반환합니다.")
     @GetMapping("/terms")
     public ApiResponse<Map<String, Map<String, String>>> getTermsUrls() {
@@ -81,6 +100,11 @@ public class MemberController {
     }
 
 
+    /**
+     * Retrieves the number of consecutive days a member has been active.
+     *
+     * @return an ApiResponse containing the consecutive active days for the member.
+     */
     @Operation(summary = "[MEMBER] 연속일 조회하기")
     @GetMapping("/members/consecutive-days")
     public ApiResponse<MemberResponseDTO.ConsecutiveDaysDTO> getConsecutiveDays() {

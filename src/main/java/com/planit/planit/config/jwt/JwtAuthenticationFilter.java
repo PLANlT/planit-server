@@ -24,6 +24,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
 
+    /**
+     * Processes incoming HTTP requests to perform JWT-based authentication, setting the security context for authenticated users.
+     *
+     * Skips authentication for predefined public or documentation-related endpoints. For other requests, validates the JWT token from the Authorization header, retrieves the associated user, and establishes the authentication context. Responds with appropriate HTTP status codes and messages for authentication failures or missing users.
+     *
+     * @param request  the HTTP request to filter
+     * @param response the HTTP response to modify in case of authentication errors
+     * @param filterChain the filter chain to continue processing the request
+     * @throws ServletException if an error occurs during filtering
+     * @throws IOException if an I/O error occurs during filtering
+     */
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
