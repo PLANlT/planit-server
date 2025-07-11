@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.dream.Dream;
 import com.planit.planit.member.association.GuiltyFree;
+import com.planit.planit.member.association.Notification;
 import com.planit.planit.member.association.Term;
 import com.planit.planit.member.enums.DailyCondition;
 import com.planit.planit.member.enums.SignType;
@@ -91,6 +92,9 @@ public class Member extends BaseEntity {
 
     @Column(nullable = false)
     private boolean isSignUpCompleted = false;
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Notification notification;
 /*------------------------------ CONSTRUCTOR ------------------------------*/
 
     protected Member() {}
@@ -122,6 +126,7 @@ public class Member extends BaseEntity {
         this.dreams = new ArrayList<>();
         this.memberName = (memberName != null) ? memberName : "여행자";
         this.role = role;
+        this.notification = Notification.of(this);
     }
 
 /*------------------------------ METHOD ------------------------------*/

@@ -19,6 +19,11 @@ public enum MemberSuccessStatus implements SuccessResponse {
 
     // 연속일
     CONSECUTIVE_DAYS_FOUND(HttpStatus.OK, "MEMBER2004", "연속일을 조회하였습니다."),
+
+    //알림
+    NOTIFICATION_SETTING_FETCHED(HttpStatus.OK, "MEMBER2020", "알림 설정 정보를 조회하였습니다."),
+    NOTIFICATION_DAILY_TASK_TOGGLED(HttpStatus.OK, "MEMBER2021", "오늘의 할 일 알림 설정을 변경하였습니다."),
+    NOTIFICATION_GUILTY_FREE_TOGGLED(HttpStatus.OK, "MEMBER2022", "길티프리 모드 알림 설정을 변경하였습니다."),
     ;
 
 
