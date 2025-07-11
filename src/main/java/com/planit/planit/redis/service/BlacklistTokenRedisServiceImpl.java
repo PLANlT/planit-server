@@ -1,5 +1,6 @@
 package com.planit.planit.redis.service;
 
+import com.planit.planit.common.aop.LogExecutionTime;
 import com.planit.planit.redis.entity.BlacklistTokenRedisEntity;
 import com.planit.planit.redis.repository.BlacklistTokenRedisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,14 @@ public class BlacklistTokenRedisServiceImpl implements BlacklistTokenRedisServic
     private final BlacklistTokenRedisRepository blacklistTokenRedisRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
+
     @Autowired
     public BlacklistTokenRedisServiceImpl(BlacklistTokenRedisRepository blacklistTokenRedisRepository, RedisTemplate<String, Object> redisTemplate) {
         this.blacklistTokenRedisRepository = blacklistTokenRedisRepository;
         this.redisTemplate = redisTemplate;
     }
 
+    @LogExecutionTime
     @Override
     public void blacklistAccessToken(String accessToken, long ttlSeconds) {
         BlacklistTokenRedisEntity entity = new BlacklistTokenRedisEntity(accessToken);
@@ -26,6 +29,7 @@ public class BlacklistTokenRedisServiceImpl implements BlacklistTokenRedisServic
         redisTemplate.expire("blacklist:" + accessToken, ttlSeconds, TimeUnit.SECONDS);
     }
 
+    @LogExecutionTime
     @Override
     public boolean isBlacklisted(String accessToken) {
         return blacklistTokenRedisRepository.existsById(accessToken);
