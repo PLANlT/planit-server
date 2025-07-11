@@ -26,11 +26,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getRequestURI();
+
+        // 로그인 관련 URL은 필터 패스
+        if (path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-resources") ||
+                path.startsWith("/swagger-ui.html") ||
+                path.startsWith("/h2-console") ||
+                path.startsWith("/members/sign-in") ||
+                path.startsWith("/auth")){
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
-        // Authorization 헤더가 없거나, Bearer 형식이 아닐 경우 필터 체인 계속 진행
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            response.setStatus(ErrorStatus.UNAUTHORIZED.getErrorStatus().value());
+            response.getWriter().write(ErrorStatus.UNAUTHORIZED.getMessage());
             return;
         }
 
@@ -44,10 +59,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         Long id = jwtProvider.getId(token);
+        logger.info("JWT token validated successfully" + id);
         Member member = memberRepository.findById(id).orElseThrow(() -> {
             response.setStatus(MemberErrorStatus.MEMBER_NOT_FOUND.getErrorStatus().value());
             return new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND);
         });
+        logger.info("Member validated successfully" + member);
 
         // UserPrincipal을 생성하고, 인증 정보를 SecurityContextHolder에 설정
         UserPrincipal userPrincipal = new UserPrincipal(

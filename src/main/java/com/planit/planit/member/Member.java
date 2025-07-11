@@ -89,6 +89,8 @@ public class Member extends BaseEntity {
     @JsonManagedReference
     private List<Dream> dreams;
 
+    @Column(nullable = false)
+    private boolean isSignUpCompleted = false;
 /*------------------------------ CONSTRUCTOR ------------------------------*/
 
     protected Member() {}
@@ -177,5 +179,12 @@ public class Member extends BaseEntity {
         return lastAttendanceDate.plusDays(1).equals(today);
     }
 
+    public boolean isSignUpCompleted() {
+        return isSignUpCompleted;
+    }
+
+    public void setSignUpCompleted(boolean isSignUpCompleted) {
+        this.isSignUpCompleted = isSignUpCompleted;
+    }
 
 }

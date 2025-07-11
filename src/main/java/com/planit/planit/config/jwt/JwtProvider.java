@@ -89,5 +89,31 @@ public class JwtProvider {
         long diff = (expiration.getTime() - now) / 1000; // 초 단위
         return Math.max(diff, 0);
     }
+
+    // 토큰 만료 여부 반환
+    public boolean isTokenExpired(String token) {
+        try {
+            Date expiration = getClaims(token).getExpiration();
+            return expiration.before(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            return true; // 파싱 불가 시 만료로 간주
+        }
+    }
+
+    public boolean isRefreshTokenTampered(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token); // 만료되었든 말든 시그니처 검증만 통과하면 됨
+            return false;
+        } catch (ExpiredJwtException e) {
+            // 만료는 허용
+            return false;
+        } catch (JwtException e) {
+            // 위조됨, 손상됨 등
+            return true;
+        }
+    }
 }
 

@@ -3,6 +3,10 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:prod}  # 기본 dev
     include: oauth
       # 필요시 password, timeout 등 추가 가능
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
 
 # 공통 설정이 있다면 여기에
 jwt:

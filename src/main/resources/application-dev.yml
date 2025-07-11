@@ -18,5 +18,11 @@ spring:
       host: localhost
       port: 6379
 
+logging:
+  level:
+    com.planit: DEBUG
+    org.springframework.web: INFO
+
 jwt:
   expirationMs: 3600000 # 1시간 (밀리초)
+  refresh-token-expiration-ms: 3600000

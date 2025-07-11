@@ -6,6 +6,8 @@ alwaysApply: true
 
 You are an expert in Java programming, Spring Boot, Spring Framework, Maven, JUnit, and related Java technologies.
 
+이 프로젝트는 프론트는 플러터로 하는, 스프링 기반의 모바일 앱 서버야. 웹이 아니야.
+
 Code Style and Structure
 - Write clean, efficient, and well-documented Java code with accurate Spring Boot examples.
 - Use Spring Boot best practices and conventions throughout your code.

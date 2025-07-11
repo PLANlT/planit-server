@@ -1,16 +1,23 @@
 package com.planit.planit.member.service;
 
+import com.planit.planit.common.api.general.GeneralException;
+import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
+import com.planit.planit.common.api.token.TokenHandler;
+import com.planit.planit.common.api.token.status.TokenErrorStatus;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.config.oauth.CustomOAuth2User;
+import com.planit.planit.config.oauth.SocialTokenVerifier;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.association.Term;
 import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
+import com.planit.planit.redis.service.RefreshTokenRedisServiceImpl;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
+import com.planit.planit.web.dto.auth.login.TokenRefreshDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import com.planit.planit.redis.service.RefreshTokenRedisService;
@@ -18,7 +25,15 @@ import com.planit.planit.redis.service.BlacklistTokenRedisService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
-
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
 import java.util.Optional;
 
 @Service
@@ -31,90 +46,54 @@ public class MemberServiceImpl implements MemberService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenRedisService refreshTokenRedisService;
     private final BlacklistTokenRedisService blacklistTokenRedisService;
-
-    //로그인인지 회원가입인지 감지
-    @Override
-    public OAuthLoginDTO.Response checkOAuthMember(CustomOAuth2User oAuth2User) {
-        String email = (String) oAuth2User.getAttributes().get("email");
-        String name = (String) oAuth2User.getAttributes().get("name");
-
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
-
-        if (optionalMember.isPresent()) {
-            Member member = optionalMember.get();
-
-            String accessToken = jwtProvider.createAccessToken(
-                    member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-            );
-
-            String refreshToken = jwtProvider.createRefreshToken(
-                    member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-            );
-
-            return OAuthLoginDTO.Response.builder()
-                    .email(member.getEmail())
-                    .name(member.getMemberName())
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .isNewMember(false)
-                    .build();
-        }
-
-        // 신규 회원 → 약관 동의 필요
-        return OAuthLoginDTO.Response.builder()
-                .email(email)
-                .name(name)
-                .accessToken(null)
-                .refreshToken(null)
-                .isNewMember(true)
-                .build();
-    }
-
+    private final SocialTokenVerifier  socialTokenVerifier;
 
 
     @Override
-    public OAuthLoginDTO.Response registerOAuthMember(CustomOAuth2User oAuth2User, TermAgreementDTO.Request request) {
-        String email = (String) oAuth2User.getAttributes().get("email");
-        String name = (String) oAuth2User.getAttributes().get("name");
-        SignType signType = oAuth2User.getSignType();
-
-
-        //혹시 오류 생길까봐 넣긴 했는데, 중복 확인이라 고민입니다
-        if (memberRepository.findByEmail(email).isPresent()) {
-            throw new MemberHandler(MemberErrorStatus.MEMBER_ALREADY_EXISTS);
+    public OAuthLoginDTO.Response signIn(OAuthLoginDTO.Request request) {
+        SocialTokenVerifier.SocialUserInfo userInfo;
+        try {
+            userInfo = socialTokenVerifier.verify(request.getOauthProvider(), request.getOauthToken());
+        } catch (Exception e) {
+            throw new GeneralException(TokenErrorStatus.INVALID_ID_TOKEN);
         }
-
-        Member member = Member.builder()
-                .email(email)
-                .memberName(name)
-                .signType(SignType.GOOGLE)  // 또는 매개변수로 받아도 됨
+        Optional<Member> memberOpt = memberRepository.findByEmail(userInfo.email);
+        final boolean isNewMember;
+        final Member member;
+        if (memberOpt.isPresent()) {
+            member = memberOpt.get();
+            if (!member.getSignType().name().equalsIgnoreCase(request.getOauthProvider())) {
+                throw new GeneralException(MemberErrorStatus.DIFFERENT_SIGN_TYPE);
+            }
+            isNewMember = false;
+        } else {
+            member = Member.builder()
+                .email(userInfo.email)
+                .memberName(userInfo.name)
+                .password(UUID.randomUUID().toString().substring(0, 10))
+                .signType(SignType.valueOf(request.getOauthProvider().toUpperCase()))
                 .guiltyFreeMode(false)
+                .dailyCondition(null)
                 .role(Role.USER)
                 .build();
-        memberRepository.save(member);
-
-        Term term = Term.builder()
-                .member(member)
-                .termOfUse(request.getTermOfUse())
-                .termOfPrivacy(request.getTermOfPrivacy())
-                .build();
-        termRepository.save(term);
-
-        String accessToken = jwtProvider.createAccessToken(
-                member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-        );
-
-        String refreshToken = jwtProvider.createRefreshToken(
-                member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-        );
-
+            memberRepository.save(member);
+            isNewMember = true;
+        }
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
+        String refreshToken = refreshTokenRedisService.getRefreshTokenByMemberId(member.getId());
+        if (refreshToken == null || jwtProvider.isTokenExpired(refreshToken)) {
+            refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
+            refreshTokenRedisService.saveRefreshToken(member.getId(), refreshToken);
+        }
         return OAuthLoginDTO.Response.builder()
-                .email(member.getEmail())
-                .name(member.getMemberName())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .isNewMember(true)
-                .build();
+            .id(member.getId())
+            .email(member.getEmail())
+            .name(member.getMemberName())
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .isNewMember(isNewMember)
+            .isSignUpCompleted(false)
+            .build();
     }
 
     @Override
@@ -129,7 +108,62 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public MemberResponseDTO.ConsecutiveDaysDTO getConsecutiveDays(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(MemberErrorStatus.MEMBER_NOT_FOUND));
         return MemberResponseDTO.ConsecutiveDaysDTO.of(member);
     }
+
+    @Transactional
+    public void completeTermsAgreement(Long memberId, TermAgreementDTO.Request request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        // Term 저장
+        Term term = Term.builder()
+                .member(member)
+                .termOfUse(request.getTermOfUse())
+                .termOfPrivacy(request.getTermOfPrivacy())
+                .termOfInfo(request.getTermOfInfo())
+                .overFourteen(request.getOverFourteen())
+                .build();
+        termRepository.save(term);
+
+        // isSignUpCompleted 업데이트
+        member.setSignUpCompleted(true);
+        member.setTerm(term); // 양방향 매핑도 같이 갱신
+
+        // 저장
+        memberRepository.save(member);
+    }
+
+    @Override
+    public TokenRefreshDTO.Response refreshAccessToken(String refreshToken) {
+        if(jwtProvider.isTokenExpired(refreshToken)) {
+            throw new TokenHandler(TokenErrorStatus.REFRESH_TOKEN_EXPIRED);
+        }
+
+        if (jwtProvider.isRefreshTokenTampered(refreshToken)) {
+            throw new TokenHandler(TokenErrorStatus.INVALID_REFRESH_TOKEN); // 진짜 위조된 경우만
+        }
+
+        Long memberId = jwtProvider.getId(refreshToken);
+
+        String savedToken = refreshTokenRedisService.getRefreshTokenByMemberId(memberId);
+        if (!refreshToken.equals(savedToken)) {
+            throw new TokenHandler(TokenErrorStatus.INVALID_REFRESH_TOKEN);
+        }
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(MemberErrorStatus.MEMBER_NOT_FOUND));
+
+        String newAccessToken = jwtProvider.createAccessToken(
+                member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
+        );
+
+        return TokenRefreshDTO.Response.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken) // Refresh는 만료되면 로그인 다시해야함
+                .build();
+    }
+
+
 }

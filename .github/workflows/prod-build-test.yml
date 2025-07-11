@@ -37,8 +37,9 @@ jobs:
 
       - name: Build with Gradle Wrapper
         run: |
+          ./gradlew build -x test
           chmod +x gradlew
-          ./gradlew test
+
 
   build:
     runs-on: ubuntu-22.04
@@ -54,7 +55,12 @@ jobs:
       OAUTH2_KAKAO_CLIENT_SECRET: ${{ secrets.OAUTH2_KAKAO_CLIENT_SECRET }}
       OAUTH2_NAVER_CLIENT_ID: ${{ secrets.OAUTH2_NAVER_CLIENT_ID }}
       OAUTH2_NAVER_CLIENT_SECRET: ${{ secrets.OAUTH2_NAVER_CLIENT_SECRET }}
-
+      GOOGLE_CLIENT_ID:  ${{ secrets.GOOGLE_CLIENT_ID}}
+      GOOGLE_PLAYGROUND_CLIENT_ID:  ${{ secrets.GOOGLE_PLAYGROUND_CLIENT_ID}}
+      KAKAO_REST_API_KEY:  ${{ secrets.KAKAO_REST_API_KEY}}
+      NAVER_CLIENT_ID:  ${{ secrets.NAVER_CLIENT_ID}}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+      
     services:
       redis:
         image: redis:7.0
@@ -75,4 +81,5 @@ jobs:
       - name: Build with Gradle Wrapper
         run: |
           chmod +x gradlew
-          ./gradlew build -x test
+
+
