@@ -28,26 +28,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
 
-        // 로그인 관련 URL은 필터 패스
-        if (path.startsWith("/swagger-ui") ||
-                path.startsWith("/v3/api-docs") ||
-                path.startsWith("/swagger-resources") ||
-                path.startsWith("/swagger-ui.html") ||
-                path.startsWith("/h2-console") ||
-                path.startsWith("/members/sign-in") ||
-                path.startsWith("/auth") ||
-                path.startsWith("/members/terms")       //TODO: 이거 없애고 엔트리포인트 추가
-        ){
-
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        // 로그인 관련 URL은 필터 패스
+//        if (path.startsWith("/members/sign-in") ||
+//                path.startsWith("/auth")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         String authHeader = request.getHeader("Authorization");
 
+        // 헤더가 없으면 그냥 다음 필터로 넘김
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(ErrorStatus.UNAUTHORIZED.getErrorStatus().value());
-            response.getWriter().write(ErrorStatus.UNAUTHORIZED.getMessage());
+            filterChain.doFilter(request, response);
             return;
         }
 
