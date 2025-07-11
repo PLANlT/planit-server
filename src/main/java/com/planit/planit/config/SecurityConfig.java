@@ -17,6 +17,15 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter  jwtAuthenticationFilter;
 
+    /**
+     * Configures and returns the application's security filter chain.
+     *
+     * Allows unauthenticated access to specific endpoints such as Swagger UI, API documentation, H2 console, sign-in, authentication, and terms retrieval. All other requests require authentication. Disables CORS, CSRF protection, and HTTP headers security, and adds the JWT authentication filter before the username-password authentication filter.
+     *
+     * @param http the {@link HttpSecurity} to configure
+     * @return the configured {@link SecurityFilterChain}
+     * @throws Exception if an error occurs during security configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         //TODO: 배포 시 사용 범위 제한

@@ -3,6 +3,10 @@ package com.planit.planit.agreement.service;
 import java.util.Map;
 
 public interface AgreementService {
-    // 인터페이스 메서드 구현
+    /**
+ * Retrieves all available terms URLs organized by category.
+ *
+ * @return a map where each key represents a category and the value is another map of term names to their corresponding URLs.
+ */
     Map<String, Map<String, String>> getAllTermsUrls();
 }

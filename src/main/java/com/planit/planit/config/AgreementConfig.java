@@ -19,7 +19,14 @@ public class AgreementConfig {
     @Getter
     @Setter
     public static class AgreementDetail {  private String version;
-        private String fileName;   // 실제 HTML 파일명 (예: "TermOfPrivacy_v20250711.html")
+        private String fileName;   /****
+         * Constructs the full URL to the agreement file by combining the provided base URL and the file name.
+         *
+         * If the base URL does not end with a slash, a slash is inserted before appending the file name.
+         *
+         * @param baseUrl the base URL to which the file name will be appended
+         * @return the complete URL to the agreement file
+         */
 
         public String getFullUrl(String baseUrl) {
             // baseUrl이 '/'로 끝나지 않으면 '/'를 추가하여 올바른 URL 경로를 만듭니다.
