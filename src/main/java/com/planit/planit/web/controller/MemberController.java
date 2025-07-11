@@ -1,6 +1,7 @@
 package com.planit.planit.web.controller;
 
 
+import com.planit.planit.agreement.service.AgreementService;
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
 import com.planit.planit.config.jwt.UserPrincipal;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final AgreementService agreementService;
 
 
     @Operation(summary = "idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
@@ -68,6 +72,14 @@ public class MemberController {
         return ApiResponse.onSuccess(MemberSuccessStatus.TERM_AGREEMENT_COMPLETED, null);
     }
 
+    @Operation(summary = "모든 약관 URL 조회", description = "최신 약관 HTML 파일들의 URL과 버전을 반환합니다.")
+    @GetMapping("/terms")
+    public ApiResponse<Map<String, Map<String, String>>> getTermsUrls() {
+        Map<String, Map<String, String>> termsInfo = agreementService.getAllTermsUrls();
+        log.info("✅ 약관 URL 정보 조회 성공: {}", termsInfo);
+        return ApiResponse.onSuccess(MemberSuccessStatus.TERMS_URLS_FOUND, termsInfo);
+    }
+
 
     @Operation(summary = "[MEMBER] 연속일 조회하기")
     @GetMapping("/members/consecutive-days")
@@ -76,6 +88,7 @@ public class MemberController {
         MemberResponseDTO.ConsecutiveDaysDTO consecutiveDaysDTO = memberService.getConsecutiveDays(memberId);
         return ApiResponse.onSuccess(MemberSuccessStatus.CONSECUTIVE_DAYS_FOUND, consecutiveDaysDTO);
     }
+
 
 
 }
