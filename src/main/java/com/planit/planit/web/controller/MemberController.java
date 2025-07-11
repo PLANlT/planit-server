@@ -7,8 +7,10 @@ import com.planit.planit.common.api.member.status.MemberSuccessStatus;
 import com.planit.planit.config.jwt.UserPrincipal;
 import com.planit.planit.config.oauth.CustomOAuth2UserService;
 import com.planit.planit.member.service.MemberService;
+import com.planit.planit.member.service.NotificationService;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 
+import com.planit.planit.web.dto.member.notification.NotificationDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
@@ -37,6 +39,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final AgreementService agreementService;
+    private final NotificationService notificationService;
 
 
     @Operation(summary = "idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
@@ -89,6 +92,35 @@ public class MemberController {
         return ApiResponse.onSuccess(MemberSuccessStatus.CONSECUTIVE_DAYS_FOUND, consecutiveDaysDTO);
     }
 
+    // 오늘의 할 일 알림 ON/OFF
+    @Operation(summary = "[NOTIFICATION] 오늘의 할 일 알림 설정 변경", description = "오늘의 할 일 알림 ON/OFF를 설정합니다.")
+    @PatchMapping("/me/notification-settings/daily-task")
+    public ApiResponse<Void> updateDailyTask(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody NotificationDTO.ToggleRequest request
+    ) {
+        notificationService.updateDailyTaskNotification(principal.getId(), request);
+        return ApiResponse.onSuccess(MemberSuccessStatus.NOTIFICATION_DAILY_TASK_TOGGLED);
+    }
 
+    // 길티프리 모드 알림 ON/OFF
+    @Operation(summary = "[NOTIFICATION] 길티프리 모드 알림 설정 변경", description = "길티프리 모드 알림 ON/OFF를 설정합니다.")
+    @PatchMapping("/me/notification-settings/guilty-free")
+    public ApiResponse<Void> updateGuiltFree(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody NotificationDTO.ToggleRequest request
+    ) {
+        notificationService.updateGuiltFreeNotification(principal.getId(), request);
+        return ApiResponse.onSuccess(MemberSuccessStatus.NOTIFICATION_GUILTY_FREE_TOGGLED);
+    }
 
+    // 전체 알림 설정 조회
+    @Operation(summary = "[NOTIFICATION] 전체 알림 설정 조회", description = "사용자의 전체 알림 설정 상태를 조회합니다.")
+    @GetMapping("/me/notification-settings")
+    public ApiResponse<NotificationDTO.Response> getNotificationSetting(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        NotificationDTO.Response response = notificationService.getMyNotificationSetting(principal.getId());
+        return ApiResponse.onSuccess(MemberSuccessStatus.NOTIFICATION_SETTING_FETCHED, response);
+    }
 }
