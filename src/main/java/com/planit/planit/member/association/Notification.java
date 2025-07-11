@@ -35,14 +35,21 @@ public class Notification {
     }
 
     public static Notification of(Member member) {
-        return Notification.builder()
-                .member(member)
-                .build();
+        Notification notification = new Notification();
+        notification.setMember(member);
+        notification.setDailyTaskEnabled(true);
+        notification.setGuiltyFreeEnabled(true);
+        notification.setUpdatedAt(LocalDateTime.now());
+        return notification;
     }
 
-    public void updateSettings(boolean daily, boolean guilty) {
-        this.dailyTaskEnabled = daily;
-        this.guiltyFreeEnabled = guilty;
+    public void updateDailyTask(boolean enabled) {
+        this.dailyTaskEnabled = enabled;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateGuiltFree(boolean enabled) {
+        this.guiltyFreeEnabled = enabled;
         this.updatedAt = LocalDateTime.now();
     }
 }
