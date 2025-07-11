@@ -35,7 +35,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 path.startsWith("/swagger-ui.html") ||
                 path.startsWith("/h2-console") ||
                 path.startsWith("/members/sign-in") ||
-                path.startsWith("/auth")){
+                path.startsWith("/auth") ||
+                path.startsWith("/members/terms")       //TODO: 이거 없애고 엔트리포인트 추가
+        ){
 
             filterChain.doFilter(request, response);
             return;

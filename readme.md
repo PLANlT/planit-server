@@ -132,3 +132,4 @@ test {
 
 ---
 
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/PLANlT/planit-server?utm_source=oss&utm_medium=github&utm_campaign=PLANlT%2Fplanit-server&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
