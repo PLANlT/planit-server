@@ -3,6 +3,7 @@ package com.planit.planit.member.service;
 import com.planit.planit.config.oauth.CustomOAuth2User;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.web.dto.auth.login.TokenRefreshDTO;
+import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import org.springframework.stereotype.Service;
@@ -21,4 +22,6 @@ public interface MemberService {
 
 
     TokenRefreshDTO.Response refreshAccessToken(String refreshToken);
+
+    MemberInfoResponseDTO getMemberInfo(Long memberId);
 }
