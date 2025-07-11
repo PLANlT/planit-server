@@ -20,9 +20,11 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class NotificationServiceTest {
+class NotificationServiceImplTest {
 
     @InjectMocks
     private NotificationServiceImpl notificationService;
@@ -70,6 +72,9 @@ class NotificationServiceTest {
         // then
         assertThat(notification.isDailyTaskEnabled()).isFalse();
         assertThat(notification.isGuiltyFreeEnabled()).isFalse();
+
+        verify(memberRepository, times(2)).findById(1L);
+        verify(notificationRepository, times(2)).findByMember(member);
     }
 
     private Member createDummyMember() {

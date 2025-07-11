@@ -8,8 +8,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Notification {
 
     @Id
@@ -21,21 +22,20 @@ public class Notification {
     private Member member;
 
     @Column(nullable = false)
-    private boolean dailyTaskEnabled = true;    //TODO: 기본값 true 인지 확인
+    @Builder.Default
+    private boolean dailyTaskEnabled = true;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean guiltyFreeEnabled = true;
 
     private LocalDateTime updatedAt;
 
     public static Notification of(Member member) {
-        Notification notification = new Notification();
-        notification.setMember(member);
-        notification.setMemberId(member.getId());
-        notification.setDailyTaskEnabled(true);
-        notification.setGuiltyFreeEnabled(true);
-        notification.setUpdatedAt(LocalDateTime.now());
-        return notification;
+        return Notification.builder()
+                .member(member)
+                .memberId(member.getId()) // MapsId는 명시적으로 ID를 넣어야 함
+                .build();
     }
 
     public void updateDailyTask(boolean enabled) {

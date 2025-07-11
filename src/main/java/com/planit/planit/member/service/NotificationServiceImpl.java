@@ -35,7 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public Notification getNotification(Long memberId) {
+    protected Notification getNotification(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
         return notificationRepository.findByMember(member)
