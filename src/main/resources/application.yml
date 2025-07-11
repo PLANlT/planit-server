@@ -11,3 +11,20 @@ spring:
 # 공통 설정이 있다면 여기에
 jwt:
   secret: your-super-secret-key-that-should-be-long-and-secure
+
+app:
+  agreement:
+    base-url: ${APP_AGREEMENT_BASEURL} #TODO: 도메인으로 변경해야함
+    terms:
+      term-of-info: # 개인정보처리방침
+        version: "20250711"
+        file-name: "TermOfInfo_v20250711.html"
+      term-of-privacy: # 개인정보 수집 및 이용 동의서
+        version: "20250711"
+        file-name: "TermOfPrivacy_v20250711.html"
+      term-of-use: # 서비스 이용약관
+        version: "20250711"
+        file-name: "TermOfUse_v20250711.html"
+      third-party-ad-consent: # 개인정보 제3자 제공 동의
+        version: "20250711"
+        file-name: "ThirdPartyConsent_v20250711.html"

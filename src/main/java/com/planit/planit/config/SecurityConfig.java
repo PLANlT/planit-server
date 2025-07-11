@@ -20,8 +20,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         //TODO: 배포 시 사용 범위 제한
-        http.authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests.anyRequest().permitAll() )
+        http
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests
+                                // **여기에 인증 없이 허용할 URL 패턴을 명확히 지정합니다.**
+                                .requestMatchers(
+                                        "/swagger-ui/**",          // Swagger UI
+                                        "/v3/api-docs/**",         // Swagger API 문서
+                                        "/swagger-resources/**",   // Swagger 리소스
+                                        "/h2-console/**",          // H2 데이터베이스 콘솔 (개발용)
+                                        "/members/sign-in",        // 로그인 API
+                                        "/auth/**",                // 인증 관련 기타 API (예: 토큰 재발급 등)
+                                        "/members/terms"           // 약관 URL 조회 API (인증 없이 허용)
+                                ).permitAll()
+                                .anyRequest().authenticated()
+                )
                 .cors(cors -> cors.disable()) //TODO: 배포 시 CORS 설정
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.disable())
