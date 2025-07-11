@@ -1,13 +1,11 @@
 package com.planit.planit.member.service;
 
 import com.planit.planit.common.api.general.GeneralException;
-import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
 import com.planit.planit.common.api.token.TokenHandler;
 import com.planit.planit.common.api.token.status.TokenErrorStatus;
 import com.planit.planit.config.jwt.JwtProvider;
-import com.planit.planit.config.oauth.CustomOAuth2User;
 import com.planit.planit.config.oauth.SocialTokenVerifier;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.association.Notification;
@@ -17,9 +15,9 @@ import com.planit.planit.member.repository.NotificationRepository;
 import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
-import com.planit.planit.redis.service.RefreshTokenRedisServiceImpl;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 import com.planit.planit.web.dto.auth.login.TokenRefreshDTO;
+import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import com.planit.planit.redis.service.RefreshTokenRedisService;
@@ -27,14 +25,7 @@ import com.planit.planit.redis.service.BlacklistTokenRedisService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.*;
-import java.util.Collections;
-import java.util.Map;
+
 import java.util.UUID;
 import java.util.Optional;
 
@@ -172,5 +163,19 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
+    @Override
+    public MemberInfoResponseDTO getMemberInfo(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        return MemberInfoResponseDTO.of(member);
+    }
+
+//    @Override                 수정할게 없어보이는데.. 해야하나?
+//    @Transactional
+//    public void updateMemberInfo(Long memberId, MemberInfoRequestDTO request) {
+//        Member member = memberRepository.findById(memberId)
+//                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+//        member.updateInfo(request.getName(), request.getEmail());
+//    }
 
 }
