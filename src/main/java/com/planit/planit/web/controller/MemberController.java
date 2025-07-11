@@ -10,6 +10,7 @@ import com.planit.planit.member.service.MemberService;
 import com.planit.planit.member.service.NotificationService;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 
+import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.notification.NotificationDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -122,5 +123,15 @@ public class MemberController {
     ) {
         NotificationDTO.Response response = notificationService.getMyNotificationSetting(principal.getId());
         return ApiResponse.onSuccess(MemberSuccessStatus.NOTIFICATION_SETTING_FETCHED, response);
+    }
+
+    //사용자 정보 조회
+    @Operation(summary = "[MEMBER] 내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다.")
+    @GetMapping("/me")
+    public ApiResponse<MemberInfoResponseDTO> getMyInfo(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        MemberInfoResponseDTO response = memberService.getMemberInfo(principal.getId());
+        return ApiResponse.onSuccess(MemberSuccessStatus.MEMBER_INFO_FETCHED, response);
     }
 }
