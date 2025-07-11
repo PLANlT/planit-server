@@ -63,7 +63,6 @@ public class MemberServiceImpl implements MemberService {
         Optional<Member> memberOpt = memberRepository.findByEmail(userInfo.email);
         final boolean isNewMember;
         final Member member;
-        final Notification notification;
         if (memberOpt.isPresent()) {
             member = memberOpt.get();
             if (!member.getSignType().name().equalsIgnoreCase(request.getOauthProvider())) {
@@ -81,11 +80,9 @@ public class MemberServiceImpl implements MemberService {
                 .role(Role.USER)
                 .build();
 
-            notification = Notification.builder()
-                                .member(member)
-                                .build();
-
             memberRepository.save(member);
+
+            Notification notification = Notification.of(member);
             notificationRepository.save(notification);
             isNewMember = true;
         }

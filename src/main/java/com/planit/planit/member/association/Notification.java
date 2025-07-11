@@ -28,15 +28,10 @@ public class Notification {
 
     private LocalDateTime updatedAt;
 
-    @Builder
-    public Notification(Member member) {
-        this.member = member;
-        this.updatedAt = LocalDateTime.now();
-    }
-
     public static Notification of(Member member) {
         Notification notification = new Notification();
         notification.setMember(member);
+        notification.setMemberId(member.getId());
         notification.setDailyTaskEnabled(true);
         notification.setGuiltyFreeEnabled(true);
         notification.setUpdatedAt(LocalDateTime.now());
