@@ -1,10 +1,9 @@
-package com.planit.planit.redis.service;
+package com.planit.planit.auth.service;
 
 import com.planit.planit.auth.entity.RefreshTokenToMemberIdRedisEntity;
 import com.planit.planit.auth.entity.MemberIdToRefreshTokenRedisEntity;
 import com.planit.planit.auth.repository.RefreshTokenToMemberIdRedisRepository;
 import com.planit.planit.auth.repository.MemberIdToRefreshTokenRedisRepository;
-import com.planit.planit.auth.service.RefreshTokenRedisServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

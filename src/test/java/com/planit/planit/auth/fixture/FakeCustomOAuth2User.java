@@ -1,4 +1,4 @@
-    package com.planit.planit.auth;
+    package com.planit.planit.auth.fixture;
 
     import com.planit.planit.auth.oauth.CustomOAuth2User;
     import com.planit.planit.member.enums.SignType;

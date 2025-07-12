@@ -1,12 +1,12 @@
-package com.planit.planit.web.controller.member.security;
+package com.planit.planit.web.controller.auth;
 
+import com.planit.planit.auth.service.AuthService;
 import com.planit.planit.config.SecurityConfig;
 import com.planit.planit.member.repository.MemberRepository;
-import com.planit.planit.member.service.MemberService;
 import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.auth.oauth.CustomOAuth2UserService;
 
-import com.planit.planit.web.controller.MemberController;
+import com.planit.planit.web.controller.AuthController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +18,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(MemberController.class)
+@WebMvcTest(AuthController.class)
 @Import(SecurityConfig.class) // ✅ 필터 포함
-@DisplayName("MemberControllerSecurityTest - Spring Security 예외 테스트")
-class MemberControllerSecurityTest {
+@DisplayName("AuthControllerSecurityTest - Spring Security 예외 테스트")
+class AuthControllerSecurityTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     // 🔧 SecurityConfig 내 필요한 빈들 Mocking
     @MockBean
-    private MemberService memberService;
+    private AuthService authService;
     @MockBean
     private JwtProvider jwtProvider;
     @MockBean

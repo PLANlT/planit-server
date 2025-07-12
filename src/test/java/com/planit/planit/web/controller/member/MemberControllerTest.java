@@ -8,7 +8,7 @@ import com.planit.planit.auth.oauth.CustomOAuth2UserService;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.web.controller.MemberController;
-import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
+import com.planit.planit.web.dto.auth.OAuthLoginDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

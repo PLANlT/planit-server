@@ -1,6 +1,5 @@
-package com.planit.planit.config.oauth;
+package com.planit.planit.auth.oauth;
 
-import com.planit.planit.auth.oauth.SocialTokenVerifier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

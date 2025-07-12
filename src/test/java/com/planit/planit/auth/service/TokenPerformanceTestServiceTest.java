@@ -1,9 +1,8 @@
-package com.planit.planit.redis.service;
+package com.planit.planit.auth.service;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.planit.planit.auth.service.TokenPerformanceTestService;
 import com.planit.planit.common.aop.LogAspect;
 import com.planit.planit.common.aop.handler.ExecutionTimeHandler;
 import org.junit.jupiter.api.BeforeEach;

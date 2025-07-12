@@ -1,5 +1,6 @@
 package com.planit.planit.web.controller.member;
 
+import com.planit.planit.auth.service.AuthService;
 import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.auth.jwt.JwtProvider;
@@ -7,8 +8,7 @@ import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.auth.oauth.CustomOAuth2UserService;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.repository.MemberRepository;
-import com.planit.planit.member.service.MemberService;
-import com.planit.planit.web.controller.MemberController;
+import com.planit.planit.web.controller.AuthController;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,17 +26,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@WebMvcTest(MemberController.class)
+@WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false) // ✅ 필터 제거해서 인증 우회
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@DisplayName("MemberController - 로그아웃")
+@DisplayName("AuthController - 로그아웃")
 class MemberControllerSignOutTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private MemberService memberService;
+    private AuthService authService;
     @MockBean
     private JwtProvider jwtProvider;
     @MockBean
@@ -81,7 +81,7 @@ class MemberControllerSignOutTest {
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(status().isOk());
 
-            verify(memberService).signOut(1L, "test-token");
+            verify(authService).signOut(1L, "test-token");
         }
 
 
@@ -113,7 +113,7 @@ class MemberControllerSignOutTest {
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             GeneralException generalException = new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR);
-            org.mockito.BDDMockito.willThrow(generalException).given(memberService).signOut(any(), any());
+            org.mockito.BDDMockito.willThrow(generalException).given(authService).signOut(any(), any());
 
             mockMvc.perform(post("/members/sign-out")
                             .contentType(MediaType.APPLICATION_JSON)

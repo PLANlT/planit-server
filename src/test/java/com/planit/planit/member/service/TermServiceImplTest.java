@@ -1,7 +1,6 @@
-package com.planit.planit.term.service;
+package com.planit.planit.member.service;
 
 import com.planit.planit.config.TermConfig;
-import com.planit.planit.member.service.TermServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

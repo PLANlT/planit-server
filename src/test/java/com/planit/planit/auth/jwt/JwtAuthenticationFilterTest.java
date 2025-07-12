@@ -1,9 +1,5 @@
-package com.planit.planit.config.oauth;
+package com.planit.planit.auth.jwt;
 
-import com.planit.planit.auth.jwt.JwtAuthenticationFilter;
-import com.planit.planit.auth.jwt.JwtProperties;
-import com.planit.planit.auth.jwt.JwtProvider;
-import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.enums.DailyCondition;
