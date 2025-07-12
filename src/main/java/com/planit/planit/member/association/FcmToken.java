@@ -21,10 +21,10 @@ public class FcmToken extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String token;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime lastUsedAt;
 
     public void updateLastUsedAt() {
