@@ -1,9 +1,16 @@
 package com.planit.planit.member.association;
 
 import com.planit.planit.member.Member;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 
@@ -36,17 +43,29 @@ public class Term {
     protected Term() {}
 
     @Builder
-    public Term(
+    private Term(
             Member member,
             LocalDateTime termOfUse,
             LocalDateTime termOfPrivacy,
             LocalDateTime termOfInfo,
             LocalDateTime overFourteen
     ) {
+        validate(member, termOfUse, termOfPrivacy,  termOfInfo, overFourteen);
+        this.id = member.getId();
         this.member = member;
         this.termOfUse = termOfUse;
         this.termOfPrivacy = termOfPrivacy;
         this.termOfInfo = termOfInfo;
         this.overFourteen = overFourteen;
+    }
+
+    private void validate(Member member, LocalDateTime termOfUse, LocalDateTime termOfPrivacy,
+                          LocalDateTime termOfInfo, LocalDateTime overFourteen
+    ) {
+        Assert.notNull(member, "member must not be null");
+        Assert.notNull(termOfUse, "termOfUse must not be null");
+        Assert.notNull(termOfPrivacy, "termOfPrivacy must not be null");
+        Assert.notNull(termOfInfo, "termOfInfo must not be null");
+        Assert.notNull(overFourteen, "overFourteen must not be null");
     }
 }

@@ -1,4 +1,4 @@
-package com.planit.planit.config;
+package com.planit.planit.member.association;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,13 +11,14 @@ import java.util.Map;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "app.agreement")
-public class TermConfig {
+public class TermInfo {
     private String baseUrl;
-    private Map<String, AgreementDetail> terms;
+    private Map<String, TermDetail> terms;
 
     @Getter
     @Setter
-    public static class AgreementDetail {  private String version;
+    public static class TermDetail {
+        private String version;
         private String fileName;   // 실제 HTML 파일명 (예: "TermOfPrivacy_v20250711.html")
 
         public String getFullUrl(String baseUrl) {

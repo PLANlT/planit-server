@@ -1,6 +1,6 @@
 package com.planit.planit.member.service;
 
-import com.planit.planit.config.TermConfig;
+import com.planit.planit.member.association.TermInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 class TermServiceImplTest {
 
     @Mock
-    private TermConfig termConfig;
+    private TermInfo termInfo;
 
     @InjectMocks
     private TermServiceImpl agreementService; // 테스트 대상 (System Under Test)
@@ -35,35 +35,35 @@ class TermServiceImplTest {
         void returns_all_agreement_urls_and_versions_from_config() {
             // Given:
             String mockBaseUrl = "https://testdomain.com/agreements/";
-            Map<String, TermConfig.AgreementDetail> mockTermsMap = new HashMap<>();
+            Map<String, TermInfo.TermDetail> mockTermsMap = new HashMap<>();
 
             // 개인정보처리방침
-            TermConfig.AgreementDetail privacyPolicy = new TermConfig.AgreementDetail();
+            TermInfo.TermDetail privacyPolicy = new TermInfo.TermDetail();
             privacyPolicy.setVersion("20250711");
             privacyPolicy.setFileName("TermOfPrivacy_v20250711.html");
             mockTermsMap.put("term-of-privacy", privacyPolicy);
 
             // 서비스 이용약관
-            TermConfig.AgreementDetail termOfUse = new TermConfig.AgreementDetail();
+            TermInfo.TermDetail termOfUse = new TermInfo.TermDetail();
             termOfUse.setVersion("20250711");
             termOfUse.setFileName("TermOfUse_v20250711.html");
             mockTermsMap.put("term-of-use", termOfUse);
 
             // 정보통신망 이용촉진 및 정보보호 등에 관한 법률 관련 약관
-            TermConfig.AgreementDetail termOfInfo = new TermConfig.AgreementDetail();
+            TermInfo.TermDetail termOfInfo = new TermInfo.TermDetail();
             termOfInfo.setVersion("20250711");
             termOfInfo.setFileName("TermOfInfo_v20250711.html");
             mockTermsMap.put("term-of-info", termOfInfo);
 
             // 개인정보 제3자 제공 동의
-            TermConfig.AgreementDetail thirdPartyConsent = new TermConfig.AgreementDetail();
+            TermInfo.TermDetail thirdPartyConsent = new TermInfo.TermDetail();
             thirdPartyConsent.setVersion("20250711");
             thirdPartyConsent.setFileName("ThirdPartyConsent_v20250711.html");
             mockTermsMap.put("third-party-ad-consent", thirdPartyConsent);
 
             // Mock 객체 (agreementConfig)의 메서드 호출 시 어떤 값을 반환할지 정의
-            when(termConfig.getBaseUrl()).thenReturn(mockBaseUrl);
-            when(termConfig.getTerms()).thenReturn(mockTermsMap);
+            when(termInfo.getBaseUrl()).thenReturn(mockBaseUrl);
+            when(termInfo.getTerms()).thenReturn(mockTermsMap);
 
             // When:
             Map<String, Map<String, String>> result = agreementService.getAllTermsUrls();
@@ -106,9 +106,9 @@ class TermServiceImplTest {
 
 
             // 4. Mock 객체의 메서드가 예상대로 호출되었는지 확인 (선택 사항이지만 좋은 습관)
-            verify(termConfig, times(1)).getBaseUrl();
-            verify(termConfig, times(1)).getTerms();
-            verifyNoMoreInteractions(termConfig); // 더 이상 다른 호출은 없었는지 확인
+            verify(termInfo, times(1)).getBaseUrl();
+            verify(termInfo, times(1)).getTerms();
+            verifyNoMoreInteractions(termInfo); // 더 이상 다른 호출은 없었는지 확인
         }
 
         @Test
@@ -116,10 +116,10 @@ class TermServiceImplTest {
         void returns_empty_map_when_no_terms_in_config() {
             // Given (준비):
             String mockBaseUrl = "https://testdomain.com/agreements/";
-            Map<String, TermConfig.AgreementDetail> emptyTermsMap = new HashMap<>();
+            Map<String, TermInfo.TermDetail> emptyTermsMap = new HashMap<>();
 
-            when(termConfig.getBaseUrl()).thenReturn(mockBaseUrl);
-            when(termConfig.getTerms()).thenReturn(emptyTermsMap);
+            when(termInfo.getBaseUrl()).thenReturn(mockBaseUrl);
+            when(termInfo.getTerms()).thenReturn(emptyTermsMap);
 
             // When (실행):
             Map<String, Map<String, String>> result = agreementService.getAllTermsUrls();
@@ -128,9 +128,9 @@ class TermServiceImplTest {
             assertNotNull(result, "결과 맵은 null이 아니어야 합니다.");
             assertTrue(result.isEmpty(), "약관 정보가 없을 때 결과 맵은 비어있어야 합니다.");
 
-            verify(termConfig, times(1)).getBaseUrl();
-            verify(termConfig, times(1)).getTerms();
-            verifyNoMoreInteractions(termConfig);
+            verify(termInfo, times(1)).getBaseUrl();
+            verify(termInfo, times(1)).getTerms();
+            verifyNoMoreInteractions(termInfo);
         }
 
         @Test
@@ -139,8 +139,8 @@ class TermServiceImplTest {
             // Given (준비):
             String mockBaseUrl = "https://testdomain.com/agreements/";
 
-            when(termConfig.getBaseUrl()).thenReturn(mockBaseUrl);
-            when(termConfig.getTerms()).thenReturn(null); // getTerms가 null 반환
+            when(termInfo.getBaseUrl()).thenReturn(mockBaseUrl);
+            when(termInfo.getTerms()).thenReturn(null); // getTerms가 null 반환
 
             // When (실행):
             Map<String, Map<String, String>> result = agreementService.getAllTermsUrls();
@@ -149,9 +149,9 @@ class TermServiceImplTest {
             assertNotNull(result, "결과 맵은 null이 아니어야 합니다.");
             assertTrue(result.isEmpty(), "getTerms가 null을 반환할 때 결과 맵은 비어있어야 합니다.");
 
-            verify(termConfig, times(1)).getBaseUrl();
-            verify(termConfig, times(1)).getTerms();
-            verifyNoMoreInteractions(termConfig);
+            verify(termInfo, times(1)).getBaseUrl();
+            verify(termInfo, times(1)).getTerms();
+            verifyNoMoreInteractions(termInfo);
         }
 
     }
