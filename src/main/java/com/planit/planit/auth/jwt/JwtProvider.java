@@ -2,6 +2,7 @@ package com.planit.planit.auth.jwt;
 import com.planit.planit.member.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Component
 public class JwtProvider {
 
@@ -81,6 +83,16 @@ public class JwtProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public UserPrincipal getUserPrincipal(String token) {
+        Claims claims = getClaims(token);
+        return new UserPrincipal(
+                Long.valueOf(claims.getSubject()),
+                claims.get("email", String.class),
+                claims.get("memberName", String.class),
+                Role.valueOf(claims.get("role", String.class))
+        );
     }
 
     public long getRemainingValidity(String token) {

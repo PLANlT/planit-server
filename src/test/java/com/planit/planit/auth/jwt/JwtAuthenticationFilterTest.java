@@ -37,7 +37,7 @@ class JwtAuthenticationFilterTest {
 
         jwtProvider = new JwtProvider(jwtProperties);
         memberRepository = mock(MemberRepository.class);
-        filter = new JwtAuthenticationFilter(jwtProvider, memberRepository);
+        filter = new JwtAuthenticationFilter(jwtProvider);
 
         SecurityContextHolder.clearContext();
     }
