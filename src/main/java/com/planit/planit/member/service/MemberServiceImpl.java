@@ -74,11 +74,6 @@ public class MemberServiceImpl implements MemberService {
                 .role(Role.USER)
                 .build();
 
-            FcmToken fcmToken = FcmToken.of(member,null);
-            member.setFcmToken(fcmToken);
-
-            Notification notification = Notification.of(member);
-            member.setNotification(notification);
             memberRepository.save(member);
             isNewMember = true;
 

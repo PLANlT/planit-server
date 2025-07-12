@@ -147,7 +147,9 @@ public class MemberController {
             @RequestBody FcmTokenDTO.SaveRequest request
     ) {
         fcmTokenService.saveOrUpdateFcmToken(principal.getId(), request.getToken());
-        log.info("✅ FCM 토큰 저장 완료: {}", request.getToken());
+        log.info("✅ FCM 토큰 저장 완료 - memberId: {}, tokenPrefix: {}***",
+        principal.getId(),
+        request.getToken().length() > 10 ? request.getToken().substring(0, 10) : "short");
         return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_SAVED);
     }
 
@@ -158,19 +160,15 @@ public class MemberController {
             @AuthenticationPrincipal UserPrincipal principal
     ) {
         String token = fcmTokenService.getTokenByMemberId(principal.getId()).orElse(null);
-        log.info("✅ FCM 토큰 조회 완료 - memberId: {}, token: {}", principal.getId(), token);
         return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_FOUND, new FcmTokenDTO.Response(token));
     }
 
-    @Operation(summary = "[FCM] FCM 토큰 삭제", description = "로그인한 사용자의 FCM 토큰을 삭제합니다.")
+    @Operation(summary = "[FCM] 내 FCM 토큰 삭제", description = "로그인한 사용자의 FCM 토큰을 삭제합니다.")
     @SecurityRequirement(name = "accessToken")
     @DeleteMapping("/me/fcm-token")
-    public ApiResponse<Void> deleteMyFcmToken(
-            @AuthenticationPrincipal UserPrincipal principal,
-            @RequestBody FcmTokenDTO.DeleteRequest request
-    ) {
-        fcmTokenService.deleteToken(request.getToken());
-        log.info("🗑️ FCM 토큰 삭제 완료 - memberId: {}, token: {}", principal.getId(), request.getToken());
+    public ApiResponse<Void> deleteMyFcmToken(@AuthenticationPrincipal UserPrincipal principal) {
+        fcmTokenService.deleteTokensByMemberId(principal.getId());
+        log.info("🗑️ FCM 토큰 삭제 완료 - memberId: {}", principal.getId());
         return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_DELETED);
     }
 }

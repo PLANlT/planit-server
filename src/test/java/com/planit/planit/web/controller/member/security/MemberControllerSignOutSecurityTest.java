@@ -36,7 +36,7 @@ class MemberControllerSignOutSecurityTest {
     @MockBean private AgreementService agreementService;
 
     @Test
-    @DisplayName("인증되지 않은 사용자가 로그아웃 요청 시 401 Unauthorized를 반환한다")
+    @DisplayName("인증되지 않은 사용자가 로그아웃 요청 시 403 Forbidden를 반환한다")
     void signOut_unauthenticatedUser_returnsUnauthorized() throws Exception {
         mockMvc.perform(post("/members/sign-out"))
                 .andExpect(status().is(403));

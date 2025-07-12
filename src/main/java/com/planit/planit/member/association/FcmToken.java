@@ -8,8 +8,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class FcmToken extends BaseEntity {
 
@@ -21,6 +20,7 @@ public class FcmToken extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Setter
     @Column(nullable = true)
     private String token;
 
@@ -37,7 +37,7 @@ public class FcmToken extends BaseEntity {
         fcmToken.member = member;
         fcmToken.memberId = member.getId();
         fcmToken.token = token;
-        fcmToken.lastUsedAt = LocalDateTime.now();
+        fcmToken.lastUsedAt = token != null ? LocalDateTime.now() : null;
         return fcmToken;
     }
 

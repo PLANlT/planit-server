@@ -8,12 +8,14 @@ import com.planit.planit.member.repository.FcmTokenRepository;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.service.FcmTokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FcmTokenServiceImpl implements FcmTokenService {
@@ -34,7 +36,6 @@ public class FcmTokenServiceImpl implements FcmTokenService {
             Member member = memberRepository.findById(memberId)
                     .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
-            fcmTokenRepository.deleteById(memberId);
             FcmToken newToken = FcmToken.of(member, token);
             fcmTokenRepository.save(newToken);
         }
@@ -61,7 +62,16 @@ public class FcmTokenServiceImpl implements FcmTokenService {
     @Override
     @Transactional(readOnly = true)
     public Optional<String> getTokenByMemberId(Long memberId) {
-        return fcmTokenRepository.findById(memberId)
+        Optional<String> tokenOpt = fcmTokenRepository.findById(memberId)
                 .map(FcmToken::getToken);
+
+        if (tokenOpt.isEmpty()) {
+            log.info("❌ FCM 토큰 없음 - memberId: {}", memberId);
+        } else {
+            log.info("✅ FCM 토큰 조회 완료 - memberId: {}", memberId);
+        }
+
+        return tokenOpt;
     }
+
 }
