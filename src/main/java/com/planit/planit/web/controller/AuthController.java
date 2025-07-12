@@ -22,7 +22,7 @@ import static com.planit.planit.common.api.token.status.TokenSuccessStatus.REFRE
 
 @Slf4j
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/planit/auth")
 @RequiredArgsConstructor
 @Tag(name = "AUTH", description = "인증 관련 API")
 public class AuthController {

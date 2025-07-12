@@ -1,18 +1,19 @@
 package com.planit.planit.auth.jwt;
 
 import com.planit.planit.member.enums.Role;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -21,20 +22,12 @@ public class JwtProvider {
     private final SecretKey secretKey;
     private final long expirationMs;
     private final long refreshTokenExpirationMs;
-    private final String tokenPrefix;
-    private final String issuer;
-    private final List<String> audiences;
 
-
-    public JwtProvider(JwtProperties jwtProperties) {
-        this.secretKey = Keys.hmacShaKeyFor(Base64.getEncoder()
-                .encodeToString(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8))
-                .getBytes());
-        this.expirationMs = jwtProperties.getExpirationMs();
-        this.refreshTokenExpirationMs = jwtProperties.getRefreshTokenExpirationMs();
-        this.tokenPrefix = jwtProperties.getTokenPrefix();
-        this.issuer = jwtProperties.getIssuer();
-        this.audiences = jwtProperties.getAudiences();
+    @Autowired
+    public JwtProvider(JwtProperties properties) {
+        this.secretKey = Keys.hmacShaKeyFor(properties.getSecret().getBytes(StandardCharsets.UTF_8));
+        this.expirationMs = properties.getExpirationMs();
+        this.refreshTokenExpirationMs = properties.getRefreshTokenExpirationMs();
     }
 
     public String createAccessToken(Long id, String email, String name, Role role) {
@@ -49,11 +42,13 @@ public class JwtProvider {
         final Date now = new Date();
         final Date expiry = new Date(now.getTime() + expirationMs);
 
+        log.info("JWT_:PROV:TIME:::createdAt({}),expiredAt({})", now, expiry);
+
         return Jwts.builder()
                 .setSubject(String.valueOf(id))
                 .claim("email", email)
                 .claim("memberName", name)
-                .claim("role", role)
+                .claim("role", role.toString())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -72,6 +67,7 @@ public class JwtProvider {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
+            log.info("JWT_:PROV:ERR_:::Invalid JWT Token. error({})", e.getMessage());
             return false;
         }
     }

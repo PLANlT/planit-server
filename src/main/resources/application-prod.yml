@@ -18,3 +18,7 @@ spring:
     redis:
       host: redis
       port: 6379
+
+jwt:
+  expirationMs: 3600000 # 1시간 (밀리초)
+  refresh-token-expiration-ms: 3600000

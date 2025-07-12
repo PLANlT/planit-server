@@ -28,7 +28,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/members")
+@RequestMapping("/planit/members")
 @Tag(name = "MEMBER", description = "회원 관련 API")
 public class MemberController {
 
@@ -58,7 +58,7 @@ public class MemberController {
 
 
     @Operation(summary = "[MEMBER] 연속일 조회하기")
-    @GetMapping("/members/consecutive-days")
+    @GetMapping("/consecutive-days")
     public ApiResponse<MemberResponseDTO.ConsecutiveDaysDTO> getConsecutiveDays() {
         Long memberId = 1L; // 인증 기능 구현 이후 변경
         MemberResponseDTO.ConsecutiveDaysDTO consecutiveDaysDTO = memberService.getConsecutiveDays(memberId);
@@ -67,7 +67,7 @@ public class MemberController {
 
     // 오늘의 할 일 알림 ON/OFF
     @Operation(summary = "[NOTIFICATION] 오늘의 할 일 알림 설정 변경", description = "오늘의 할 일 알림 ON/OFF를 설정합니다.")
-    @PatchMapping("/me/notification-settings/daily-task")
+    @PatchMapping("/notification-settings/daily-task")
     public ApiResponse<Void> updateDailyTask(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestBody NotificationDTO.ToggleRequest request
@@ -78,7 +78,7 @@ public class MemberController {
 
     // 길티프리 모드 알림 ON/OFF
     @Operation(summary = "[NOTIFICATION] 길티프리 모드 알림 설정 변경", description = "길티프리 모드 알림 ON/OFF를 설정합니다.")
-    @PatchMapping("/me/notification-settings/guilty-free")
+    @PatchMapping("/notification-settings/guilty-free")
     public ApiResponse<Void> updateGuiltFree(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestBody NotificationDTO.ToggleRequest request
@@ -89,7 +89,7 @@ public class MemberController {
 
     // 전체 알림 설정 조회
     @Operation(summary = "[NOTIFICATION] 전체 알림 설정 조회", description = "사용자의 전체 알림 설정 상태를 조회합니다.")
-    @GetMapping("/me/notification-settings")
+    @GetMapping("/notification-settings")
     public ApiResponse<NotificationDTO.Response> getNotificationSetting(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
@@ -100,7 +100,7 @@ public class MemberController {
     //사용자 정보 조회
     @Operation(summary = "[MEMBER] 내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다.")
     @SecurityRequirement(name = "accessToken")
-    @GetMapping("/me")
+    @GetMapping("")
     public ApiResponse<MemberInfoResponseDTO> getMyInfo(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
