@@ -1,8 +1,8 @@
-package com.planit.planit.term.service;
+package com.planit.planit.member.service;
 
 import java.util.Map;
 
-public interface AgreementService {
+public interface TermService {
     // 인터페이스 메서드 구현
     Map<String, Map<String, String>> getAllTermsUrls();
 }

@@ -1,6 +1,7 @@
 package com.planit.planit.term.service;
 
 import com.planit.planit.config.TermConfig;
+import com.planit.planit.member.service.TermServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,13 +19,13 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Transactional
-class AgreementServiceImplTest {
+class TermServiceImplTest {
 
     @Mock
     private TermConfig termConfig;
 
     @InjectMocks
-    private AgreementServiceImpl agreementService; // 테스트 대상 (System Under Test)
+    private TermServiceImpl agreementService; // 테스트 대상 (System Under Test)
 
     @Nested
     @DisplayName("getAllTermsUrls 메서드는")

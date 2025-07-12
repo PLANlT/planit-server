@@ -1,7 +1,7 @@
 package com.planit.planit.web.controller;
 
 
-import com.planit.planit.term.service.AgreementService;
+import com.planit.planit.member.service.TermService;
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
 import com.planit.planit.auth.jwt.UserPrincipal;
@@ -35,7 +35,7 @@ import java.util.Map;
 public class MemberController {
 
     private final MemberService memberService;
-    private final AgreementService agreementService;
+    private final TermService termService;
     private final NotificationService notificationService;
 
 
@@ -75,7 +75,7 @@ public class MemberController {
     @Operation(summary = "모든 약관 URL 조회", description = "최신 약관 HTML 파일들의 URL과 버전을 반환합니다.")
     @GetMapping("/terms")
     public ApiResponse<Map<String, Map<String, String>>> getTermsUrls() {
-        Map<String, Map<String, String>> termsInfo = agreementService.getAllTermsUrls();
+        Map<String, Map<String, String>> termsInfo = termService.getAllTermsUrls();
         log.info("✅ 약관 URL 정보 조회 성공: {}", termsInfo);
         return ApiResponse.onSuccess(MemberSuccessStatus.TERMS_URLS_FOUND, termsInfo);
     }

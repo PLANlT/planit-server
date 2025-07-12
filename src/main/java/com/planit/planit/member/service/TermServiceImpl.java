@@ -1,4 +1,4 @@
-package com.planit.planit.term.service;
+package com.planit.planit.member.service;
 import com.planit.planit.config.TermConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AgreementServiceImpl implements AgreementService {
+public class TermServiceImpl implements TermService {
     private final TermConfig termConfig;
 
     @Override
