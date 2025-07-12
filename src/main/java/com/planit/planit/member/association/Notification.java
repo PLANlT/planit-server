@@ -1,5 +1,6 @@
 package com.planit.planit.member.association;
 
+import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Notification {
+public class Notification extends BaseEntity {
 
     @Id
     private Long memberId;
@@ -29,8 +30,6 @@ public class Notification {
     @Builder.Default
     private boolean guiltyFreeEnabled = true;
 
-    private LocalDateTime updatedAt;
-
     public static Notification of(Member member) {
         return Notification.builder()
                 .member(member)
@@ -40,11 +39,9 @@ public class Notification {
 
     public void updateDailyTask(boolean enabled) {
         this.dailyTaskEnabled = enabled;
-        this.updatedAt = LocalDateTime.now();
     }
 
     public void updateGuiltFree(boolean enabled) {
         this.guiltyFreeEnabled = enabled;
-        this.updatedAt = LocalDateTime.now();
     }
 }
