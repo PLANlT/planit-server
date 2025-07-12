@@ -1,4 +1,4 @@
-package com.planit.planit.config.oauth;
+package com.planit.planit.auth.oauth;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

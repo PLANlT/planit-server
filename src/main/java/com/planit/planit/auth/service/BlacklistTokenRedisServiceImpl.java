@@ -1,8 +1,8 @@
-package com.planit.planit.redis.service;
+package com.planit.planit.auth.service;
 
 import com.planit.planit.common.aop.LogExecutionTime;
-import com.planit.planit.redis.entity.BlacklistTokenRedisEntity;
-import com.planit.planit.redis.repository.BlacklistTokenRedisRepository;
+import com.planit.planit.auth.entity.BlacklistTokenRedisEntity;
+import com.planit.planit.auth.repository.BlacklistTokenRedisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;

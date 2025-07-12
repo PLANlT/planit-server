@@ -2,16 +2,16 @@ package com.planit.planit.member.service;
 
 import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.token.TokenHandler;
-import com.planit.planit.config.jwt.JwtProvider;
+import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
-import com.planit.planit.redis.service.RefreshTokenRedisService;
-import com.planit.planit.redis.service.BlacklistTokenRedisService;
-import com.planit.planit.config.oauth.SocialTokenVerifier;
+import com.planit.planit.auth.service.RefreshTokenRedisService;
+import com.planit.planit.auth.service.BlacklistTokenRedisService;
+import com.planit.planit.auth.oauth.SocialTokenVerifier;
 import com.planit.planit.web.dto.auth.login.TokenRefreshDTO;
 
 import org.junit.jupiter.api.*;

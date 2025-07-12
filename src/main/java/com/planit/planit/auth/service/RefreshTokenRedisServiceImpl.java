@@ -1,10 +1,10 @@
-package com.planit.planit.redis.service;
+package com.planit.planit.auth.service;
 
 import com.planit.planit.common.aop.LogExecutionTime;
-import com.planit.planit.redis.entity.RefreshTokenToMemberIdRedisEntity;
-import com.planit.planit.redis.entity.MemberIdToRefreshTokenRedisEntity;
-import com.planit.planit.redis.repository.RefreshTokenToMemberIdRedisRepository;
-import com.planit.planit.redis.repository.MemberIdToRefreshTokenRedisRepository;
+import com.planit.planit.auth.entity.RefreshTokenToMemberIdRedisEntity;
+import com.planit.planit.auth.entity.MemberIdToRefreshTokenRedisEntity;
+import com.planit.planit.auth.repository.RefreshTokenToMemberIdRedisRepository;
+import com.planit.planit.auth.repository.MemberIdToRefreshTokenRedisRepository;
 import org.springframework.stereotype.Service;
 
 

@@ -4,7 +4,7 @@ package com.planit.planit.web.controller;
 import com.planit.planit.term.service.AgreementService;
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
-import com.planit.planit.config.jwt.UserPrincipal;
+import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.member.service.NotificationService;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;

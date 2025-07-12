@@ -1,4 +1,4 @@
-package com.planit.planit.config.jwt;
+package com.planit.planit.auth.jwt;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 

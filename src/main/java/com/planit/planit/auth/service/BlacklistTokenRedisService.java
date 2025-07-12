@@ -1,4 +1,4 @@
-package com.planit.planit.redis.service;
+package com.planit.planit.auth.service;
 
 public interface BlacklistTokenRedisService {
     void blacklistAccessToken(String accessToken, long ttlSeconds);

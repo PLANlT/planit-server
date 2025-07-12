@@ -1,4 +1,4 @@
-package com.planit.planit.config.oauth;
+package com.planit.planit.auth.oauth;
 
 import com.planit.planit.member.enums.SignType;
 import lombok.Getter;

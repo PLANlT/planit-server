@@ -1,4 +1,4 @@
-package com.planit.planit.config.jwt;
+package com.planit.planit.auth.jwt;
 
 import com.planit.planit.member.enums.Role;
 import lombok.Getter;

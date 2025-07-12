@@ -1,6 +1,6 @@
     package com.planit.planit.auth;
 
-    import com.planit.planit.config.oauth.CustomOAuth2User;
+    import com.planit.planit.auth.oauth.CustomOAuth2User;
     import com.planit.planit.member.enums.SignType;
 
     import java.util.Map;

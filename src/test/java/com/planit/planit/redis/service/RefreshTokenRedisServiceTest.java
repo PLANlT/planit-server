@@ -1,17 +1,15 @@
 package com.planit.planit.redis.service;
 
-import com.planit.planit.redis.service.RefreshTokenRedisService;
-import com.planit.planit.redis.entity.RefreshTokenToMemberIdRedisEntity;
-import com.planit.planit.redis.entity.MemberIdToRefreshTokenRedisEntity;
-import com.planit.planit.redis.repository.RefreshTokenToMemberIdRedisRepository;
-import com.planit.planit.redis.repository.MemberIdToRefreshTokenRedisRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.planit.planit.auth.entity.RefreshTokenToMemberIdRedisEntity;
+import com.planit.planit.auth.entity.MemberIdToRefreshTokenRedisEntity;
+import com.planit.planit.auth.repository.RefreshTokenToMemberIdRedisRepository;
+import com.planit.planit.auth.repository.MemberIdToRefreshTokenRedisRepository;
+import com.planit.planit.auth.service.RefreshTokenRedisServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 

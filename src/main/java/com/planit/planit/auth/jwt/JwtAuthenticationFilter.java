@@ -1,4 +1,4 @@
-package com.planit.planit.config.jwt;
+package com.planit.planit.auth.jwt;
 
 import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.common.api.member.MemberHandler;

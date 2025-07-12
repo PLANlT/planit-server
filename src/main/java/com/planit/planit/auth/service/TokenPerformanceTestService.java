@@ -1,4 +1,4 @@
-package com.planit.planit.redis.service;
+package com.planit.planit.auth.service;
 
 import com.planit.planit.common.aop.LogExecutionTime;
 import lombok.RequiredArgsConstructor;

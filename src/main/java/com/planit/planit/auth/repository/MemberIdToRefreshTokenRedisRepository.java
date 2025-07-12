@@ -1,6 +1,6 @@
-package com.planit.planit.redis.repository;
+package com.planit.planit.auth.repository;
 
-import com.planit.planit.redis.entity.MemberIdToRefreshTokenRedisEntity;
+import com.planit.planit.auth.entity.MemberIdToRefreshTokenRedisEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,24 +1,11 @@
 
 package com.planit.planit.web.controller;
 
-import com.planit.planit.config.jwt.UserPrincipal;
-import com.planit.planit.member.enums.Role;
-import com.planit.planit.member.service.MemberServiceImpl;
-import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
-
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 
 @DisplayName("MemberController - 소셜 로그인")

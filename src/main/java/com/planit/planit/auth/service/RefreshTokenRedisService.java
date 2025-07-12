@@ -1,4 +1,4 @@
-package com.planit.planit.redis.service;
+package com.planit.planit.auth.service;
 
 public interface RefreshTokenRedisService {
     void saveRefreshToken(Long memberId, String refreshToken);

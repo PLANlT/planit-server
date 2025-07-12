@@ -1,7 +1,7 @@
 package com.planit.planit.jwt;
 
-import com.planit.planit.config.jwt.JwtProperties;
-import com.planit.planit.config.jwt.JwtProvider;
+import com.planit.planit.auth.jwt.JwtProperties;
+import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.member.enums.Role;
 import org.junit.jupiter.api.*;
 

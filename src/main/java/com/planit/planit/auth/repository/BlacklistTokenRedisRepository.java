@@ -1,6 +1,6 @@
-package com.planit.planit.redis.repository;
+package com.planit.planit.auth.repository;
 
-import com.planit.planit.redis.entity.BlacklistTokenRedisEntity;
+import com.planit.planit.auth.entity.BlacklistTokenRedisEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

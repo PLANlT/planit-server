@@ -2,9 +2,9 @@ package com.planit.planit.web.controller.member;
 
 import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.general.status.ErrorStatus;
-import com.planit.planit.config.jwt.JwtProvider;
-import com.planit.planit.config.jwt.UserPrincipal;
-import com.planit.planit.config.oauth.CustomOAuth2UserService;
+import com.planit.planit.auth.jwt.JwtProvider;
+import com.planit.planit.auth.jwt.UserPrincipal;
+import com.planit.planit.auth.oauth.CustomOAuth2UserService;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.service.MemberService;
