@@ -14,7 +14,7 @@ import java.util.List;
 public class PlanConverter {
 
     public static PlanResponseDTO.PlanPreviewDTO toPlanPreviewDTO(Plan plan) {
-        String dDay = formatDDay(LocalDate.now(), plan.getFinishedAt());
+        String dDay = plan.getFinishedAt() != null ? formatDDay(LocalDate.now(), plan.getFinishedAt()) : null;
         return PlanResponseDTO.PlanPreviewDTO.builder()
                 .planId(plan.getId())
                 .title(plan.getTitle())
@@ -50,7 +50,7 @@ public class PlanConverter {
     }
 
     public static PlanResponseDTO.TodayPlanDTO toTodayPlanDTO(Plan plan, TaskType taskType, LocalDate today) {
-        String dDay = formatDDay(LocalDate.now(), plan.getFinishedAt());
+        String dDay = plan.getFinishedAt() != null ? formatDDay(LocalDate.now(), plan.getFinishedAt()) : null;
         return PlanResponseDTO.TodayPlanDTO.builder()
                 .planId(plan.getId())
                 .title(plan.getTitle())

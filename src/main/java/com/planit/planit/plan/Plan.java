@@ -9,6 +9,7 @@ import com.planit.planit.task.Task;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,13 +25,13 @@ public class Plan extends BaseEntity {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 20)
     private String title;               // 플랜 제목
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 40)
     private String motivation;          // 다짐 문장
 
-    @Column(columnDefinition = "text")
+    @Column(nullable = false, columnDefinition = "text")
     private String icon;                // 아이콘
 
     @Enumerated(EnumType.STRING)
@@ -38,10 +39,10 @@ public class Plan extends BaseEntity {
     private PlanStatus planStatus;      // 플랜 진행 여부
 
     @Column
-    private LocalDate startedAt;    // 플랜 시작일
+    private LocalDate startedAt;        // 플랜 시작일
 
     @Column
-    private LocalDate finishedAt;   // 플랜 종료일
+    private LocalDate finishedAt;       // 플랜 종료일
 
     @Column
     private LocalDateTime inactive;     // 플랜 비활성화(중단, 아카이빙, 삭제)
@@ -71,6 +72,7 @@ public class Plan extends BaseEntity {
             Member member
 
     ) {
+        validate(member, title, icon, planStatus);
         this.id = id;
         this.title = title;
         this.motivation = motivation;
@@ -82,7 +84,7 @@ public class Plan extends BaseEntity {
         this.tasks = new ArrayList<>();
     }
 
-/*------------------------------ METHOD ------------------------------*/
+    /*------------------------------ METHOD ------------------------------*/
 
     public void updatePlan(
             String title,          String motivation,       String icon,
@@ -115,5 +117,12 @@ public class Plan extends BaseEntity {
 
     public void addTask(Task task) {
         tasks.add(task);
+    }
+
+    private void validate(Member member, String title, String icon, PlanStatus planStatus) {
+        Assert.notNull(member, "Member must not be null");
+        Assert.notNull(title, "Title must not be null");
+        Assert.notNull(icon, "Icon must not be null");
+        Assert.notNull(planStatus, "PlanStatus must not be null");
     }
 }

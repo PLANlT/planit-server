@@ -35,8 +35,8 @@ public class PlanQueryServiceImpl implements PlanQueryService {
 
         List<Plan> todayPlans = planRepository
                 .findAllByMemberIdAndPlanStatus(memberId, PlanStatus.IN_PROGRESS).stream()
-                .filter(plan -> plan.getFinishedAt().isAfter(todayDate) ||
-                                     plan.getFinishedAt().isEqual(todayDate))
+                .filter(plan -> plan.getFinishedAt() == null ||
+                        (plan.getFinishedAt().isAfter(todayDate) || plan.getFinishedAt().isEqual(todayDate)))
                 .toList();
 
         return PlanConverter.toTodayPlanListDTO(todayDate, todayPlans);
