@@ -8,7 +8,9 @@ import com.planit.planit.common.api.token.status.TokenErrorStatus;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.config.oauth.SocialTokenVerifier;
 import com.planit.planit.member.Member;
+import com.planit.planit.member.association.FcmToken;
 import com.planit.planit.member.association.Notification;
+import com.planit.planit.member.repository.FcmTokenRepository;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.association.Term;
 import com.planit.planit.member.repository.NotificationRepository;
@@ -41,6 +43,7 @@ public class MemberServiceImpl implements MemberService {
     private final BlacklistTokenRedisService blacklistTokenRedisService;
     private final SocialTokenVerifier  socialTokenVerifier;
     private final NotificationRepository notificationRepository;
+    private final FcmTokenRepository fcmTokenRepository;
 
 
     @Override
@@ -71,11 +74,14 @@ public class MemberServiceImpl implements MemberService {
                 .role(Role.USER)
                 .build();
 
-            memberRepository.save(member);
+            FcmToken fcmToken = FcmToken.of(member,null);
+            member.setFcmToken(fcmToken);
 
             Notification notification = Notification.of(member);
-            notificationRepository.save(notification);
+            member.setNotification(notification);
+            memberRepository.save(member);
             isNewMember = true;
+
         }
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
         String refreshToken = refreshTokenRedisService.getRefreshTokenByMemberId(member.getId());

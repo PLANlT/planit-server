@@ -95,9 +95,11 @@ public class Member extends BaseEntity {
     private boolean isSignUpCompleted = false;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    @Setter
     private Notification notification;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    @Setter
     private FcmToken fcmToken;
 /*------------------------------ CONSTRUCTOR ------------------------------*/
 

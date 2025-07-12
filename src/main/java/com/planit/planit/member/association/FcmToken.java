@@ -31,21 +31,14 @@ public class FcmToken extends BaseEntity {
         this.lastUsedAt = LocalDateTime.now();
     }
 
-    @Builder
-    public FcmToken(Long memberId, Member member, String token, LocalDateTime lastUsedAt) {
-        this.memberId = memberId;
-        this.member = member;
-        this.token = token;
-        this.lastUsedAt = lastUsedAt;
-    }
 
     public static FcmToken of(Member member, String token) {
-        return FcmToken.builder()
-                .member(member)
-                .memberId(member.getId())
-                .token(token)
-                .lastUsedAt(LocalDateTime.now())
-                .build();
+        FcmToken fcmToken = new FcmToken();
+        fcmToken.member = member;
+        fcmToken.memberId = member.getId();
+        fcmToken.token = token;
+        fcmToken.lastUsedAt = LocalDateTime.now();
+        return fcmToken;
     }
 
 }

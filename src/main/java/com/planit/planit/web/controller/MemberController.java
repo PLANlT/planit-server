@@ -6,11 +6,13 @@ import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
 import com.planit.planit.config.jwt.UserPrincipal;
 import com.planit.planit.config.oauth.CustomOAuth2UserService;
+import com.planit.planit.member.service.FcmTokenService;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.member.service.NotificationService;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
 
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
+import com.planit.planit.web.dto.member.fcmtoken.FcmTokenDTO;
 import com.planit.planit.web.dto.member.notification.NotificationDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,9 +43,10 @@ public class MemberController {
     private final MemberService memberService;
     private final AgreementService agreementService;
     private final NotificationService notificationService;
+    private final FcmTokenService fcmTokenService;
 
 
-    @Operation(summary = "idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
+    @Operation(summary = "[MEMBER] idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
     @PostMapping("/sign-in")
     public ApiResponse<OAuthLoginDTO.Response> signIn(@RequestBody OAuthLoginDTO.Request request) {
         OAuthLoginDTO.Response response = memberService.signIn(request);
@@ -52,7 +55,7 @@ public class MemberController {
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, response);
     }
 
-    @Operation(summary = "로그아웃", description = "사용자 로그아웃을 처리하고 토큰을 블랙리스트에 추가합니다.")
+    @Operation(summary = "[MEMBER] 로그아웃", description = "사용자 로그아웃을 처리하고 토큰을 블랙리스트에 추가합니다.")
     @SecurityRequirement(name = "accessToken")
     @PostMapping("/sign-out")
     public ApiResponse<Void> signOut(@AuthenticationPrincipal UserPrincipal principal, HttpServletRequest request) {
@@ -76,7 +79,7 @@ public class MemberController {
         return ApiResponse.onSuccess(MemberSuccessStatus.TERM_AGREEMENT_COMPLETED, null);
     }
 
-    @Operation(summary = "모든 약관 URL 조회", description = "최신 약관 HTML 파일들의 URL과 버전을 반환합니다.")
+    @Operation(summary = "[POLICY] 모든 약관 URL 조회", description = "최신 약관 HTML 파일들의 URL과 버전을 반환합니다.")
     @GetMapping("/terms")
     public ApiResponse<Map<String, Map<String, String>>> getTermsUrls() {
         Map<String, Map<String, String>> termsInfo = agreementService.getAllTermsUrls();
@@ -134,5 +137,40 @@ public class MemberController {
     ) {
         MemberInfoResponseDTO response = memberService.getMemberInfo(principal.getId());
         return ApiResponse.onSuccess(MemberSuccessStatus.MEMBER_INFO_FETCHED, response);
+    }
+
+    @Operation(summary = "[FCM] FCM 토큰 저장 또는 갱신", description = "로그인한 사용자의 FCM 토큰을 저장하거나 갱신합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @PostMapping("/me/fcm-token")
+    public ApiResponse<Void> saveOrUpdateFcmToken(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody FcmTokenDTO.SaveRequest request
+    ) {
+        fcmTokenService.saveOrUpdateFcmToken(principal.getId(), request.getToken());
+        log.info("✅ FCM 토큰 저장 완료: {}", request.getToken());
+        return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_SAVED);
+    }
+
+    @Operation(summary = "[FCM] 내 FCM 토큰 조회", description = "로그인한 사용자의 저장된 FCM 토큰을 조회합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @GetMapping("/me/fcm-token")
+    public ApiResponse<FcmTokenDTO.Response> getMyFcmToken(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        String token = fcmTokenService.getTokenByMemberId(principal.getId()).orElse(null);
+        log.info("✅ FCM 토큰 조회 완료 - memberId: {}, token: {}", principal.getId(), token);
+        return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_FOUND, new FcmTokenDTO.Response(token));
+    }
+
+    @Operation(summary = "[FCM] FCM 토큰 삭제", description = "로그인한 사용자의 FCM 토큰을 삭제합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @DeleteMapping("/me/fcm-token")
+    public ApiResponse<Void> deleteMyFcmToken(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody FcmTokenDTO.DeleteRequest request
+    ) {
+        fcmTokenService.deleteToken(request.getToken());
+        log.info("🗑️ FCM 토큰 삭제 완료 - memberId: {}, token: {}", principal.getId(), request.getToken());
+        return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_DELETED);
     }
 }
