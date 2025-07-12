@@ -32,10 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 토큰이 유효한 경우 SecurityContextHolder에 인증 정보 저장
         if (token != null && jwtProvider.validateToken(token)) {
             UserPrincipal userPrincipal = setAuthentication(token);
-            log.info("JWT_:FLT_:AUTH:::Authentication established successfully. userPrincipal({})", userPrincipal);
+            log.info("JWT_:FLT_:AUTH:::Authentication established successfully,id({}),email({}),name({}),role({})",
+                    userPrincipal.getId(),  userPrincipal.getEmail(), userPrincipal.getMemberName(), userPrincipal.getRole());
         }
 
-        filterChain.doFilter(request, response); // 다음 필터로 요청을 전달
+        // 다음 필터로 요청 전달
+        filterChain.doFilter(request, response);
     }
 
     private UserPrincipal setAuthentication(String token) {

@@ -2,9 +2,7 @@ package com.planit.planit.web.controller.auth;
 
 import com.planit.planit.auth.service.AuthService;
 import com.planit.planit.config.SecurityConfig;
-import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.auth.jwt.JwtProvider;
-import com.planit.planit.auth.oauth.CustomOAuth2UserService;
 
 import com.planit.planit.web.controller.AuthController;
 import org.junit.jupiter.api.DisplayName;
@@ -26,21 +24,16 @@ class AuthControllerSecurityTest {
     @Autowired
     private MockMvc mockMvc;
 
-    // 🔧 SecurityConfig 내 필요한 빈들 Mocking
     @MockBean
     private AuthService authService;
     @MockBean
     private JwtProvider jwtProvider;
-    @MockBean
-    private MemberRepository memberRepository;
-    @MockBean
-    private CustomOAuth2UserService customOAuth2UserService;
 
     @Test
-    @DisplayName("인증되지 않은 사용자가 로그아웃 요청 시 401 Unauthorized를 반환한다")
+    @DisplayName("인증되지 않은 사용자가 로그아웃 요청 시 403 Forbidden을 반환한다")
     void signOut_unauthenticatedUser_returnsUnauthorized() throws Exception {
         mockMvc.perform(post("/auth/sign-out"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
 }

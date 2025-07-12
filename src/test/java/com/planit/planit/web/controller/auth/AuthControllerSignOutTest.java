@@ -5,9 +5,7 @@ import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.auth.jwt.UserPrincipal;
-import com.planit.planit.auth.oauth.CustomOAuth2UserService;
 import com.planit.planit.member.enums.Role;
-import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.web.controller.AuthController;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +37,6 @@ class AuthControllerSignOutTest {
     private AuthService authService;
     @MockBean
     private JwtProvider jwtProvider;
-    @MockBean
-    private MemberRepository memberRepository;
-    @MockBean
-    private CustomOAuth2UserService customOAuth2UserService;
 
     @AfterEach
     void clearSecurityContext() {
@@ -62,7 +56,7 @@ class AuthControllerSignOutTest {
                     new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            mockMvc.perform(post("/auth/sign-out")
+            mockMvc.perform(post("/planit/auth/sign-out")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(status().isOk());
@@ -77,7 +71,7 @@ class AuthControllerSignOutTest {
                     new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            mockMvc.perform(post("/auth/sign-out")
+            mockMvc.perform(post("/planit/auth/sign-out")
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(status().isOk());
 
@@ -94,7 +88,7 @@ class AuthControllerSignOutTest {
                     new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            mockMvc.perform(post("/auth/sign-out")
+            mockMvc.perform(post("/planit/auth/sign-out")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(status().isOk())
@@ -115,7 +109,7 @@ class AuthControllerSignOutTest {
             GeneralException generalException = new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR);
             org.mockito.BDDMockito.willThrow(generalException).given(authService).signOut(any(), any());
 
-            mockMvc.perform(post("/auth/sign-out")
+            mockMvc.perform(post("/planit/auth/sign-out")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(jsonPath("$.isSuccess").value(false))

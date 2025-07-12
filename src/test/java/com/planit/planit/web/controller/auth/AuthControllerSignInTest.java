@@ -4,11 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.planit.planit.auth.jwt.JwtProvider;
-import com.planit.planit.auth.oauth.CustomOAuth2UserService;
 import com.planit.planit.auth.service.AuthService;
-import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.web.controller.AuthController;
-import com.planit.planit.web.controller.MemberController;
 import com.planit.planit.web.dto.auth.OAuthLoginDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,13 +38,7 @@ class AuthControllerSignInTest {
     private AuthService authService;
 
     @MockBean
-    private CustomOAuth2UserService customOAuth2UserService;
-
-    @MockBean
     private JwtProvider jwtProvider;
-
-    @MockBean
-    private MemberRepository memberRepository;
 
     @BeforeEach
     void setUp() {
