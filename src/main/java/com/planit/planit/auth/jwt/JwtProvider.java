@@ -1,12 +1,9 @@
 package com.planit.planit.auth.jwt;
 
 import com.planit.planit.member.enums.Role;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,7 +39,7 @@ public class JwtProvider {
         final Date now = new Date();
         final Date expiry = new Date(now.getTime() + expirationMs);
 
-        log.info("JWT_:PROV:TIME:::createdAt({}),expiredAt({})", now, expiry);
+        log.info("JWT_:PROV:CRTE:::토큰을 생성합니다. createdAt({}),expiredAt({})", now, expiry);
 
         return Jwts.builder()
                 .setSubject(String.valueOf(id))
@@ -66,8 +63,17 @@ public class JwtProvider {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            log.info("JWT_:PROV:ERR_:::Invalid JWT Token. error({})", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.info("JWT_:PROV:ERR_:::만료된 토큰입니다. msg({})", e.getMessage());
+            return false;
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
+            log.info("JWT_:PROV:ERR_:::위변조가 발생한 토큰입니다. msg({})", e.getMessage());
+            return false;
+        } catch (IllegalArgumentException e) {
+            log.info("JWT_:PROV:ERR_:::잘못된 형식의 토큰입니다. error({})", e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.info("JWT_:PROV:ERR_:::토큰 파싱 과정에서 문제가 발생했습니다. error({})", e.getMessage());
             return false;
         }
     }
@@ -116,8 +122,18 @@ public class JwtProvider {
         try {
             final Date expiration = getClaims(token).getExpiration();
             return expiration.before(new Date());
-        } catch (JwtException | IllegalArgumentException e) {
-            return true; // 파싱 불가 시 만료로 간주
+        } catch (ExpiredJwtException e) {
+            log.info("JWT_:PROV:ERR_:::만료된 토큰입니다. msg({})", e.getMessage());
+            return true;
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
+            log.info("JWT_:PROV:ERR_:::위변조가 발생한 토큰입니다. msg({})", e.getMessage());
+            return true;
+        } catch (IllegalArgumentException e) {
+            log.info("JWT_:PROV:ERR_:::잘못된 형식의 토큰입니다. error({})", e.getMessage());
+            return true;
+        } catch (Exception e) {
+            log.info("JWT_:PROV:ERR_:::토큰 파싱 과정에서 문제가 발생했습니다. error({})", e.getMessage());
+            return true;
         }
     }
 
@@ -129,10 +145,15 @@ public class JwtProvider {
                     .parseClaimsJws(token); // 만료되었든 말든 시그니처 검증만 통과하면 됨
             return false;
         } catch (ExpiredJwtException e) {
-            // 만료는 허용
-            return false;
-        } catch (JwtException e) {
-            // 위조됨, 손상됨 등
+            return false;                   // 만료된 토큰 허용
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
+            log.info("JWT_:PROV:ERR_:::위변조가 발생한 토큰입니다. msg({})", e.getMessage());
+            return true;
+        } catch (IllegalArgumentException e) {
+            log.info("JWT_:PROV:ERR_:::잘못된 형식의 토큰입니다. error({})", e.getMessage());
+            return true;
+        } catch (Exception e) {
+            log.info("JWT_:PROV:ERR_:::토큰 파싱 과정에서 문제가 발생했습니다. error({})", e.getMessage());
             return true;
         }
     }

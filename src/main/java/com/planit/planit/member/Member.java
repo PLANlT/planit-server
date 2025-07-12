@@ -186,10 +186,6 @@ public class Member extends BaseEntity {
         return lastAttendanceDate.plusDays(1).equals(today);
     }
 
-    public boolean isSignUpCompleted() {
-        return isSignUpCompleted;
-    }
-
     public void setSignUpCompleted(boolean isSignUpCompleted) {
         this.isSignUpCompleted = isSignUpCompleted;
     }
