@@ -37,8 +37,8 @@ jobs:
 
       - name: Build with Gradle Wrapper
         run: |
-          ./gradlew build -x test
           chmod +x gradlew
+          ./gradlew test
 
 
   build:
@@ -81,5 +81,6 @@ jobs:
       - name: Build with Gradle Wrapper
         run: |
           chmod +x gradlew
+          ./gradlew build -x test
 
 

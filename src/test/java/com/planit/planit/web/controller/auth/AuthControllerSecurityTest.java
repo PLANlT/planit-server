@@ -39,7 +39,7 @@ class AuthControllerSecurityTest {
     @Test
     @DisplayName("인증되지 않은 사용자가 로그아웃 요청 시 401 Unauthorized를 반환한다")
     void signOut_unauthenticatedUser_returnsUnauthorized() throws Exception {
-        mockMvc.perform(post("/members/sign-out"))
+        mockMvc.perform(post("/auth/sign-out"))
                 .andExpect(status().isUnauthorized());
     }
 

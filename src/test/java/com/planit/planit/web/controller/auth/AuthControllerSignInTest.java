@@ -1,12 +1,13 @@
-package com.planit.planit.web.controller.member;
+package com.planit.planit.web.controller.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.auth.oauth.CustomOAuth2UserService;
+import com.planit.planit.auth.service.AuthService;
 import com.planit.planit.member.repository.MemberRepository;
-import com.planit.planit.member.service.MemberService;
+import com.planit.planit.web.controller.AuthController;
 import com.planit.planit.web.controller.MemberController;
 import com.planit.planit.web.dto.auth.OAuthLoginDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,15 +23,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(MemberController.class)
-@DisplayName("MemberController - 소셜 로그인")
-class MemberControllerTest {
+@WebMvcTest(AuthController.class)
+@DisplayName("AuthController - 소셜 로그인")
+class AuthControllerSignInTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -39,7 +38,7 @@ class MemberControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private MemberService memberService;
+    private AuthService authService;
 
     @MockBean
     private CustomOAuth2UserService customOAuth2UserService;
@@ -57,7 +56,7 @@ class MemberControllerTest {
     }
 
     @Nested
-    @DisplayName("signIn API는")
+    @DisplayName("signIn API")
     class SignIn {
         @Test
         @DisplayName("신규 회원이면 회원가입 후 토큰이 발급된다")
@@ -74,8 +73,8 @@ class MemberControllerTest {
                     .accessToken("access-token-xyz")
                     .refreshToken("refresh-token-xyz")
                     .build();
-            given(memberService.signIn(any())).willReturn(loginResponse);
-            mockMvc.perform(post("/members/sign-in")
+            given(authService.signIn(any())).willReturn(loginResponse);
+            mockMvc.perform(post("/auth/sign-in")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(loginRequest)))
                     .andExpect(status().isOk());

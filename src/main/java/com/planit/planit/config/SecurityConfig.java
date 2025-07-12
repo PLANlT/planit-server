@@ -28,8 +28,8 @@ public class SecurityConfig {
                                         "/v3/api-docs/**",         // Swagger API 문서
                                         "/swagger-resources/**",   // Swagger 리소스
                                         "/h2-console/**",          // H2 데이터베이스 콘솔 (개발용)
-                                        "/members/sign-in",        // 로그인 API
-                                        "/auth/**",                // 인증 관련 기타 API (예: 토큰 재발급 등)
+                                        "/auth/sign-in",           // 로그인 API
+                                        "/auth/refresh",           // 토큰 재발급 API
                                         "/members/terms"           // 약관 URL 조회 API (인증 없이 허용)
                                 ).permitAll()
                                 .anyRequest().authenticated()

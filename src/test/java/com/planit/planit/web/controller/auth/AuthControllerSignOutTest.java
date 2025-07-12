@@ -1,4 +1,4 @@
-package com.planit.planit.web.controller.member;
+package com.planit.planit.web.controller.auth;
 
 import com.planit.planit.auth.service.AuthService;
 import com.planit.planit.common.api.general.GeneralException;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false) // ✅ 필터 제거해서 인증 우회
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("AuthController - 로그아웃")
-class MemberControllerSignOutTest {
+class AuthControllerSignOutTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,7 +50,7 @@ class MemberControllerSignOutTest {
     }
 
     @Nested
-    @DisplayName("signOut API는")
+    @DisplayName("signOut API")
     class Signout {
 
         @Test
@@ -62,7 +62,7 @@ class MemberControllerSignOutTest {
                     new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            mockMvc.perform(post("/members/sign-out")
+            mockMvc.perform(post("/auth/sign-out")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(status().isOk());
@@ -70,14 +70,14 @@ class MemberControllerSignOutTest {
 
         @Test
         @Order(2)
-        @DisplayName("로그아웃 시 memberService의 signOut 메서드가 호출된다")
-        void signOut_callsMemberServiceSignOut() throws Exception {
+        @DisplayName("로그아웃 시 authService의 signOut 메서드가 호출된다")
+        void signOut_callsAuthServiceSignOut() throws Exception {
             UserPrincipal userPrincipal = new UserPrincipal(1L, "test@example.com", "홍길동", Role.USER);
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            mockMvc.perform(post("/members/sign-out")
+            mockMvc.perform(post("/auth/sign-out")
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(status().isOk());
 
@@ -94,7 +94,7 @@ class MemberControllerSignOutTest {
                     new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            mockMvc.perform(post("/members/sign-out")
+            mockMvc.perform(post("/auth/sign-out")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(status().isOk())
@@ -105,8 +105,8 @@ class MemberControllerSignOutTest {
 
         @Test
         @Order(5)
-        @DisplayName("memberService에서 예외 발생 시 해당 예외를 그대로 전파한다")
-        void signOut_memberServiceException_propagatesException() throws Exception {
+        @DisplayName("authService에서 예외 발생 시 해당 예외를 그대로 전파한다")
+        void signOut_authServiceException_propagatesException() throws Exception {
             UserPrincipal userPrincipal = new UserPrincipal(1L, "test@example.com", "홍길동", Role.USER);
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
@@ -115,7 +115,7 @@ class MemberControllerSignOutTest {
             GeneralException generalException = new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR);
             org.mockito.BDDMockito.willThrow(generalException).given(authService).signOut(any(), any());
 
-            mockMvc.perform(post("/members/sign-out")
+            mockMvc.perform(post("/auth/sign-out")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer test-token"))
                     .andExpect(jsonPath("$.isSuccess").value(false))

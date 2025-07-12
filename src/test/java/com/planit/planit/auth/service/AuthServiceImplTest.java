@@ -8,6 +8,7 @@ import com.planit.planit.member.Member;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.member.repository.MemberRepository;
+import com.planit.planit.member.repository.NotificationRepository;
 import com.planit.planit.web.dto.auth.OAuthLoginDTO;
 import com.planit.planit.web.dto.auth.TokenRefreshDTO;
 import org.junit.jupiter.api.*;
@@ -36,6 +37,9 @@ class AuthServiceImplTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private NotificationRepository notificationRepository;
 
     @Mock
     private JwtProvider jwtProvider;
