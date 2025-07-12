@@ -1,9 +1,7 @@
 package com.planit.planit.member.service;
 
-import com.planit.planit.auth.FakeCustomOAuth2User;
 import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.token.TokenHandler;
-import com.planit.planit.common.api.token.status.TokenErrorStatus;
 import com.planit.planit.config.jwt.JwtProvider;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.repository.MemberRepository;
@@ -15,19 +13,14 @@ import com.planit.planit.redis.service.RefreshTokenRedisService;
 import com.planit.planit.redis.service.BlacklistTokenRedisService;
 import com.planit.planit.config.oauth.SocialTokenVerifier;
 import com.planit.planit.web.dto.auth.login.TokenRefreshDTO;
-import org.mockito.MockedStatic;
 
-import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -35,7 +28,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -69,7 +61,7 @@ class MemberServiceImplTest {
         @Test
         @DisplayName("신규 회원이면 회원가입 후 토큰을 반환한다")
         void signIn_newMember_registersAndReturnsToken() throws Exception {
-            OAuthLoginDTO.Request request = OAuthLoginDTO.Request.builder()
+            OAuthLoginDTO.LoginRequest loginRequest = OAuthLoginDTO.LoginRequest.builder()
                     .oauthProvider("GOOGLE")
                     .oauthToken("mock-id-token")
                     .build();
@@ -91,13 +83,13 @@ class MemberServiceImplTest {
                     .willReturn("refresh-token2");
             given(socialTokenVerifier.verify(anyString(), anyString()))
                     .willReturn(new SocialTokenVerifier.SocialUserInfo("newbie@planit.com", "뉴비"));
-            OAuthLoginDTO.Response response = memberServiceImpl.signIn(request);
+            OAuthLoginDTO.LoginResponse loginResponse = memberServiceImpl.signIn(loginRequest);
 
             //then
             verify(refreshTokenRedisService).saveRefreshToken(null, "refresh-token2");  //영속성 때문에 저장 안됨
-            assertThat(response.isNewMember()).isTrue();
-            assertThat(response.getEmail()).isEqualTo("newbie@planit.com");
-            assertThat(response.getAccessToken()).isEqualTo("access-token2");
+            assertThat(loginResponse.isNewMember()).isTrue();
+            assertThat(loginResponse.getEmail()).isEqualTo("newbie@planit.com");
+            assertThat(loginResponse.getAccessToken()).isEqualTo("access-token2");
         }
     }
 

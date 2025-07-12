@@ -14,7 +14,7 @@ public class OAuthLoginDTO {
     @AllArgsConstructor
     @Builder
     @Schema(description = "OAuth 로그인 요청 DTO")
-    public static class Request {
+    public static class LoginRequest {
         @Schema(description = "소셜 로그인 제공자 (KAKAO, NAVER, GOOGLE)", example = "KAKAO")
         private String oauthProvider;
 
@@ -23,7 +23,7 @@ public class OAuthLoginDTO {
     }
 
     @Builder
-    public static class Response {
+    public static class LoginResponse {
 
         @Schema(description = "회원 고유 ID")
         private Long id;

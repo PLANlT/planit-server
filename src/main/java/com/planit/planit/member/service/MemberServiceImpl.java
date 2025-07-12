@@ -44,10 +44,10 @@ public class MemberServiceImpl implements MemberService {
 
 
     @Override
-    public OAuthLoginDTO.Response signIn(OAuthLoginDTO.Request request) {
+    public OAuthLoginDTO.LoginResponse signIn(OAuthLoginDTO.LoginRequest loginRequest) {
         SocialTokenVerifier.SocialUserInfo userInfo;
         try {
-            userInfo = socialTokenVerifier.verify(request.getOauthProvider(), request.getOauthToken());
+            userInfo = socialTokenVerifier.verify(loginRequest.getOauthProvider(), loginRequest.getOauthToken());
         } catch (Exception e) {
             throw new GeneralException(TokenErrorStatus.INVALID_ID_TOKEN);
         }
@@ -56,7 +56,7 @@ public class MemberServiceImpl implements MemberService {
         final Member member;
         if (memberOpt.isPresent()) {
             member = memberOpt.get();
-            if (!member.getSignType().name().equalsIgnoreCase(request.getOauthProvider())) {
+            if (!member.getSignType().name().equalsIgnoreCase(loginRequest.getOauthProvider())) {
                 throw new GeneralException(MemberErrorStatus.DIFFERENT_SIGN_TYPE);
             }
             isNewMember = false;
@@ -65,7 +65,7 @@ public class MemberServiceImpl implements MemberService {
                 .email(userInfo.email)
                 .memberName(userInfo.name)
                 .password(UUID.randomUUID().toString().substring(0, 10))
-                .signType(SignType.valueOf(request.getOauthProvider().toUpperCase()))
+                .signType(SignType.valueOf(loginRequest.getOauthProvider().toUpperCase()))
                 .guiltyFreeMode(false)
                 .dailyCondition(null)
                 .role(Role.USER)
@@ -83,7 +83,7 @@ public class MemberServiceImpl implements MemberService {
             refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
             refreshTokenRedisService.saveRefreshToken(member.getId(), refreshToken);
         }
-        return OAuthLoginDTO.Response.builder()
+        return OAuthLoginDTO.LoginResponse.builder()
             .id(member.getId())
             .email(member.getEmail())
             .name(member.getMemberName())

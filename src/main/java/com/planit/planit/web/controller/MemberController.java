@@ -5,7 +5,6 @@ import com.planit.planit.agreement.service.AgreementService;
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
 import com.planit.planit.config.jwt.UserPrincipal;
-import com.planit.planit.config.oauth.CustomOAuth2UserService;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.member.service.NotificationService;
 import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
@@ -19,11 +18,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,11 +41,11 @@ public class MemberController {
 
     @Operation(summary = "idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
     @PostMapping("/sign-in")
-    public ApiResponse<OAuthLoginDTO.Response> signIn(@RequestBody OAuthLoginDTO.Request request) {
-        OAuthLoginDTO.Response response = memberService.signIn(request);
+    public ApiResponse<OAuthLoginDTO.LoginResponse> signIn(@RequestBody OAuthLoginDTO.LoginRequest loginRequest) {
+        OAuthLoginDTO.LoginResponse loginResponse = memberService.signIn(loginRequest);
         log.info("✅ 로그인 or 회원가입 성공 - id: {}, email: {}, name: {}, isNewMember: {}, 약관 동의여부: {}",
-                response.getId(),response.getEmail(), response.getName(), response.isNewMember(), response.isSignUpCompleted());
-        return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, response);
+                loginResponse.getId(), loginResponse.getEmail(), loginResponse.getName(), loginResponse.isNewMember(), loginResponse.isSignUpCompleted());
+        return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, loginResponse);
     }
 
     @Operation(summary = "로그아웃", description = "사용자 로그아웃을 처리하고 토큰을 블랙리스트에 추가합니다.")
