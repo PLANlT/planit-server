@@ -1,12 +1,16 @@
 package com.planit.planit.auth.jwt;
+
 import com.planit.planit.member.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -21,9 +25,11 @@ public class JwtProvider {
     private final String issuer;
     private final List<String> audiences;
 
-    @Autowired
+
     public JwtProvider(JwtProperties jwtProperties) {
-        this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        this.secretKey = Keys.hmacShaKeyFor(Base64.getEncoder()
+                .encodeToString(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8))
+                .getBytes());
         this.expirationMs = jwtProperties.getExpirationMs();
         this.refreshTokenExpirationMs = jwtProperties.getRefreshTokenExpirationMs();
         this.tokenPrefix = jwtProperties.getTokenPrefix();
@@ -40,8 +46,8 @@ public class JwtProvider {
     }
 
     private String createToken(Long id, String email, String name, Role role, long expirationMs) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + expirationMs);
+        final Date now = new Date();
+        final Date expiry = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .setSubject(String.valueOf(id))
@@ -52,6 +58,13 @@ public class JwtProvider {
                 .setExpiration(expiry)
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String resolveHeaderToken(String headerValue, String prefix) {
+        if (headerValue == null || !headerValue.startsWith(prefix)) {
+            return null;
+        }
+        return headerValue.substring(prefix.length()).trim();
     }
 
     public boolean validateToken(String token) {
@@ -86,7 +99,7 @@ public class JwtProvider {
     }
 
     public UserPrincipal getUserPrincipal(String token) {
-        Claims claims = getClaims(token);
+        final Claims claims = getClaims(token);
         return new UserPrincipal(
                 Long.valueOf(claims.getSubject()),
                 claims.get("email", String.class),
@@ -96,7 +109,7 @@ public class JwtProvider {
     }
 
     public long getRemainingValidity(String token) {
-        Date expiration = getClaims(token).getExpiration();
+        final Date expiration = getClaims(token).getExpiration();
         long now = System.currentTimeMillis();
         long diff = (expiration.getTime() - now) / 1000; // 초 단위
         return Math.max(diff, 0);
@@ -105,7 +118,7 @@ public class JwtProvider {
     // 토큰 만료 여부 반환
     public boolean isTokenExpired(String token) {
         try {
-            Date expiration = getClaims(token).getExpiration();
+            final Date expiration = getClaims(token).getExpiration();
             return expiration.before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
             return true; // 파싱 불가 시 만료로 간주
