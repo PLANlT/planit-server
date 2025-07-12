@@ -1,7 +1,7 @@
 package com.planit.planit.web.controller;
 
 
-import com.planit.planit.agreement.service.AgreementService;
+import com.planit.planit.term.service.AgreementService;
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
 import com.planit.planit.config.jwt.UserPrincipal;

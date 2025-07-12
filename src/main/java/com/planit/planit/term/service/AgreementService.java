@@ -1,4 +1,4 @@
-package com.planit.planit.agreement.service;
+package com.planit.planit.term.service;
 
 import java.util.Map;
 

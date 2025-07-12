@@ -1,5 +1,5 @@
-package com.planit.planit.agreement.service;
-import com.planit.planit.config.AgreementConfig;
+package com.planit.planit.term.service;
+import com.planit.planit.config.TermConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,16 +11,16 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AgreementServiceImpl implements AgreementService {
-    private final AgreementConfig agreementConfig;
+    private final TermConfig termConfig;
 
     @Override
     public Map<String, Map<String, String>> getAllTermsUrls() {
         Map<String, Map<String, String>> termsInfo = new HashMap<>();
 
-        String baseUrl = Optional.ofNullable(agreementConfig.getBaseUrl()).orElse("");
+        String baseUrl = Optional.ofNullable(termConfig.getBaseUrl()).orElse("");
 
-        Map<String, AgreementConfig.AgreementDetail> configuredTerms =
-                Optional.ofNullable(agreementConfig.getTerms()).orElse(Collections.emptyMap());
+        Map<String, TermConfig.AgreementDetail> configuredTerms =
+                Optional.ofNullable(termConfig.getTerms()).orElse(Collections.emptyMap());
 
         configuredTerms.forEach((key, agreementDetail) -> {
             Map<String, String> detailMap = new HashMap<>();

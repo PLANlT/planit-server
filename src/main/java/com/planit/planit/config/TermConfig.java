@@ -3,7 +3,6 @@ package com.planit.planit.config;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "app.agreement")
-public class AgreementConfig {
+public class TermConfig {
     private String baseUrl;
     private Map<String, AgreementDetail> terms;
 
