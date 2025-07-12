@@ -131,6 +131,7 @@ public class Member extends BaseEntity {
         this.memberName = (memberName != null) ? memberName : "여행자";
         this.role = role;
         this.notification = Notification.of(this);
+        this.fcmToken = FcmToken.of(this, null);
     }
 
 /*------------------------------ METHOD ------------------------------*/
