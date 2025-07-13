@@ -4,15 +4,12 @@ import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.association.GuiltyFree;
-import com.planit.planit.member.association.Notification;
-import com.planit.planit.member.association.SignedMember;
+import com.planit.planit.member.association.*;
 import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.member.repository.GuiltyFreeRepository;
 import com.planit.planit.member.repository.MemberRepository;
-import com.planit.planit.member.association.Term;
 import com.planit.planit.member.repository.NotificationRepository;
 import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
@@ -29,8 +26,6 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-
-    private static final LocalDate guiltyFreeInitDate = LocalDate.of(2000, 1, 1);
 
     private final MemberRepository memberRepository;
     private final TermRepository termRepository;
@@ -87,7 +82,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     private void saveGuiltyFree(Member member) {
-        GuiltyFree guiltyFree = GuiltyFree.of(member, GuiltyFreeReason.NONE, guiltyFreeInitDate);
+        GuiltyFree guiltyFree = GuiltyFree.of(member, GuiltyFreeReason.NONE, GuiltyFreeProperty.guiltyFreeInitDate);
         guiltyFree = guiltyFreeRepository.save(guiltyFree);
         member.addGuiltyFree(guiltyFree);
     }

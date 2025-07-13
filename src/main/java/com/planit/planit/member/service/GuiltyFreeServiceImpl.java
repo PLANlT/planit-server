@@ -4,6 +4,7 @@ import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.association.GuiltyFree;
+import com.planit.planit.member.association.GuiltyFreeProperty;
 import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.member.repository.GuiltyFreeRepository;
 import com.planit.planit.member.repository.MemberRepository;
@@ -41,7 +42,7 @@ public class GuiltyFreeServiceImpl implements GuiltyFreeService {
         member.activateGuiltyFree(guiltyFree);
 
         // 2주 연속 같은 이유로 길티프리를 활성화한 경우 Advice 반환
-        GuiltyFree lastGuiltyFree = guiltyFreeRepository.findByActive(lastGuiltyFreeDate)
+        GuiltyFree lastGuiltyFree = guiltyFreeRepository.findByMemberIdAndActive(memberId, lastGuiltyFreeDate)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.LAST_GUILTY_FREE_NOT_FOUND));
 
         if (lastGuiltyFreeDate.plusDays(14).isAfter(today) &&
@@ -56,6 +57,10 @@ public class GuiltyFreeServiceImpl implements GuiltyFreeService {
     public GuiltyFreeResponseDTO.GuiltyFreeStatusDTO getGuiltyFreeStatus(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        // 길티프리를 한 번도 사용한 적 없는 경우
+        if (member.getLastGuiltyFreeDate().equals(GuiltyFreeProperty.guiltyFreeInitDate)) {
+            throw new MemberHandler(MemberErrorStatus.GUILTY_FREE_NOT_ACTIVATED);
+        }
         return GuiltyFreeResponseDTO.GuiltyFreeStatusDTO.of(member);
     }
 

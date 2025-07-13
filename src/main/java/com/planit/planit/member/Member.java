@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.dream.Dream;
 import com.planit.planit.member.association.GuiltyFree;
+import com.planit.planit.member.association.GuiltyFreeProperty;
 import com.planit.planit.member.association.Notification;
 import com.planit.planit.member.association.Term;
 import com.planit.planit.member.enums.DailyCondition;
@@ -113,7 +114,6 @@ public class Member extends BaseEntity {
             Role role
     ) {
         validate(email, password, signType, guiltyFreeMode, role);
-        final LocalDate guiltyFreeInitDate = LocalDate.of(2000, 1, 1);
         this.id = id;
         this.email = email;
         this.password = password;
@@ -122,9 +122,9 @@ public class Member extends BaseEntity {
         this.role = role;
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
-        this.lastAttendanceDate = guiltyFreeInitDate;
-        this.attendanceStartedAt = guiltyFreeInitDate;
-        this.lastGuiltyFreeDate = guiltyFreeInitDate;
+        this.lastAttendanceDate = GuiltyFreeProperty.guiltyFreeInitDate;
+        this.attendanceStartedAt = GuiltyFreeProperty.guiltyFreeInitDate;
+        this.lastGuiltyFreeDate = GuiltyFreeProperty.guiltyFreeInitDate;
         this.maxConsecutiveDays = 0L;
         this.isSignUpCompleted = false;
         this.guiltyFrees = new ArrayList<>();
@@ -164,8 +164,8 @@ public class Member extends BaseEntity {
     public void updateConsecutiveDays(LocalDate today) {
 
         // 최초 출석인 경우
-        if (lastAttendanceDate.equals(LocalDate.of(2000, 1, 1)) ||
-            attendanceStartedAt.equals(LocalDate.of(2000, 1, 1))
+        if (lastAttendanceDate.equals(GuiltyFreeProperty.guiltyFreeInitDate) ||
+            attendanceStartedAt.equals(GuiltyFreeProperty.guiltyFreeInitDate)
         ) {
             lastAttendanceDate = today;
             attendanceStartedAt = today;
@@ -191,7 +191,7 @@ public class Member extends BaseEntity {
 
     public boolean isConsecutiveAttendance(LocalDate today) {
         // 길티프리를 사용한 적이 있는 경우 길티프리 날짜 확인
-        if (!lastGuiltyFreeDate.equals(LocalDate.of(2000, 1, 1))) {
+        if (!lastGuiltyFreeDate.equals(GuiltyFreeProperty.guiltyFreeInitDate)) {
             return lastAttendanceDate.plusDays(1).equals(today) || (
                     lastAttendanceDate.plusDays(2).equals(today) &&
                     lastGuiltyFreeDate.plusDays(1).equals(today));
