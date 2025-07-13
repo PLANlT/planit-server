@@ -7,6 +7,11 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+  data:
+    redis:
+      host: redis
+      port: 6379
+
 
 # 공통 설정이 있다면 여기에
 jwt:
