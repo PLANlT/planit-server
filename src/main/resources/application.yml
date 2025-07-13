@@ -18,13 +18,13 @@ app:
     terms:
       term-of-info: # 개인정보처리방침
         version: "20250711"
-        file-name: "TermOfInfo_v20250711.html"
+        file-name: "TermOfInfo.html"
       term-of-privacy: # 개인정보 수집 및 이용 동의서
         version: "20250711"
-        file-name: "TermOfPrivacy_v20250711.html"
+        file-name: "TermOfPrivacy.html"
       term-of-use: # 서비스 이용약관
         version: "20250711"
-        file-name: "TermOfUse_v20250711.html"
+        file-name: "TermOfUse.html"
       third-party-ad-consent: # 개인정보 제3자 제공 동의
         version: "20250711"
-        file-name: "ThirdPartyConsent_v20250711.html"
+        file-name: "ThirdPartyConsent.html"

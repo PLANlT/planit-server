@@ -29,6 +29,8 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/planit/auth/sign-in", "POST")).permitAll()     // 로그인 API
                 .requestMatchers(new AntPathRequestMatcher("/planit/auth/refresh", "POST")).permitAll()     // 토큰 재발급 API
                 .requestMatchers(new AntPathRequestMatcher("/planit/members/terms", "GET")).permitAll()    // 약관 URL 조회 API (인증 없이 허용)
+                .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
+
                 .anyRequest().authenticated()
         );
 
