@@ -44,10 +44,9 @@ public class MemberController {
     @SecurityRequirement(name = "accessToken")
     @PostMapping("/terms")
     public ApiResponse<Void> agreeTerms(
-            @AuthenticationPrincipal UserPrincipal principal,
             @RequestBody TermAgreementDTO.Request request
     ) {
-        memberService.completeTermsAgreement(principal.getId(), request);
+        memberService.completeTermsAgreement(request);
         return ApiResponse.onSuccess(MemberSuccessStatus.TERM_AGREEMENT_COMPLETED, null);
     }
 

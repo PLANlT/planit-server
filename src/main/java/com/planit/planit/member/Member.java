@@ -137,8 +137,6 @@ public class Member extends BaseEntity {
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();
-        this.notification = Notification.of(this);
-        this.fcmToken = FcmToken.of(this, null);
     }
 
     /*------------------------------ METHOD ------------------------------*/

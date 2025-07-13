@@ -1,5 +1,6 @@
 package com.planit.planit.member.service;
 
+import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
@@ -17,12 +18,14 @@ import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class MemberServiceImpl implements MemberService {
     private final GuiltyFreeRepository guiltyFreeRepository;
     private final NotificationRepository notificationRepository;
     private final FcmTokenRepository fcmTokenRepository;
+    private final JwtProvider jwtProvider;
 
 
     @Override
@@ -97,10 +101,13 @@ public class MemberServiceImpl implements MemberService {
         return MemberResponseDTO.ConsecutiveDaysDTO.of(member);
     }
 
+    @Override
     @Transactional
-    public void completeTermsAgreement(Long memberId, TermAgreementDTO.Request request) {
+    public void completeTermsAgreement(TermAgreementDTO.Request request) {
+        String token = request.getOauthToken();
+        Long memberId = jwtProvider.getId(token);
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new GeneralException(MemberErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
         // Term 저장
         Term term = Term.builder()
@@ -118,6 +125,7 @@ public class MemberServiceImpl implements MemberService {
 
         // 저장
         memberRepository.save(member);
+        log.info("✅ 약관 동의 성공 - id: {}, email: {}", member.getId(), member.getEmail());
     }
 
     @Override
