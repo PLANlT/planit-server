@@ -55,6 +55,6 @@ public class AuthController {
     @PostMapping("/refresh")
     public ApiResponse<TokenRefreshDTO.Response> refreshToken(@RequestBody TokenRefreshDTO.Request request) {
         TokenRefreshDTO.Response response = authService.refreshAccessToken(request.getRefreshToken());
-        return ApiResponse.onSuccess(REFRESH_SUCCESS, null);
+        return ApiResponse.onSuccess(REFRESH_SUCCESS, response);
     }
 }

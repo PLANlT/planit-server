@@ -59,9 +59,10 @@ public class MemberController {
 
     @Operation(summary = "[MEMBER] 연속일 조회하기")
     @GetMapping("/consecutive-days")
-    public ApiResponse<MemberResponseDTO.ConsecutiveDaysDTO> getConsecutiveDays() {
-        Long memberId = 1L; // 인증 기능 구현 이후 변경
-        MemberResponseDTO.ConsecutiveDaysDTO consecutiveDaysDTO = memberService.getConsecutiveDays(memberId);
+    public ApiResponse<MemberResponseDTO.ConsecutiveDaysDTO> getConsecutiveDays(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        MemberResponseDTO.ConsecutiveDaysDTO consecutiveDaysDTO = memberService.getConsecutiveDays(principal.getId());
         return ApiResponse.onSuccess(MemberSuccessStatus.CONSECUTIVE_DAYS_FOUND, consecutiveDaysDTO);
     }
 
