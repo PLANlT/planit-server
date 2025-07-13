@@ -16,7 +16,7 @@ spring:
       root: WARN
   data:
     redis:
-      host: redis
+      host: planit-server-redis-1
       port: 6379
 
 jwt:
