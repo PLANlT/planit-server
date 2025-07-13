@@ -21,11 +21,11 @@ import java.time.LocalDateTime;
 public class Notification extends BaseEntity {
 
     @Id
-    private Long id;
+    private Long memberId;
 
     @MapsId
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @Column(nullable = false)
