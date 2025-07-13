@@ -35,7 +35,6 @@ public class FcmToken extends BaseEntity {
     public static FcmToken of(Member member, String token) {
         FcmToken fcmToken = new FcmToken();
         fcmToken.member = member;
-        fcmToken.memberId = member.getId();
         fcmToken.token = token;
         fcmToken.lastUsedAt = token != null ? LocalDateTime.now() : null;
         return fcmToken;

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -17,18 +17,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
+@Transactional
 class NotificationRepositoryTest {
-
-    @Autowired
-    private TestEntityManager em;
 
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @Test
     @DisplayName("회원으로 알림 설정을 조회할 수 있다")
     void findByMember_success() {
-
         // given
         Member member = Member.builder()
                 .email("test@planit.com")
@@ -40,16 +40,18 @@ class NotificationRepositoryTest {
                 .dailyCondition(DailyCondition.DISTRESS)
                 .build();
 
-        em.persist(member);
-        em.flush();
-        em.clear();
+        Member savedMember = memberRepository.save(member);
+
+        // Notification 생성 및 저장
+        Notification notification = Notification.of(savedMember);
+        notificationRepository.save(notification);
 
         // when
-        Optional<Notification> result = notificationRepository.findByMember(member);
+        Optional<Notification> result = notificationRepository.findByMember(savedMember);
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get().getMember().getId()).isEqualTo(member.getId());
+        assertThat(result.get().getMember().getId()).isEqualTo(savedMember.getId());
         assertThat(result.get().isDailyTaskEnabled()).isTrue();
     }
 }
