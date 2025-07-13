@@ -1,5 +1,6 @@
 package com.planit.planit.member.service;
 
+import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
@@ -33,6 +34,7 @@ public class MemberServiceImpl implements MemberService {
     private final GuiltyFreeRepository guiltyFreeRepository;
     private final NotificationRepository notificationRepository;
     private final FcmTokenRepository fcmTokenRepository;
+    private final JwtProvider jwtProvider;
 
 
     @Override
@@ -97,10 +99,12 @@ public class MemberServiceImpl implements MemberService {
         return MemberResponseDTO.ConsecutiveDaysDTO.of(member);
     }
 
+    @Override
     @Transactional
-    public void completeTermsAgreement(Long memberId, TermAgreementDTO.Request request) {
+    public void completeTermsAgreement(String token, TermAgreementDTO.Request request) {
+        Long memberId = jwtProvider.getId(token);
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new GeneralException(MemberErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
         // Term 저장
         Term term = Term.builder()
