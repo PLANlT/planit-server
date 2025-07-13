@@ -101,7 +101,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void completeTermsAgreement(String token, TermAgreementDTO.Request request) {
+    public void completeTermsAgreement(TermAgreementDTO.Request request) {
+        String token = request.getOauthToken();
         Long memberId = jwtProvider.getId(token);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));

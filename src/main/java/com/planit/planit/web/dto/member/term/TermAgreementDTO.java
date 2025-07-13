@@ -14,6 +14,9 @@ public class TermAgreementDTO {
     @AllArgsConstructor
     @Builder
     public static class Request {
+
+        @Schema(type = "string", example = "eyJhbGciOiJIUzI1NiJ9...")
+        private String oauthToken;
         // 만약 이 필드들이 LocalDateTime 타입이라면 아래처럼 설정
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         @Schema(type = "string", example = "2025-07-08T01:17:17") // 원하는 형식의 예시 값
