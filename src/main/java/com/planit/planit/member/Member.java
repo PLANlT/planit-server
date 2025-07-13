@@ -3,6 +3,7 @@ package com.planit.planit.member;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.dream.Dream;
+import com.planit.planit.member.association.FcmToken;
 import com.planit.planit.member.association.GuiltyFree;
 import com.planit.planit.member.association.GuiltyFreeProperty;
 import com.planit.planit.member.association.Notification;
@@ -95,8 +96,13 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private boolean isSignUpCompleted;
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    @Setter
     private Notification notification;
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    @Setter
+    private FcmToken fcmToken;
 
 /*------------------------------ CONSTRUCTOR ------------------------------*/
 
@@ -132,7 +138,10 @@ public class Member extends BaseEntity {
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();
         this.notification = Notification.of(this);
+        this.fcmToken = FcmToken.of(this, null);
     }
+
+    /*------------------------------ METHOD ------------------------------*/
 
     private void validate(String email, String password, SignType signType, Boolean guiltyFreeMode, Role role) {
         Assert.notNull(email, "Email is required");
@@ -141,8 +150,6 @@ public class Member extends BaseEntity {
         Assert.notNull(guiltyFreeMode, "GuiltyFreeMode is required");
         Assert.notNull(role, "Role is required");
     }
-
-    /*------------------------------ METHOD ------------------------------*/
 
     public void inactivate() {
         this.inactive = LocalDateTime.now();

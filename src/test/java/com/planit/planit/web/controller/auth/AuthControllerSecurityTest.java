@@ -35,5 +35,4 @@ class AuthControllerSecurityTest {
         mockMvc.perform(post("/auth/sign-out"))
                 .andExpect(status().isOk());        //TODO: 이거 수정해야함
     }
-
 }

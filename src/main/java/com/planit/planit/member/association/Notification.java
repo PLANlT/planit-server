@@ -1,5 +1,6 @@
 package com.planit.planit.member.association;
 
+import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notification {
+public class Notification extends BaseEntity {
 
     @Id
     private Long id;
@@ -48,11 +49,9 @@ public class Notification {
 
     public void updateDailyTask(boolean enabled) {
         this.dailyTaskEnabled = enabled;
-        this.updatedAt = LocalDateTime.now();
     }
 
     public void updateGuiltFree(boolean enabled) {
         this.guiltyFreeEnabled = enabled;
-        this.updatedAt = LocalDateTime.now();
     }
 }

@@ -9,6 +9,8 @@ import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.member.repository.GuiltyFreeRepository;
+import com.planit.planit.member.association.Notification;
+import com.planit.planit.member.repository.FcmTokenRepository;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.repository.NotificationRepository;
 import com.planit.planit.member.repository.TermRepository;
@@ -19,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -31,6 +32,7 @@ public class MemberServiceImpl implements MemberService {
     private final TermRepository termRepository;
     private final GuiltyFreeRepository guiltyFreeRepository;
     private final NotificationRepository notificationRepository;
+    private final FcmTokenRepository fcmTokenRepository;
 
 
     @Override
