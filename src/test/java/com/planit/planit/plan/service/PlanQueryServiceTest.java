@@ -2,6 +2,8 @@ package com.planit.planit.plan.service;
 
 import com.planit.planit.common.api.plan.PlanHandler;
 import com.planit.planit.member.Member;
+import com.planit.planit.member.enums.Role;
+import com.planit.planit.member.enums.SignType;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.plan.enums.PlanStatus;
@@ -74,12 +76,18 @@ class PlanQueryServiceTest {
                 .email("xxx@email.com")
                 .password("password")
                 .guiltyFreeMode(false)
+                .memberName("xxx")
+                .role(Role.USER)
+                .signType(SignType.GOOGLE)
                 .build();
         member2 = Member.builder()
                 .id(2L)
                 .email("yyy@email.com")
                 .password("password")
                 .guiltyFreeMode(false)
+                .memberName("yyy")
+                .role(Role.USER)
+                .signType(SignType.GOOGLE)
                 .build();
     }
 

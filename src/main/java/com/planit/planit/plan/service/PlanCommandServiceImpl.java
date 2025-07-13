@@ -42,6 +42,7 @@ public class PlanCommandServiceImpl implements PlanCommandService {
                 .build();
 
         plan = planRepository.save(plan);
+        member.addPlan(plan);
 
         return PlanConverter.toPlanMetaDTO(plan);
     }
@@ -72,8 +73,6 @@ public class PlanCommandServiceImpl implements PlanCommandService {
                 planDTO.getFinishedAt()
         );
 
-        planRepository.save(plan);
-
         return PlanConverter.toPlanMetaDTO(plan);
     }
 
@@ -95,7 +94,6 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         }
 
         plan.completePlan();
-        planRepository.save(plan);
 
         return PlanConverter.toPlanMetaDTO(plan);
     }
@@ -118,7 +116,6 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         }
 
         plan.pausePlan();
-        planRepository.save(plan);
 
         return PlanConverter.toPlanMetaDTO(plan);
     }
@@ -136,7 +133,6 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         }
 
         plan.deletePlan();
-        planRepository.save(plan);
 
         return PlanConverter.toPlanMetaDTO(plan);
     }

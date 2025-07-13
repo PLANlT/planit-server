@@ -57,6 +57,8 @@ public class TaskCommandServiceImpl implements TaskCommandService {
                 .build();
 
         task = taskRepository.save(task);
+        plan.addTask(task);
+
         return TaskConverter.toTaskPreviewDTO(task);
     }
 
