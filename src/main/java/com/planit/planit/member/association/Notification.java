@@ -1,6 +1,5 @@
 package com.planit.planit.member.association;
 
-import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,14 +10,19 @@ import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import jakarta.persistence.EntityListeners;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notification extends BaseEntity {
+public class Notification {
 
     @Id
     private Long memberId;
@@ -34,6 +38,10 @@ public class Notification extends BaseEntity {
     @Column(nullable = false)
     private boolean guiltyFreeEnabled;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     private Notification(Member member) {
@@ -44,10 +52,7 @@ public class Notification extends BaseEntity {
     }
 
     public static Notification of(Member member) {
-        Notification notification = new Notification();
-        notification.member = member;
-        notification.dailyTaskEnabled = true;
-        notification.guiltyFreeEnabled = true;
+        Notification notification = new Notification(member);
         notification.updatedAt = LocalDateTime.now();
         return notification;
     }
