@@ -77,7 +77,7 @@ public class Member extends BaseEntity {
     private List<GuiltyFree> guiltyFrees;
 
     @Setter
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "member", orphanRemoval = true)
     private Term term;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -95,7 +95,8 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private boolean isSignUpCompleted;
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Setter
+    @OneToOne(mappedBy = "member", orphanRemoval = true)
     private Notification notification;
 
 /*------------------------------ CONSTRUCTOR ------------------------------*/
@@ -131,7 +132,6 @@ public class Member extends BaseEntity {
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();
-        this.notification = Notification.of(this);
     }
 
     private void validate(String email, String password, SignType signType, Boolean guiltyFreeMode, Role role) {

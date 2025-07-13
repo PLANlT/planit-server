@@ -79,6 +79,7 @@ public class MemberServiceImpl implements MemberService {
     private void saveNotification(Member member) {
         Notification notification = Notification.of(member);
         notificationRepository.save(notification);
+        member.setNotification(notification);
     }
 
     private void saveGuiltyFree(Member member) {

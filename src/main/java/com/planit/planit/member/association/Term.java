@@ -51,6 +51,7 @@ public class Term {
             LocalDateTime overFourteen
     ) {
         validate(member, termOfUse, termOfPrivacy,  termOfInfo, overFourteen);
+        this.id = member.getId();
         this.member = member;
         this.termOfUse = termOfUse;
         this.termOfPrivacy = termOfPrivacy;

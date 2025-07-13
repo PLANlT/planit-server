@@ -37,6 +37,8 @@ public class Notification {
 
     private Notification(Member member) {
         Assert.notNull(member, "member must not be null");
+        Assert.notNull(member.getId(), "memberId must not be null");
+        this.id = member.getId();
         this.member = member;
         this.dailyTaskEnabled = true;
         this.guiltyFreeEnabled = true;
