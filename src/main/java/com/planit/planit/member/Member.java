@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.planit.planit.member.enums.Role;
 import lombok.Setter;
+import org.springframework.util.Assert;
 
 @Getter
 @Entity
@@ -91,16 +92,17 @@ public class Member extends BaseEntity {
     private List<Dream> dreams;
 
     @Column(nullable = false)
-    private boolean isSignUpCompleted = false;
+    private boolean isSignUpCompleted;
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Notification notification;
+
 /*------------------------------ CONSTRUCTOR ------------------------------*/
 
     protected Member() {}
 
     @Builder
-    public Member(
+    private Member(
             Long id,
             String email,
             String password,
@@ -110,27 +112,37 @@ public class Member extends BaseEntity {
             String memberName,
             Role role
     ) {
+        validate(email, password, signType, guiltyFreeMode, role);
         final LocalDate guiltyFreeInitDate = LocalDate.of(2000, 1, 1);
         this.id = id;
         this.email = email;
         this.password = password;
         this.signType = signType;
+        this.memberName = (memberName != null) ? memberName : "여행자";
+        this.role = role;
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
         this.lastAttendanceDate = guiltyFreeInitDate;
         this.attendanceStartedAt = guiltyFreeInitDate;
         this.lastGuiltyFreeDate = guiltyFreeInitDate;
         this.maxConsecutiveDays = 0L;
+        this.isSignUpCompleted = false;
         this.guiltyFrees = new ArrayList<>();
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();
-        this.memberName = (memberName != null) ? memberName : "여행자";
-        this.role = role;
         this.notification = Notification.of(this);
     }
 
-/*------------------------------ METHOD ------------------------------*/
+    private void validate(String email, String password, SignType signType, Boolean guiltyFreeMode, Role role) {
+        Assert.notNull(email, "Email is required");
+        Assert.notNull(password, "Password is required");
+        Assert.notNull(signType, "SignType is required");
+        Assert.notNull(guiltyFreeMode, "GuiltyFreeMode is required");
+        Assert.notNull(role, "Role is required");
+    }
+
+    /*------------------------------ METHOD ------------------------------*/
 
     public void inactivate() {
         this.inactive = LocalDateTime.now();
@@ -193,5 +205,9 @@ public class Member extends BaseEntity {
 
     public void addPlan(Plan plan) {
         this.plans.add(plan);
+    }
+
+    public void addGuiltyFree(GuiltyFree guiltyFree) {
+        this.guiltyFrees.add(guiltyFree);
     }
 }

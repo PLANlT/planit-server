@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -25,9 +26,10 @@ public class SocialTokenVerifier {
     @Value("${oauth.google.playground-client-id}")
     private String playgroundClientId;
 
+    @Getter
     public static class SocialUserInfo {
-        public final String email;
-        public final String name;
+        private final String email;
+        private final String name;
 
         public SocialUserInfo(String email, String name) {
             this.email = email;

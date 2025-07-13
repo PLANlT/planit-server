@@ -23,7 +23,7 @@ public class Term {
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "id", nullable = false)
     private Member member;
 
     @Column(nullable = false)
@@ -51,7 +51,6 @@ public class Term {
             LocalDateTime overFourteen
     ) {
         validate(member, termOfUse, termOfPrivacy,  termOfInfo, overFourteen);
-        this.id = member.getId();
         this.member = member;
         this.termOfUse = termOfUse;
         this.termOfPrivacy = termOfPrivacy;
@@ -63,6 +62,7 @@ public class Term {
                           LocalDateTime termOfInfo, LocalDateTime overFourteen
     ) {
         Assert.notNull(member, "member must not be null");
+        Assert.notNull(member.getId(), "memberId must not be null");
         Assert.notNull(termOfUse, "termOfUse must not be null");
         Assert.notNull(termOfPrivacy, "termOfPrivacy must not be null");
         Assert.notNull(termOfInfo, "termOfInfo must not be null");
