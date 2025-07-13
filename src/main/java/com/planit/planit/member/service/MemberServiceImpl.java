@@ -18,12 +18,14 @@ import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -123,6 +125,7 @@ public class MemberServiceImpl implements MemberService {
 
         // 저장
         memberRepository.save(member);
+        log.info("✅ 약관 동의 성공 - id: {}, email: {}", member.getId(), member.getEmail());
     }
 
     @Override
