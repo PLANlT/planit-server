@@ -1,8 +1,6 @@
 services:
   redis:
     image: redis:7.0
-    ports:
-      - "6379:6379"
     networks:
       - planit-network
 
@@ -14,7 +12,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     ports:
-      - '8080:8080'
+      - '8080:8080'  # API는 외부에 열어야 하니까 이건 OK
     depends_on:
       - redis
     networks:
