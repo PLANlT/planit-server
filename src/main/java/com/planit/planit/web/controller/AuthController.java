@@ -51,7 +51,7 @@ public class AuthController {
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_OUT_SUCCESS, null);
     }
 
-    @Operation(summary = "[AUTH] 토큰 리프레시", description = "사용자 로그아웃을 처리하고 토큰을 블랙리스트에 추가합니다.")
+    @Operation(summary = "[AUTH] 토큰 리프레시", description = "사용자 리프레시 토큰을 초기화합니다.")
     @PostMapping("/refresh")
     public ApiResponse<TokenRefreshDTO.Response> refreshToken(@RequestBody TokenRefreshDTO.Request request) {
         TokenRefreshDTO.Response response = authService.refreshAccessToken(request.getRefreshToken());

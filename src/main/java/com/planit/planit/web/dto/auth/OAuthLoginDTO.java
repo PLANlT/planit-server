@@ -1,5 +1,6 @@
 package com.planit.planit.web.dto.auth;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.association.SignedMember;
@@ -10,7 +11,6 @@ public class OAuthLoginDTO {
 
     @Getter
     @Builder
-    @RequiredArgsConstructor
     @Schema(description = "OAuth 로그인 요청 DTO")
     public static class LoginRequest {
         @Schema(description = "소셜 로그인 제공자 (KAKAO, NAVER, GOOGLE)", example = "KAKAO")
@@ -18,6 +18,15 @@ public class OAuthLoginDTO {
 
         @Schema(description = "클라이언트로부터 받은 OAuth ID Token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
         private final String oauthToken;
+
+        @JsonCreator
+        public LoginRequest(
+                @JsonProperty("oauthProvider") String oauthProvider,
+                @JsonProperty("oauthToken") String oauthToken
+        ) {
+            this.oauthProvider = oauthProvider;
+            this.oauthToken = oauthToken;
+        }
     }
 
     @Getter
