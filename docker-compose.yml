@@ -1,12 +1,25 @@
 services:
   redis:
     image: redis:7.0
+    ports:
+      - "6379:6379"
+    networks:
+      - planit-network
 
   app:
     image: ${DOCKERHUB_USERNAME}/planit:latest
     env_file:
       - .env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - '8080:8080'
     depends_on:
       - redis
+    networks:
+      - planit-network
+
+networks:
+  planit-network:
+    driver: bridge
