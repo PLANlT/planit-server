@@ -18,10 +18,10 @@ jobs:
       SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
       SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
       SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID}}
-      GOOGLE_PLAYGROUND_CLIENT_ID: ${{ secrets.GOOGLE_PLAYGROUND_CLIENT_ID}}
-      KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY}}
-      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID}}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_PLAYGROUND_CLIENT_ID: ${{ secrets.GOOGLE_PLAYGROUND_CLIENT_ID }}
+      KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
       APP_AGREEMENT_BASEURL: ${{ secrets.HOST_URL }}
 
@@ -69,12 +69,12 @@ jobs:
           echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> .env
           echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> .env
           echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
-          echo "GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID}}" >> .env
-          echo "GOOGLE_PLAYGROUND_CLIENT_ID: ${{ secrets.GOOGLE_PLAYGROUND_CLIENT_ID}}" >> .env
-          echo "KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY}}" >> .env
-          echo "NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID}}" >> .env
-          echo "NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
-          echo "APP_AGREEMENT_BASEURL: ${{ secrets.HOST_URL }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID}}" >> .env
+          echo "GOOGLE_PLAYGROUND_CLIENT_ID=${{ secrets.GOOGLE_PLAYGROUND_CLIENT_ID}}" >> .env
+          echo "KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY}}" >> .env
+          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID}}" >> .env
+          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
+          echo "APP_AGREEMENT_BASEURL=${{ secrets.HOST_URL }}" >> .env
 
       - name: Execute docker compose down
         run: sudo docker compose down
