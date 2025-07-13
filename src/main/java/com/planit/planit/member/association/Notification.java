@@ -20,11 +20,11 @@ import java.time.LocalDateTime;
 public class Notification {
 
     @Id
-    private Long memberId;
+    private Long id;
 
     @MapsId
     @OneToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "id")
     private Member member;
 
     @Column(nullable = false)
