@@ -110,15 +110,16 @@ public class Member extends BaseEntity {
             String memberName,
             Role role
     ) {
+        final LocalDate guiltyFreeInitDate = LocalDate.of(2000, 1, 1);
         this.id = id;
         this.email = email;
         this.password = password;
         this.signType = signType;
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
-        this.lastAttendanceDate = LocalDate.of(2000, 1, 1);
-        this.attendanceStartedAt = LocalDate.of(2000, 1, 1);
-        this.lastGuiltyFreeDate = LocalDate.of(2000, 1, 1);
+        this.lastAttendanceDate = guiltyFreeInitDate;
+        this.attendanceStartedAt = guiltyFreeInitDate;
+        this.lastGuiltyFreeDate = guiltyFreeInitDate;
         this.maxConsecutiveDays = 0L;
         this.guiltyFrees = new ArrayList<>();
         this.plans = new ArrayList<>();
@@ -186,8 +187,11 @@ public class Member extends BaseEntity {
         return lastAttendanceDate.plusDays(1).equals(today);
     }
 
-    public void setSignUpCompleted(boolean isSignUpCompleted) {
-        this.isSignUpCompleted = isSignUpCompleted;
+    public void completeSignUp() {
+        this.isSignUpCompleted = true;
     }
 
+    public void addPlan(Plan plan) {
+        this.plans.add(plan);
+    }
 }

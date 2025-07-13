@@ -47,7 +47,7 @@ public class MemberServiceImpl implements MemberService {
         termRepository.save(term);
 
         // isSignUpCompleted 업데이트
-        member.setSignUpCompleted(true);
+        member.completeSignUp();
         member.setTerm(term); // 양방향 매핑도 같이 갱신
 
         // 저장

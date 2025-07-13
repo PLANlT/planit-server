@@ -7,9 +7,12 @@ import com.planit.planit.common.api.member.status.MemberErrorStatus;
 import com.planit.planit.common.api.token.TokenHandler;
 import com.planit.planit.common.api.token.status.TokenErrorStatus;
 import com.planit.planit.member.Member;
+import com.planit.planit.member.association.GuiltyFree;
 import com.planit.planit.member.association.Notification;
+import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
+import com.planit.planit.member.repository.GuiltyFreeRepository;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.repository.NotificationRepository;
 import com.planit.planit.web.dto.auth.OAuthLoginDTO;
@@ -18,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +30,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private static final LocalDate guiltyFreeInitDate = LocalDate.of(2000, 1, 1);
+
     private final MemberRepository memberRepository;
+    private final GuiltyFreeRepository guiltyFreeRepository;
     private final BlacklistTokenRedisService blacklistTokenRedisService;
     private final SocialTokenVerifier  socialTokenVerifier;
     private final NotificationRepository notificationRepository;
@@ -51,6 +58,8 @@ public class AuthServiceImpl implements AuthService {
             }
             isNewMember = false;
         } else {
+
+            // 회원 정보 저장
             member = Member.builder()
                     .email(userInfo.email)
                     .memberName(userInfo.name)
@@ -60,9 +69,13 @@ public class AuthServiceImpl implements AuthService {
                     .dailyCondition(null)
                     .role(Role.USER)
                     .build();
-
             memberRepository.save(member);
 
+            // 길티프리 설정 초기화
+            GuiltyFree guiltyFree = GuiltyFree.of(member, GuiltyFreeReason.NONE, guiltyFreeInitDate);
+            guiltyFreeRepository.save(guiltyFree);
+
+            // 알림 설정 저장
             Notification notification = Notification.of(member);
             notificationRepository.save(notification);
             isNewMember = true;
