@@ -18,7 +18,5 @@ public interface MemberService {
 
     void completeTermsAgreement(Long id, TermAgreementDTO.Request request);
 
-    TokenRefreshDTO.Response refreshAccessToken(String refreshToken);
-
     MemberInfoResponseDTO getMemberInfo(Long memberId);
 }
