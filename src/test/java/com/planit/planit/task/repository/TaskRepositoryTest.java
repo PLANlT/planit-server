@@ -1,6 +1,7 @@
 package com.planit.planit.task.repository;
 
 import com.planit.planit.member.Member;
+import com.planit.planit.member.enums.SignType;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.plan.Plan;
@@ -58,6 +59,7 @@ class TaskRepositoryTest {
                 .guiltyFreeMode(false)
                 .memberName("xxx")
                 .role(Role.USER)
+                .signType(SignType.GOOGLE)
                 .build();
     }
 

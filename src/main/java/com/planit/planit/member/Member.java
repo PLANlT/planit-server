@@ -5,6 +5,7 @@ import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.dream.Dream;
 import com.planit.planit.member.association.FcmToken;
 import com.planit.planit.member.association.GuiltyFree;
+import com.planit.planit.member.association.GuiltyFreeProperty;
 import com.planit.planit.member.association.Notification;
 import com.planit.planit.member.association.Term;
 import com.planit.planit.member.enums.DailyCondition;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import com.planit.planit.member.enums.Role;
 import lombok.Setter;
+import org.springframework.util.Assert;
 
 @Getter
 @Entity
@@ -92,7 +94,7 @@ public class Member extends BaseEntity {
     private List<Dream> dreams;
 
     @Column(nullable = false)
-    private boolean isSignUpCompleted = false;
+    private boolean isSignUpCompleted;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     @Setter
@@ -101,12 +103,13 @@ public class Member extends BaseEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     @Setter
     private FcmToken fcmToken;
+
 /*------------------------------ CONSTRUCTOR ------------------------------*/
 
     protected Member() {}
 
     @Builder
-    public Member(
+    private Member(
             Long id,
             String email,
             String password,
@@ -116,27 +119,37 @@ public class Member extends BaseEntity {
             String memberName,
             Role role
     ) {
+        validate(email, password, signType, guiltyFreeMode, role);
         this.id = id;
         this.email = email;
         this.password = password;
         this.signType = signType;
+        this.memberName = (memberName != null) ? memberName : "여행자";
+        this.role = role;
         this.guiltyFreeMode = guiltyFreeMode;
         this.dailyCondition = dailyCondition;
-        this.lastAttendanceDate = LocalDate.MIN;
-        this.attendanceStartedAt = LocalDate.MIN;
-        this.lastGuiltyFreeDate = LocalDate.MIN;
+        this.lastAttendanceDate = GuiltyFreeProperty.guiltyFreeInitDate;
+        this.attendanceStartedAt = GuiltyFreeProperty.guiltyFreeInitDate;
+        this.lastGuiltyFreeDate = GuiltyFreeProperty.guiltyFreeInitDate;
         this.maxConsecutiveDays = 0L;
+        this.isSignUpCompleted = false;
         this.guiltyFrees = new ArrayList<>();
         this.plans = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.dreams = new ArrayList<>();
-        this.memberName = (memberName != null) ? memberName : "여행자";
-        this.role = role;
         this.notification = Notification.of(this);
         this.fcmToken = FcmToken.of(this, null);
     }
 
-/*------------------------------ METHOD ------------------------------*/
+    /*------------------------------ METHOD ------------------------------*/
+
+    private void validate(String email, String password, SignType signType, Boolean guiltyFreeMode, Role role) {
+        Assert.notNull(email, "Email is required");
+        Assert.notNull(password, "Password is required");
+        Assert.notNull(signType, "SignType is required");
+        Assert.notNull(guiltyFreeMode, "GuiltyFreeMode is required");
+        Assert.notNull(role, "Role is required");
+    }
 
     public void inactivate() {
         this.inactive = LocalDateTime.now();
@@ -158,7 +171,9 @@ public class Member extends BaseEntity {
     public void updateConsecutiveDays(LocalDate today) {
 
         // 최초 출석인 경우
-        if (lastAttendanceDate.equals(LocalDate.MIN) || attendanceStartedAt.equals(LocalDate.MIN)) {
+        if (lastAttendanceDate.equals(GuiltyFreeProperty.guiltyFreeInitDate) ||
+            attendanceStartedAt.equals(GuiltyFreeProperty.guiltyFreeInitDate)
+        ) {
             lastAttendanceDate = today;
             attendanceStartedAt = today;
             maxConsecutiveDays = 1L;
@@ -183,7 +198,7 @@ public class Member extends BaseEntity {
 
     public boolean isConsecutiveAttendance(LocalDate today) {
         // 길티프리를 사용한 적이 있는 경우 길티프리 날짜 확인
-        if (!lastGuiltyFreeDate.equals(LocalDate.MIN)) {
+        if (!lastGuiltyFreeDate.equals(GuiltyFreeProperty.guiltyFreeInitDate)) {
             return lastAttendanceDate.plusDays(1).equals(today) || (
                     lastAttendanceDate.plusDays(2).equals(today) &&
                     lastGuiltyFreeDate.plusDays(1).equals(today));
@@ -191,12 +206,15 @@ public class Member extends BaseEntity {
         return lastAttendanceDate.plusDays(1).equals(today);
     }
 
-    public boolean isSignUpCompleted() {
-        return isSignUpCompleted;
+    public void completeSignUp() {
+        this.isSignUpCompleted = true;
     }
 
-    public void setSignUpCompleted(boolean isSignUpCompleted) {
-        this.isSignUpCompleted = isSignUpCompleted;
+    public void addPlan(Plan plan) {
+        this.plans.add(plan);
     }
 
+    public void addGuiltyFree(GuiltyFree guiltyFree) {
+        this.guiltyFrees.add(guiltyFree);
+    }
 }

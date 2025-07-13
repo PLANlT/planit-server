@@ -1,44 +1,42 @@
 package com.planit.planit.config;
 
-import com.planit.planit.config.jwt.JwtAuthenticationFilter;
+import com.planit.planit.auth.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter  jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        //TODO: 배포 시 사용 범위 제한
-        http
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests
-                                // **여기에 인증 없이 허용할 URL 패턴을 명확히 지정합니다.**
-                                .requestMatchers(
-                                        "/swagger-ui/**",          // Swagger UI
-                                        "/v3/api-docs/**",         // Swagger API 문서
-                                        "/swagger-resources/**",   // Swagger 리소스
-                                        "/h2-console/**",          // H2 데이터베이스 콘솔 (개발용)
-                                        "/members/sign-in",        // 로그인 API
-                                        "/auth/**",                // 인증 관련 기타 API (예: 토큰 재발급 등)
-                                        "/members/terms"           // 약관 URL 조회 API (인증 없이 허용)
-                                ).permitAll()
-                                .anyRequest().authenticated()
-                )
-                .cors(cors -> cors.disable()) //TODO: 배포 시 CORS 설정
-                .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers.disable())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.authorizeHttpRequests((authz) -> authz
+                .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()                              // Swagger UI
+                .requestMatchers(new AntPathRequestMatcher("/v3/**")).permitAll()                                      // Swagger API 문서
+                .requestMatchers(new AntPathRequestMatcher("/swagger-resources/**")).permitAll()                       // Swagger 리소스
+                .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()                              // H2 데이터베이스 콘솔 (개발용)
+                .requestMatchers(new AntPathRequestMatcher("/planit/auth/sign-in", "POST")).permitAll()     // 로그인 API
+                .requestMatchers(new AntPathRequestMatcher("/planit/auth/refresh", "POST")).permitAll()     // 토큰 재발급 API
+                .requestMatchers(new AntPathRequestMatcher("/planit/members/terms", "GET")).permitAll()    // 약관 URL 조회 API (인증 없이 허용)
+                .anyRequest().authenticated()
+        );
+
+        http.csrf(csrf -> csrf.disable())
+            .headers(headers -> headers.disable())
+            .sessionManagement((session) -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

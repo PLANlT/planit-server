@@ -3,33 +3,25 @@ package com.planit.planit.member.service;
 import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.member.status.MemberErrorStatus;
-import com.planit.planit.common.api.token.TokenHandler;
-import com.planit.planit.common.api.token.status.TokenErrorStatus;
-import com.planit.planit.config.jwt.JwtProvider;
-import com.planit.planit.config.oauth.SocialTokenVerifier;
 import com.planit.planit.member.Member;
-import com.planit.planit.member.association.FcmToken;
+import com.planit.planit.member.association.*;
+import com.planit.planit.member.enums.GuiltyFreeReason;
+import com.planit.planit.member.enums.Role;
+import com.planit.planit.member.enums.SignType;
+import com.planit.planit.member.repository.GuiltyFreeRepository;
 import com.planit.planit.member.association.Notification;
 import com.planit.planit.member.repository.FcmTokenRepository;
 import com.planit.planit.member.repository.MemberRepository;
-import com.planit.planit.member.association.Term;
 import com.planit.planit.member.repository.NotificationRepository;
 import com.planit.planit.member.repository.TermRepository;
-import com.planit.planit.member.enums.Role;
-import com.planit.planit.member.enums.SignType;
-import com.planit.planit.web.dto.auth.login.OAuthLoginDTO;
-import com.planit.planit.web.dto.auth.login.TokenRefreshDTO;
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
-import com.planit.planit.redis.service.RefreshTokenRedisService;
-import com.planit.planit.redis.service.BlacklistTokenRedisService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -38,69 +30,63 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final TermRepository termRepository;
-    private final JwtProvider jwtProvider;
-    private final RefreshTokenRedisService refreshTokenRedisService;
-    private final BlacklistTokenRedisService blacklistTokenRedisService;
-    private final SocialTokenVerifier  socialTokenVerifier;
+    private final GuiltyFreeRepository guiltyFreeRepository;
     private final NotificationRepository notificationRepository;
     private final FcmTokenRepository fcmTokenRepository;
 
 
     @Override
-    public OAuthLoginDTO.Response signIn(OAuthLoginDTO.Request request) {
-        SocialTokenVerifier.SocialUserInfo userInfo;
-        try {
-            userInfo = socialTokenVerifier.verify(request.getOauthProvider(), request.getOauthToken());
-        } catch (Exception e) {
-            throw new GeneralException(TokenErrorStatus.INVALID_ID_TOKEN);
+    public SignedMember getSignedMemberByUserInfo(String email, String name, SignType signType) {
+        Member member = memberRepository.findByEmail(email).orElse(null);
+        // 사용자가 존재하지 않으면 신규 회원을 생성하여 반환
+        if (member == null) {
+            return SignedMember.of(saveMember(email, name, signType), true);
         }
-        Optional<Member> memberOpt = memberRepository.findByEmail(userInfo.email);
-        final boolean isNewMember;
-        final Member member;
-        if (memberOpt.isPresent()) {
-            member = memberOpt.get();
-            if (!member.getSignType().name().equalsIgnoreCase(request.getOauthProvider())) {
-                throw new GeneralException(MemberErrorStatus.DIFFERENT_SIGN_TYPE);
-            }
-            isNewMember = false;
-        } else {
-            member = Member.builder()
-                .email(userInfo.email)
-                .memberName(userInfo.name)
+        // 다른 로그인 타입으로 가입한 회원이면 예외 처리
+        if (!member.getSignType().equals(signType)) {
+            throw new MemberHandler(MemberErrorStatus.DIFFERENT_SIGN_TYPE);
+        }
+        return SignedMember.of(member, false);
+    }
+
+    @Override
+    public SignedMember getSignedMemberById(Long id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        return SignedMember.of(member, false);
+    }
+
+    private Member saveMember(String email,  String name, SignType signType) {
+
+        Member member = Member.builder()
+                .email(email)
+                .memberName(name)
                 .password(UUID.randomUUID().toString().substring(0, 10))
-                .signType(SignType.valueOf(request.getOauthProvider().toUpperCase()))
+                .signType(signType)
                 .guiltyFreeMode(false)
                 .dailyCondition(null)
                 .role(Role.USER)
                 .build();
+        member = memberRepository.save(member);
 
-            memberRepository.save(member);
-            isNewMember = true;
+        // 길티프리 설정 초기화
+        saveGuiltyFree(member);
 
-        }
-        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
-        String refreshToken = refreshTokenRedisService.getRefreshTokenByMemberId(member.getId());
-        if (refreshToken == null || jwtProvider.isTokenExpired(refreshToken)) {
-            refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmail(), member.getMemberName(), member.getRole());
-            refreshTokenRedisService.saveRefreshToken(member.getId(), refreshToken);
-        }
-        return OAuthLoginDTO.Response.builder()
-            .id(member.getId())
-            .email(member.getEmail())
-            .name(member.getMemberName())
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .isNewMember(isNewMember)
-            .isSignUpCompleted(false)
-            .build();
+        // 알림 설정 저장
+        saveNotification(member);
+
+        return member;
     }
 
-    @Override
-    public void signOut(Long memberId, String accessToken) {
-        // accessToken 남은 만료시간 계산
-        long ttl = jwtProvider.getRemainingValidity(accessToken);
-        blacklistTokenRedisService.blacklistAccessToken(accessToken, ttl);
-        refreshTokenRedisService.deleteByMemberId(memberId);
+    private void saveNotification(Member member) {
+        Notification notification = Notification.of(member);
+        notificationRepository.save(notification);
+    }
+
+    private void saveGuiltyFree(Member member) {
+        GuiltyFree guiltyFree = GuiltyFree.of(member, GuiltyFreeReason.NONE, GuiltyFreeProperty.guiltyFreeInitDate);
+        guiltyFree = guiltyFreeRepository.save(guiltyFree);
+        member.addGuiltyFree(guiltyFree);
     }
 
     @Override
@@ -127,41 +113,11 @@ public class MemberServiceImpl implements MemberService {
         termRepository.save(term);
 
         // isSignUpCompleted 업데이트
-        member.setSignUpCompleted(true);
+        member.completeSignUp();
         member.setTerm(term); // 양방향 매핑도 같이 갱신
 
         // 저장
         memberRepository.save(member);
-    }
-
-    @Override
-    public TokenRefreshDTO.Response refreshAccessToken(String refreshToken) {
-        if(jwtProvider.isTokenExpired(refreshToken)) {
-            throw new TokenHandler(TokenErrorStatus.REFRESH_TOKEN_EXPIRED);
-        }
-
-        if (jwtProvider.isRefreshTokenTampered(refreshToken)) {
-            throw new TokenHandler(TokenErrorStatus.INVALID_REFRESH_TOKEN); // 진짜 위조된 경우만
-        }
-
-        Long memberId = jwtProvider.getId(refreshToken);
-
-        String savedToken = refreshTokenRedisService.getRefreshTokenByMemberId(memberId);
-        if (!refreshToken.equals(savedToken)) {
-            throw new TokenHandler(TokenErrorStatus.INVALID_REFRESH_TOKEN);
-        }
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new GeneralException(MemberErrorStatus.MEMBER_NOT_FOUND));
-
-        String newAccessToken = jwtProvider.createAccessToken(
-                member.getId(), member.getEmail(), member.getMemberName(), member.getRole()
-        );
-
-        return TokenRefreshDTO.Response.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(refreshToken) // Refresh는 만료되면 로그인 다시해야함
-                .build();
     }
 
     @Override

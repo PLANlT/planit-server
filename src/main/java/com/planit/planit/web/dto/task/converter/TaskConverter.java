@@ -41,7 +41,8 @@ public class TaskConverter {
                 // 오늘 완료된 작업이 있으면 true로 표시
                 .map(task -> {
                     List<Task> tasks = task.getCompletedTasks().stream()
-                            .filter(completedTask -> completedTask.getCompletedAt().equals(today))
+                            .filter(completedTask -> completedTask.getCompletedAt().equals(today) &&
+                                    completedTask.getIsDeleted() == false)
                             .map(CompletedTask::getTask)
                             .toList();
                     return toTaskStatusDTO(task, !tasks.isEmpty());

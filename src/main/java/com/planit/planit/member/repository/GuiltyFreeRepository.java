@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface GuiltyFreeRepository extends JpaRepository<GuiltyFree, Long> {
 
-    Optional<GuiltyFree> findByActive(LocalDate active);
+    Optional<GuiltyFree> findByMemberIdAndActive(Long memberId, LocalDate active);
 }

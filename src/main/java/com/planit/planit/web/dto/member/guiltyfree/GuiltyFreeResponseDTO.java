@@ -2,6 +2,7 @@ package com.planit.planit.web.dto.member.guiltyfree;
 
 import com.planit.planit.member.Member;
 import com.planit.planit.member.association.GuiltyFree;
+import com.planit.planit.member.association.GuiltyFreeProperty;
 import com.planit.planit.member.enums.GuiltyFreeReason;
 import jakarta.annotation.Nullable;
 import lombok.AccessLevel;
@@ -55,6 +56,7 @@ public class GuiltyFreeResponseDTO {
         public static GuiltyFreeReasonListDTO of(Member member) {
             return new GuiltyFreeReasonListDTO(member.getMemberName(),
                     member.getGuiltyFrees().stream()
+                            .filter(guiltyFree -> guiltyFree.getActive().isAfter(GuiltyFreeProperty.guiltyFreeInitDate))
                             .map(GuiltyFreeReasonDTO::of)
                             .toList()
             );

@@ -1,15 +1,21 @@
 package com.planit.planit.member.association;
 
-import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import com.planit.planit.member.enums.GuiltyFreeReason;
-import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
-import lombok.Builder;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import lombok.Getter;
+import org.springframework.util.Assert;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -40,6 +46,7 @@ public class GuiltyFree {
             GuiltyFreeReason reason,
             LocalDate active
     ) {
+        validate(member, reason, active);
         this.member = member;
         this.reason = reason;
         this.active = active;
@@ -54,5 +61,11 @@ public class GuiltyFree {
     public void activate(GuiltyFreeReason reason, LocalDate active) {
         this.reason = reason;
         this.active = active;
+    }
+
+    private void validate(Member member, GuiltyFreeReason reason, LocalDate active) {
+        Assert.notNull(member, "member must not be null");
+        Assert.notNull(reason, "reason must not be null");
+        Assert.notNull(active, "active must not be null");
     }
 }
