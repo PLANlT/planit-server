@@ -1,6 +1,7 @@
 package com.planit.planit.web.controller;
 
 
+import com.planit.planit.member.service.FcmTokenService;
 import com.planit.planit.member.service.TermService;
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
@@ -9,6 +10,7 @@ import com.planit.planit.member.service.MemberService;
 import com.planit.planit.member.service.NotificationService;
 
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
+import com.planit.planit.web.dto.member.fcmtoken.FcmTokenDTO;
 import com.planit.planit.web.dto.member.notification.NotificationDTO;
 import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
@@ -35,16 +37,16 @@ public class MemberController {
     private final MemberService memberService;
     private final TermService termService;
     private final NotificationService notificationService;
+    private final FcmTokenService fcmTokenService;
 
 
     @Operation(summary = "[TERM] 약관 동의 완료", description = "사용자가 약관에 동의했음을 저장하고 isSignUpCompleted를 true로 갱신합니다.")
     @SecurityRequirement(name = "accessToken")
     @PostMapping("/terms")
     public ApiResponse<Void> agreeTerms(
-            @AuthenticationPrincipal UserPrincipal principal,
             @RequestBody TermAgreementDTO.Request request
     ) {
-        memberService.completeTermsAgreement(principal.getId(), request);
+        memberService.completeTermsAgreement(request);
         return ApiResponse.onSuccess(MemberSuccessStatus.TERM_AGREEMENT_COMPLETED, null);
     }
 
@@ -107,5 +109,38 @@ public class MemberController {
     ) {
         MemberInfoResponseDTO response = memberService.getMemberInfo(principal.getId());
         return ApiResponse.onSuccess(MemberSuccessStatus.MEMBER_INFO_FETCHED, response);
+    }
+
+    @Operation(summary = "[FCM] FCM 토큰 저장 또는 갱신", description = "로그인한 사용자의 FCM 토큰을 저장하거나 갱신합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @PostMapping("/me/fcm-token")
+    public ApiResponse<Void> saveOrUpdateFcmToken(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody FcmTokenDTO.SaveRequest request
+    ) {
+        fcmTokenService.saveOrUpdateFcmToken(principal.getId(), request.getToken());
+        log.info("✅ FCM 토큰 저장 완료 - memberId: {}, tokenPrefix: {}***",
+        principal.getId(),
+        request.getToken().length() > 10 ? request.getToken().substring(0, 10) : "short");
+        return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_SAVED);
+    }
+
+    @Operation(summary = "[FCM] 내 FCM 토큰 조회", description = "로그인한 사용자의 저장된 FCM 토큰을 조회합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @GetMapping("/me/fcm-token")
+    public ApiResponse<FcmTokenDTO.Response> getMyFcmToken(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        String token = fcmTokenService.getTokenByMemberId(principal.getId()).orElse(null);
+        return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_FOUND, new FcmTokenDTO.Response(token));
+    }
+
+    @Operation(summary = "[FCM] 내 FCM 토큰 삭제", description = "로그인한 사용자의 FCM 토큰을 삭제합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @DeleteMapping("/me/fcm-token")
+    public ApiResponse<Void> deleteMyFcmToken(@AuthenticationPrincipal UserPrincipal principal) {
+        fcmTokenService.deleteTokensByMemberId(principal.getId());
+        log.info("🗑️ FCM 토큰 삭제 완료 - memberId: {}", principal.getId());
+        return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_DELETED);
     }
 }
