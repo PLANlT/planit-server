@@ -3,12 +3,15 @@ package com.planit.planit.auth.service;
 import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.auth.oauth.SocialTokenVerifier;
 import com.planit.planit.common.api.general.GeneralException;
+import com.planit.planit.common.api.member.MemberHandler;
 import com.planit.planit.common.api.token.TokenHandler;
 import com.planit.planit.member.Member;
+import com.planit.planit.member.association.SignedMember;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.member.repository.MemberRepository;
 import com.planit.planit.member.repository.NotificationRepository;
+import com.planit.planit.member.service.MemberServiceImpl;
 import com.planit.planit.web.dto.auth.OAuthLoginDTO;
 import com.planit.planit.web.dto.auth.TokenRefreshDTO;
 import org.junit.jupiter.api.*;
@@ -36,10 +39,7 @@ class AuthServiceImplTest {
     private AuthServiceImpl authServiceImpl;
 
     @Mock
-    private MemberRepository memberRepository;
-
-    @Mock
-    private NotificationRepository notificationRepository;
+    private MemberServiceImpl memberService;
 
     @Mock
     private JwtProvider jwtProvider;
@@ -65,8 +65,6 @@ class AuthServiceImplTest {
                     .oauthProvider("GOOGLE")
                     .oauthToken("mock-id-token")
                     .build();
-            given(memberRepository.findByEmail("newbie@planit.com"))
-                    .willReturn(Optional.empty());
             Member saved = Member.builder()
                     .id(99L)
                     .email("newbie@planit.com")
@@ -76,7 +74,11 @@ class AuthServiceImplTest {
                     .guiltyFreeMode(false)
                     .password("")
                     .build();
-            given(memberRepository.save(any(Member.class))).willReturn(saved);
+            SignedMember signedMember = SignedMember.of(saved, true);
+
+            given(memberService.getSignedMemberByUserInfo(
+                    "newbie@planit.com", "뉴비", SignType.GOOGLE
+            )).willReturn(signedMember);
             given(jwtProvider.createAccessToken(any(), any(), any(), any()))
                     .willReturn("access-token2");
             given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
@@ -86,7 +88,7 @@ class AuthServiceImplTest {
             OAuthLoginDTO.LoginResponse loginResponse = authServiceImpl.signIn(loginRequest);
 
             //then
-            verify(refreshTokenRedisService).saveRefreshToken(null, "refresh-token2");  //영속성 때문에 저장 안됨
+            verify(refreshTokenRedisService).saveRefreshToken(99L, "refresh-token2");  //영속성 때문에 저장 안됨
             assertThat(loginResponse.isNewMember()).isTrue();
             assertThat(loginResponse.getEmail()).isEqualTo("newbie@planit.com");
             assertThat(loginResponse.getAccessToken()).isEqualTo("access-token2");
@@ -294,8 +296,11 @@ class AuthServiceImplTest {
         private final Member member = Member.builder()
                 .id(memberId)
                 .email("test@example.com")
-                .memberName("홍길동")
+                .password("password")
+                .memberName("yyy")
+                .guiltyFreeMode(false)
                 .role(Role.USER)
+                .signType(SignType.GOOGLE)
                 .build();
 
         @Test
@@ -304,7 +309,7 @@ class AuthServiceImplTest {
             // given
             given(jwtProvider.getId(validRefreshToken)).willReturn(memberId);
             given(refreshTokenRedisService.getRefreshTokenByMemberId(memberId)).willReturn(validRefreshToken);
-            given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+            given(memberService.getSignedMemberById(memberId)).willReturn(SignedMember.of(member, false));
             given(jwtProvider.createAccessToken(
                     member.getId(), member.getEmail(), member.getMemberName(), member.getRole())
             ).willReturn("newAccessToken");
@@ -348,11 +353,11 @@ class AuthServiceImplTest {
             // given
             given(jwtProvider.getId(validRefreshToken)).willReturn(memberId);
             given(refreshTokenRedisService.getRefreshTokenByMemberId(memberId)).willReturn(validRefreshToken);
-            given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+            given(memberService.getSignedMemberById(memberId)).willThrow(MemberHandler.class);
+
             // when & then
             assertThatThrownBy(() -> authServiceImpl.refreshAccessToken(validRefreshToken))
-                    .isInstanceOf(GeneralException.class)
-                    .hasMessageContaining("MEMBER");
+                    .isInstanceOf(MemberHandler.class);
         }
     }
 }

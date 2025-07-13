@@ -43,8 +43,8 @@ class SocialTokenVerifierTest {
             SocialTokenVerifier.SocialUserInfo userInfo = verifier.verify("KAKAO", accessToken);
 
             // then
-            assertThat(userInfo.email).isEqualTo("kakao@planit.com");
-            assertThat(userInfo.name).isEqualTo("카카오유저");
+            assertThat(userInfo.getEmail()).isEqualTo("kakao@planit.com");
+            assertThat(userInfo.getName()).isEqualTo("카카오유저");
         }
     }
 
@@ -77,8 +77,8 @@ class SocialTokenVerifierTest {
             SocialTokenVerifier.SocialUserInfo userInfo = verifier.verify("NAVER", accessToken);
 
             // then
-            assertThat(userInfo.email).isEqualTo("naver@planit.com");
-            assertThat(userInfo.name).isEqualTo("네이버유저");
+            assertThat(userInfo.getEmail()).isEqualTo("naver@planit.com");
+            assertThat(userInfo.getName()).isEqualTo("네이버유저");
         }
     }
 }
