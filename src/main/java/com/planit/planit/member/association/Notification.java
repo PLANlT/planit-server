@@ -44,7 +44,12 @@ public class Notification extends BaseEntity {
     }
 
     public static Notification of(Member member) {
-        return new Notification(member);
+        Notification notification = new Notification();
+        notification.member = member;
+        notification.dailyTaskEnabled = true;
+        notification.guiltyFreeEnabled = true;
+        notification.updatedAt = LocalDateTime.now();
+        return notification;
     }
 
     public void updateDailyTask(boolean enabled) {
