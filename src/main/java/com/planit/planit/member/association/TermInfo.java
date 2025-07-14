@@ -26,7 +26,7 @@ public class TermInfo {
             if (baseUrl != null && !baseUrl.endsWith("/")) {
                 return baseUrl + "/terms/" + fileName;
             }
-            return baseUrl + fileName;
+            return baseUrl + "terms/" + fileName;
         }
     }
 }
