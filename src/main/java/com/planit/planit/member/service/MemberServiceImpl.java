@@ -17,7 +17,7 @@ import com.planit.planit.member.repository.NotificationRepository;
 import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
-import com.planit.planit.web.dto.member.term.TermAgreementDTO;
+import com.planit.planit.web.dto.member.term.TermDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,19 +103,20 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void completeTermsAgreement(TermAgreementDTO.Request request) {
-        String token = request.getOauthToken();
-        Long memberId = jwtProvider.getId(token);
+    public void completeTermsAgreement(String signUpToken, TermDTO.AgreementRequest agreementRequest) {
+
+        // 회원가입용 토큰 검증
+        Long memberId = jwtProvider.validateSignUpTokenAndGetId(signUpToken);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
         // Term 저장
         Term term = Term.builder()
                 .member(member)
-                .termOfUse(request.getTermOfUse())
-                .termOfPrivacy(request.getTermOfPrivacy())
-                .termOfInfo(request.getTermOfInfo())
-                .overFourteen(request.getOverFourteen())
+                .termOfUse(agreementRequest.getTermOfUse())
+                .termOfPrivacy(agreementRequest.getTermOfPrivacy())
+                .termOfInfo(agreementRequest.getTermOfInfo())
+                .overFourteen(agreementRequest.getOverFourteen())
                 .build();
         termRepository.save(term);
 
@@ -124,7 +125,6 @@ public class MemberServiceImpl implements MemberService {
         member.setTerm(term); // 양방향 매핑도 같이 갱신
 
         // 저장
-        memberRepository.save(member);
         log.info("✅ 약관 동의 성공 - id: {}, email: {}", member.getId(), member.getEmail());
     }
 

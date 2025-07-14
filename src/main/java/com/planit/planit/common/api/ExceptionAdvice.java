@@ -45,4 +45,15 @@ public class ExceptionAdvice {
         log.error("ARG_:CTRL:MISMATCH:::MethodArgumentTypeMismatchException msg({})", exception.getMessage());
         return ApiResponse.onFailure(ErrorStatus.BAD_REQUEST, exception.getMessage());
     }
+
+    /**
+     * JwtException 처리
+     * @param exception JwtException
+     * @return ApiResponse - FORBIDDEN
+     */
+    @ExceptionHandler(JwtException.class)
+    public ApiResponse<String> exceptionHandle(JwtException exception) {
+        log.error("JWT_:CTRL:INVALID:::Exception msg({})", exception.getMessage());
+        return ApiResponse.onFailure(ErrorStatus.FORBIDDEN, exception.getMessage());
+    }
 }

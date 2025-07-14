@@ -8,7 +8,6 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +16,8 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtProvider {
+
+    private static final String prefix = "Bearer ";
 
     private final SecretKey secretKey;
     private final long expirationMs;
@@ -171,6 +172,18 @@ public class JwtProvider {
 
     public boolean isAccessToken(String token) {
         return getClaims(token).get("signUp").equals(Boolean.FALSE.toString());
+    }
+
+    public Long validateSignUpTokenAndGetId(String bearerToken) {
+        String token = resolveHeaderToken(bearerToken, prefix);
+        try {
+            if (token == null || isAccessToken(token)) {
+                throw new JwtException("회원가입용 토큰이 아닙니다.");
+            }
+            return getId(token);
+        } catch (JwtException e) {
+            throw new JwtException(e.getMessage());
+        }
     }
 }
 
