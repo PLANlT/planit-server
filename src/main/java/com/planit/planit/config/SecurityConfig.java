@@ -30,8 +30,7 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/planit/auth/refresh", "POST")).permitAll()     // 토큰 재발급 API
                 .requestMatchers(new AntPathRequestMatcher("/planit/members/terms", "GET")).permitAll()    // 약관 URL 조회 API (인증 없이 허용)
                 .requestMatchers(new AntPathRequestMatcher("/planit/members/terms", "POST")).permitAll()    // 약관 동의 인증 API (인증 없이 허용)
-                .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
-
+                .requestMatchers(new AntPathRequestMatcher("/terms/**")).permitAll()
                 .anyRequest().authenticated()
         );
 
