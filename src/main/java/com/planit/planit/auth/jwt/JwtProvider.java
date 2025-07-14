@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -61,20 +62,21 @@ public class JwtProvider {
 
     public boolean validateToken(String token) {
         try {
+            Assert.notNull(token, "Token must not be null");
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException e) {
             log.info("JWT_:PROV:ERR_:::만료된 토큰입니다. msg({})", e.getMessage());
-            return false;
+            throw new JwtException(e.getMessage());
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
             log.info("JWT_:PROV:ERR_:::위변조가 발생한 토큰입니다. msg({})", e.getMessage());
-            return false;
+            throw new JwtException(e.getMessage());
         } catch (IllegalArgumentException e) {
             log.info("JWT_:PROV:ERR_:::잘못된 형식의 토큰입니다. error({})", e.getMessage());
-            return false;
+            throw new JwtException(e.getMessage());
         } catch (Exception e) {
             log.info("JWT_:PROV:ERR_:::토큰 파싱 과정에서 문제가 발생했습니다. error({})", e.getMessage());
-            return false;
+            throw new JwtException(e.getMessage());
         }
     }
 
