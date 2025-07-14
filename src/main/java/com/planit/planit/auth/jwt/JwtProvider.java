@@ -1,5 +1,6 @@
 package com.planit.planit.auth.jwt;
 
+import com.planit.planit.member.association.SignedMember;
 import com.planit.planit.member.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -28,15 +29,22 @@ public class JwtProvider {
         this.refreshTokenExpirationMs = properties.getRefreshTokenExpirationMs();
     }
 
+    public String createSignUpToken(SignedMember signedMember) {
+        return createToken(signedMember.getId(), signedMember.getEmail(), signedMember.getName(),
+                           signedMember.getRole(), true, expirationMs);
+    }
+
     public String createAccessToken(Long id, String email, String name, Role role) {
-        return createToken(id, email, name, role, expirationMs);
+        return createToken(id, email, name, role, false, expirationMs);
     }
 
     public String createRefreshToken(Long id, String email, String name, Role role) {
-        return createToken(id, email, name, role, refreshTokenExpirationMs);
+        return createToken(id, email, name, role, false, refreshTokenExpirationMs);
     }
 
-    private String createToken(Long id, String email, String name, Role role, long expirationMs) {
+    private String createToken(
+            Long id, String email, String name, Role role, Boolean signUp, long expirationMs
+    ) {
         final Date now = new Date();
         final Date expiry = new Date(now.getTime() + expirationMs);
 
@@ -47,10 +55,12 @@ public class JwtProvider {
                 .claim("email", email)
                 .claim("memberName", name)
                 .claim("role", role.toString())
+                .claim("signUp", signUp.toString())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
+
     }
 
     public String resolveHeaderToken(String headerValue, String prefix) {
@@ -62,7 +72,6 @@ public class JwtProvider {
 
     public boolean validateToken(String token) {
         try {
-            Assert.notNull(token, "Token must not be null");
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException e) {
@@ -158,6 +167,10 @@ public class JwtProvider {
             log.info("JWT_:PROV:ERR_:::토큰 파싱 과정에서 문제가 발생했습니다. error({})", e.getMessage());
             return true;
         }
+    }
+
+    public boolean isAccessToken(String token) {
+        return getClaims(token).get("signUp").equals(Boolean.FALSE.toString());
     }
 }
 

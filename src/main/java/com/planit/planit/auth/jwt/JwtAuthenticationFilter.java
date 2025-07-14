@@ -34,11 +34,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 헤더에서 토큰 추출
             String token = jwtProvider.resolveHeaderToken(request.getHeader(HttpHeaders.AUTHORIZATION), prefix);
 
-            // 토큰이 유효한 경우 SecurityContextHolder에 인증 정보 저장
-            if (jwtProvider.validateToken(token)) {
-                UserPrincipal userPrincipal = setAuthentication(token);
-                log.info("JWT_:FLT_:AUTH:::Authentication established successfully,id({}),email({}),name({}),role({})",
-                        userPrincipal.getId(), userPrincipal.getEmail(), userPrincipal.getMemberName(), userPrincipal.getRole());
+            // 액세스 토큰이 유효한 경우 SecurityContextHolder에 인증 정보 저장
+            if (token != null && jwtProvider.validateToken(token)) {
+                if (jwtProvider.isAccessToken(token)) {
+                    UserPrincipal userPrincipal = setAuthentication(token);
+                    log.info("JWT_:FLT_:AUTH:::Authentication established successfully,id({}),email({}),name({}),role({})",
+                            userPrincipal.getId(), userPrincipal.getEmail(), userPrincipal.getMemberName(), userPrincipal.getRole());
+                }
             }
 
             // 다음 필터로 요청 전달
