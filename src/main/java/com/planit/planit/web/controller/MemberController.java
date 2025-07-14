@@ -9,7 +9,6 @@ import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.member.service.NotificationService;
 
-import com.planit.planit.web.dto.auth.OAuthLoginDTO;
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.fcmtoken.FcmTokenDTO;
 import com.planit.planit.web.dto.member.notification.NotificationDTO;
@@ -47,7 +46,7 @@ public class MemberController {
                        테스트시 필드에 Authorization을 작성하지 않고 스웨거의 Authorization에 넣어야 합니다. (Bearer prefix 필요)
                """)
     @PostMapping("/terms")
-    public ApiResponse<OAuthLoginDTO.LoginResponse> agreeTerms(
+    public ApiResponse<Void> agreeTerms(
             @RequestHeader(value = "Authorization", required = false) String signUpToken,
             @RequestBody TermDTO.AgreementRequest agreementRequest
     ) {
