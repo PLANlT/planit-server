@@ -40,7 +40,13 @@ public class AuthServiceImpl implements AuthService {
         final SignedMember signedMember = memberService.getSignedMemberByUserInfo(
                 userInfo.getEmail(), userInfo.getName(), SignType.valueOf(loginRequest.getOauthProvider().toUpperCase()));
 
-        // 토큰 생성
+        // 회원가입이 완료되지 않은 회원 > 가입용 토큰 생성
+        if (signedMember.getIsSignUpCompleted() == false) {
+            final String signUpToken = jwtProvider.createSignUpToken(signedMember);
+            return OAuthLoginDTO.LoginResponse.of(signedMember, signUpToken, null);
+        }
+
+        // 회원가입이 완료된 회원 > 액세스 토큰과 리프레시 토큰 생성
         final String accessToken = jwtProvider.createAccessToken(
                 signedMember.getId(), signedMember.getEmail(), signedMember.getName(), signedMember.getRole());
         String refreshToken = refreshTokenRedisService.getRefreshTokenByMemberId(signedMember.getId());

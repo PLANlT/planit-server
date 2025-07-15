@@ -81,28 +81,28 @@ class TermServiceImplTest {
             Map<String, String> privacyResult = result.get("term-of-privacy");
             assertNotNull(privacyResult, "'term-of-privacy'의 상세 정보는 null이 아니어야 합니다.");
             assertEquals("20250711", privacyResult.get("version"), "'term-of-privacy'의 버전이 일치해야 합니다.");
-            assertEquals(mockBaseUrl + "TermOfPrivacy.html", privacyResult.get("url"), "'term-of-privacy'의 URL이 일치해야 합니다.");
+            assertEquals(mockBaseUrl + "terms/" + "TermOfPrivacy.html", privacyResult.get("url"), "'term-of-privacy'의 URL이 일치해야 합니다.");
 
             // 서비스 이용약관 (term-of-use)
             assertTrue(result.containsKey("term-of-use"), "'term-of-use' 키가 결과 맵에 포함되어야 합니다.");
             Map<String, String> useResult = result.get("term-of-use");
             assertNotNull(useResult, "'term-of-use'의 상세 정보는 null이 아니어야 합니다.");
             assertEquals("20250711", useResult.get("version"), "'term-of-use'의 버전이 일치해야 합니다.");
-            assertEquals(mockBaseUrl + "TermOfUse.html", useResult.get("url"), "'term-of-use'의 URL이 일치해야 합니다.");
+            assertEquals(mockBaseUrl + "terms/" + "TermOfUse.html", useResult.get("url"), "'term-of-use'의 URL이 일치해야 합니다.");
 
             // 정보통신망 이용촉진 및 정보보호 등에 관한 법률 관련 약관 (term-of-info)
             assertTrue(result.containsKey("term-of-info"), "'term-of-info' 키가 결과 맵에 포함되어야 합니다.");
             Map<String, String> infoResult = result.get("term-of-info");
             assertNotNull(infoResult, "'term-of-info'의 상세 정보는 null이 아니어야 합니다.");
             assertEquals("20250711", infoResult.get("version"), "'term-of-info'의 버전이 일치해야 합니다.");
-            assertEquals(mockBaseUrl + "TermOfInfo.html", infoResult.get("url"), "'term-of-info'의 URL이 일치해야 합니다.");
+            assertEquals(mockBaseUrl + "terms/" + "TermOfInfo.html", infoResult.get("url"), "'term-of-info'의 URL이 일치해야 합니다.");
 
             // 개인정보 제3자 제공 동의 (third-party-ad-consent)
             assertTrue(result.containsKey("third-party-ad-consent"), "'third-party-ad-consent' 키가 결과 맵에 포함되어야 합니다.");
             Map<String, String> consentResult = result.get("third-party-ad-consent");
             assertNotNull(consentResult, "'third-party-ad-consent'의 상세 정보는 null이 아니어야 합니다.");
             assertEquals("20250711", consentResult.get("version"), "'third-party-ad-consent'의 버전이 일치해야 합니다.");
-            assertEquals(mockBaseUrl + "ThirdPartyConsent.html", consentResult.get("url"), "'third-party-ad-consent'의 URL이 일치해야 합니다.");
+            assertEquals(mockBaseUrl + "terms/" + "ThirdPartyConsent.html", consentResult.get("url"), "'third-party-ad-consent'의 URL이 일치해야 합니다.");
 
 
             // 4. Mock 객체의 메서드가 예상대로 호출되었는지 확인 (선택 사항이지만 좋은 습관)

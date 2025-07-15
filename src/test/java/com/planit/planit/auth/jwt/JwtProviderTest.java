@@ -1,11 +1,13 @@
 package com.planit.planit.auth.jwt;
 
 import com.planit.planit.member.enums.Role;
+import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.*;
 
 
 import static com.planit.planit.member.enums.Role.USER;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class JwtProviderTest {
@@ -56,7 +58,7 @@ class JwtProviderTest {
 
         Thread.sleep(10); // 토큰 만료 기다림
 
-        assertThat(shortLivedProvider.validateToken(token)).isFalse();
+        assertThrows(JwtException.class, () -> shortLivedProvider.validateToken(token));
     }
 
     @Test

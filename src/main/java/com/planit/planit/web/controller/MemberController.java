@@ -12,7 +12,7 @@ import com.planit.planit.member.service.NotificationService;
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.fcmtoken.FcmTokenDTO;
 import com.planit.planit.web.dto.member.notification.NotificationDTO;
-import com.planit.planit.web.dto.member.term.TermAgreementDTO;
+import com.planit.planit.web.dto.member.term.TermDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,13 +40,17 @@ public class MemberController {
     private final FcmTokenService fcmTokenService;
 
 
-    @Operation(summary = "[TERM] 약관 동의 완료", description = "사용자가 약관에 동의했음을 저장하고 isSignUpCompleted를 true로 갱신합니다.")
-    @SecurityRequirement(name = "accessToken")
+    @Operation(summary = "[TERM] 약관 동의 완료",
+               description = """
+                       사용자가 약관에 동의했음을 저장하고 isSignUpCompleted를 true로 갱신합니다.
+                       테스트시 필드에 Authorization을 작성하지 않고 스웨거의 Authorization에 넣어야 합니다. (Bearer prefix 필요)
+               """)
     @PostMapping("/terms")
     public ApiResponse<Void> agreeTerms(
-            @RequestBody TermAgreementDTO.Request request
+            @RequestHeader(value = "Authorization", required = false) String signUpToken,
+            @RequestBody TermDTO.AgreementRequest agreementRequest
     ) {
-        memberService.completeTermsAgreement(request);
+        memberService.completeTermsAgreement(signUpToken, agreementRequest);
         return ApiResponse.onSuccess(MemberSuccessStatus.TERM_AGREEMENT_COMPLETED, null);
     }
 

@@ -19,8 +19,10 @@ public class SignedMember {
     private final String name;
     private final Role role;
     private final Boolean isNewMember;
+    private final Boolean isSignUpCompleted;
 
     public static SignedMember of(Member member, Boolean isNewMember) {
-        return new SignedMember(member.getId(), member.getEmail(), member.getMemberName(), member.getRole(), isNewMember);
+        return new SignedMember(member.getId(), member.getEmail(), member.getMemberName(),
+                                member.getRole(), isNewMember, member.isSignUpCompleted());
     }
 }
