@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -43,15 +44,14 @@ public class MemberController {
     @Operation(summary = "[TERM] 약관 동의 완료",
                description = """
                        사용자가 약관에 동의했음을 저장하고 isSignUpCompleted를 true로 갱신합니다.
-                       테스트시 필드에 Authorization을 작성하지 않고 스웨거의 Authorization에 넣어야 합니다. (Bearer prefix 필요)
+                       테스트시 필드에 Authorization을 작성하지 않고 스웨거의 Authorization에 넣어야 합니다.
                """)
     @PostMapping("/terms")
-    public ApiResponse<Void> agreeTerms(
-            @RequestHeader(value = "Authorization", required = false) String signUpToken,
-            @RequestBody TermDTO.AgreementRequest agreementRequest
+    public ApiResponse<String> agreeTerms(
+            @RequestHeader(value = "Authorization", required = false) String signUpToken
     ) {
-        memberService.completeTermsAgreement(signUpToken, agreementRequest);
-        return ApiResponse.onSuccess(MemberSuccessStatus.TERM_AGREEMENT_COMPLETED, null);
+        LocalDateTime termAgreeDate = memberService.completeTermsAgreement(signUpToken);
+        return ApiResponse.onSuccess(MemberSuccessStatus.TERM_AGREEMENT_COMPLETED, termAgreeDate.toString());
     }
 
     @Operation(summary = "[TERM] 모든 약관 URL 조회", description = "최신 약관 HTML 파일들의 URL과 버전을 반환합니다.")
