@@ -62,10 +62,10 @@ class AuthControllerSignInTest {
                     .email("new@example.com")
                     .name("새 유저")
                     .accessToken("access-token-xyz")
-                    .refreshToken("refresh-token-xyz")
+                    .refreshToken(null)
                     .build();
             given(authService.signIn(any())).willReturn(loginResponse);
-            mockMvc.perform(post("/auth/sign-in")
+            mockMvc.perform(post("/planit/auth/sign-in")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(loginRequest)))
                     .andExpect(status().isOk());

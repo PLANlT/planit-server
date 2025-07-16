@@ -11,6 +11,7 @@ import com.planit.planit.web.dto.plan.PlanResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class PlanController {
 
     @Operation(summary = "[PLAN] 플랜 생성하기")
     @PostMapping("/plans")
-    public ApiResponse<PlanResponseDTO.PlanMetaDTO> createPlan(
+    public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> createPlan(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestBody PlanRequestDTO.PlanDTO planDTO
     ) {
@@ -36,7 +37,7 @@ public class PlanController {
 
     @Operation(summary = "[PLAN] 플랜 수정하기")
     @PatchMapping("/plans/{planId}")
-    public ApiResponse<PlanResponseDTO.PlanMetaDTO> updatePlan(
+    public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> updatePlan(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long planId,
             @RequestBody PlanRequestDTO.PlanDTO planDTO
@@ -48,7 +49,7 @@ public class PlanController {
 
     @Operation(summary = "[PLAN] 플랜 완료(아카이빙) 하기")
     @PatchMapping("/plans/{planId}/complete")
-    public ApiResponse<PlanResponseDTO.PlanMetaDTO> completePlan(
+    public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> completePlan(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long planId
     ) {
@@ -59,7 +60,7 @@ public class PlanController {
 
     @Operation(summary = "[PLAN] 플랜 중단하기")
     @PatchMapping("/plans/{planId}/pause")
-    public ApiResponse<PlanResponseDTO.PlanMetaDTO> pausePlan(
+    public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> pausePlan(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long planId
     ) {
@@ -70,7 +71,7 @@ public class PlanController {
 
     @Operation(summary = "[PLAN] 플랜 삭제하기")
     @PatchMapping("/plans/{planId}/delete")
-    public ApiResponse<PlanResponseDTO.PlanMetaDTO> deletePlan(
+    public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> deletePlan(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long planId
     ) {
@@ -81,7 +82,7 @@ public class PlanController {
 
     @Operation(summary = "[PLAN] 오늘의 플랜 목록 조회하기")
     @GetMapping("/plans/today")
-    public ApiResponse<PlanResponseDTO.TodayPlanListDTO> getTodayPlans(@AuthenticationPrincipal UserPrincipal principal) {
+    public ResponseEntity<ApiResponse<PlanResponseDTO.TodayPlanListDTO>> getTodayPlans(@AuthenticationPrincipal UserPrincipal principal) {
         PlanResponseDTO.TodayPlanListDTO todayPlanListDTO = planQueryService.getTodayPlans(principal.getId());
         return ApiResponse.onSuccess(PlanSuccessStatus.TODAY_PLAN_LIST_FOUND, todayPlanListDTO);
     }
@@ -89,7 +90,7 @@ public class PlanController {
 
     @Operation(summary = "[PLAN] 플랜 목록 조회하기")
     @GetMapping("/plans")
-    public ApiResponse<PlanResponseDTO.PlanListDTO> getPlans(
+    public ResponseEntity<ApiResponse<PlanResponseDTO.PlanListDTO>> getPlans(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam PlanStatus planStatus
     ) {
@@ -99,7 +100,7 @@ public class PlanController {
 
     @Operation(summary = "[PLAN] 플랜 단건 조회하기")
     @GetMapping("/plans/{planId}")
-    public ApiResponse<PlanResponseDTO.PlanContentDTO> getPlan(
+    public ResponseEntity<ApiResponse<PlanResponseDTO.PlanContentDTO>> getPlan(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long planId
     ) {

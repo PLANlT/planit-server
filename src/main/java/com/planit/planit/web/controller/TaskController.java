@@ -10,6 +10,7 @@ import com.planit.planit.web.dto.task.TaskResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class TaskController {
 
     @Operation(summary = "[TASK] 작업 생성하기")
     @PostMapping("/tasks")
-    public ApiResponse<TaskResponseDTO.TaskPreviewDTO> createTask(
+    public ResponseEntity<ApiResponse<TaskResponseDTO.TaskPreviewDTO>> createTask(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam Long planId,
             @RequestParam String title
@@ -37,29 +38,31 @@ public class TaskController {
 
     @Operation(summary = "[TASK] 작업명 수정하기")
     @PatchMapping("/tasks/{taskId}/title")
-    public ApiResponse<TaskResponseDTO.TaskPreviewDTO> updateTask(
+    public ResponseEntity<ApiResponse<TaskResponseDTO.TaskPreviewDTO>> updateTask(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long taskId,
             @RequestParam String title
     ) {
-        TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService.updateTaskTitle(principal.getId(), taskId, title);
+        TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService
+                .updateTaskTitle(principal.getId(), taskId, title);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_TITLE_UPDATED, taskPreviewDTO);
     }
 
     @Operation(summary = "[TASK] 루틴 설정하기")
     @PatchMapping("/tasks/{taskId}/routine")
-    public ApiResponse<TaskResponseDTO.TaskRoutineDTO> setRoutine(
+    public ResponseEntity<ApiResponse<TaskResponseDTO.TaskRoutineDTO>> setRoutine(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long taskId,
             @RequestBody TaskRequestDTO.RoutineDTO routineDTO
     ) {
-        TaskResponseDTO.TaskRoutineDTO taskRoutineDTO = taskCommandService.setRoutine(principal.getId(), taskId, routineDTO);
+        TaskResponseDTO.TaskRoutineDTO taskRoutineDTO = taskCommandService
+                .setRoutine(principal.getId(), taskId, routineDTO);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_ROUTINE_SET, taskRoutineDTO);
     }
 
     @Operation(summary = "[TASK] 작업 삭제하기")
     @PatchMapping("/tasks/{taskId}/delete")
-    public ApiResponse<TaskResponseDTO.TaskPreviewDTO> deleteTask(
+    public ResponseEntity<ApiResponse<TaskResponseDTO.TaskPreviewDTO>> deleteTask(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long taskId
     ) {
@@ -69,29 +72,31 @@ public class TaskController {
 
     @Operation(summary = "[TASK] 작업 완료하기")
     @PostMapping("/tasks/{taskId}/complete")
-    public ApiResponse<TaskResponseDTO.CompletedTaskDTO> completeTask(
+    public ResponseEntity<ApiResponse<TaskResponseDTO.CompletedTaskDTO>> completeTask(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long taskId
     ) {
         LocalDate today = LocalDate.now();
-        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService.completeTask(principal.getId(), taskId, today);
+        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService
+                .completeTask(principal.getId(), taskId, today);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_COMPLETED, completedTaskDTO);
     }
 
     @Operation(summary = "[TASK] 작업 완료 취소하기")
     @PatchMapping("/tasks/{taskId}/cancel-completion")
-    public ApiResponse<TaskResponseDTO.CompletedTaskDTO> cancelTaskCompletion(
+    public ResponseEntity<ApiResponse<TaskResponseDTO.CompletedTaskDTO>> cancelTaskCompletion(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long taskId
     ) {
         LocalDate today = LocalDate.now();
-        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService.cancelTaskCompletion(principal.getId(), taskId, today);
+        TaskResponseDTO.CompletedTaskDTO completedTaskDTO = taskCommandService
+                .cancelTaskCompletion(principal.getId(), taskId, today);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_COMPLETION_CANCELED, completedTaskDTO);
     }
 
     @Operation(summary = "[TASK] 루틴 조회하기")
     @GetMapping("/tasks/{taskId}/routine")
-    public ApiResponse<TaskResponseDTO.TaskRoutineDTO> getCurrentRoutine(
+    public ResponseEntity<ApiResponse<TaskResponseDTO.TaskRoutineDTO>> getCurrentRoutine(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long taskId
     ) {
