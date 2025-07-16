@@ -110,6 +110,11 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
+        // 이미 약관 동의가 완료된 경우 예외 처리
+        if (member.isSignUpCompleted()) {
+            throw new MemberHandler(MemberErrorStatus.MEMBER_ALREADY_SIGN_UP_COMPLETED);
+        }
+
         // Term 저장
         LocalDateTime now = LocalDateTime.now();
         Term term = Term.builder()

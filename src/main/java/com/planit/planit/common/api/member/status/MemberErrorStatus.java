@@ -8,6 +8,7 @@ public enum MemberErrorStatus implements ErrorResponse {
     // 회원
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "회원을 찾을 수 없습니다."),
     MEMBER_ALREADY_EXISTS(HttpStatus.CONFLICT, "MEMBER4002", "이미 가입된 회원입니다."),
+    MEMBER_ALREADY_SIGN_UP_COMPLETED(HttpStatus.BAD_REQUEST, "MEMBER4003", "약관 동의가 완료된 회원입니다."),
 
     // 길티프리
     GUILTY_FREE_ACTIVATION_FORBIDDEN(HttpStatus.BAD_REQUEST, "MEMBER4010", "길티프리는 주 1회만 활성화할 수 있습니다."),
