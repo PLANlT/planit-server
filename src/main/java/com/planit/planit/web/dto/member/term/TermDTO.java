@@ -28,6 +28,10 @@ public class TermDTO {
 
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         @Schema(type = "string", example = "2025-07-08T01:17:17")
+        private LocalDateTime thirdPartyAdConsent;
+
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        @Schema(type = "string", example = "2025-07-08T01:17:17")
         private LocalDateTime overFourteen;
     }
 }
