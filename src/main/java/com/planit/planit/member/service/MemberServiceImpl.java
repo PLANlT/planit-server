@@ -116,6 +116,7 @@ public class MemberServiceImpl implements MemberService {
                 .termOfUse(agreementRequest.getTermOfUse())
                 .termOfPrivacy(agreementRequest.getTermOfPrivacy())
                 .termOfInfo(agreementRequest.getTermOfInfo())
+                .thirdPartyAdConsent(agreementRequest.getThirdPartyAdConsent())
                 .overFourteen(agreementRequest.getOverFourteen())
                 .build();
         termRepository.save(term);

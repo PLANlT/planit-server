@@ -36,6 +36,9 @@ public class Term {
     private LocalDateTime termOfInfo;
 
     @Column(nullable = false)
+    private LocalDateTime thirdPartyAdConsent;
+
+    @Column(nullable = false)
     private LocalDateTime overFourteen;
 
     /*------------------------------ CONSTRUCTOR ------------------------------*/
@@ -48,24 +51,27 @@ public class Term {
             LocalDateTime termOfUse,
             LocalDateTime termOfPrivacy,
             LocalDateTime termOfInfo,
+            LocalDateTime thirdPartyAdConsent,
             LocalDateTime overFourteen
     ) {
-        validate(member, termOfUse, termOfPrivacy,  termOfInfo, overFourteen);
+        validate(member, termOfUse, termOfPrivacy,  termOfInfo, thirdPartyAdConsent, overFourteen);
         this.member = member;
         this.termOfUse = termOfUse;
         this.termOfPrivacy = termOfPrivacy;
         this.termOfInfo = termOfInfo;
+        this.thirdPartyAdConsent = thirdPartyAdConsent;
         this.overFourteen = overFourteen;
     }
 
     private void validate(Member member, LocalDateTime termOfUse, LocalDateTime termOfPrivacy,
-                          LocalDateTime termOfInfo, LocalDateTime overFourteen
+                          LocalDateTime thirdPartyAdConsent, LocalDateTime termOfInfo, LocalDateTime overFourteen
     ) {
         Assert.notNull(member, "member must not be null");
         Assert.notNull(member.getId(), "memberId must not be null");
         Assert.notNull(termOfUse, "termOfUse must not be null");
         Assert.notNull(termOfPrivacy, "termOfPrivacy must not be null");
         Assert.notNull(termOfInfo, "termOfInfo must not be null");
+        Assert.notNull(thirdPartyAdConsent, "thirdPartyAdConsent must not be null");
         Assert.notNull(overFourteen, "overFourteen must not be null");
     }
 }
