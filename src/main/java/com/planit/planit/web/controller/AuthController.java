@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,17 +32,22 @@ public class AuthController {
 
     @Operation(summary = "[AUTH] idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
     @PostMapping("/sign-in")
-    public ApiResponse<OAuthLoginDTO.LoginResponse> signIn(@RequestBody OAuthLoginDTO.LoginRequest loginRequest) {
+    public ResponseEntity<ApiResponse<OAuthLoginDTO.LoginResponse>> signIn(
+            @RequestBody OAuthLoginDTO.LoginRequest loginRequest
+    ) {
         OAuthLoginDTO.LoginResponse loginResponse = authService.signIn(loginRequest);
         log.info("✅ 로그인 or 회원가입 성공 - id: {}, email: {}, name: {}, isNewMember: {}, 약관 동의여부: {}",
-                loginResponse.getId(), loginResponse.getEmail(), loginResponse.getName(), loginResponse.isNewMember(), loginResponse.isSignUpCompleted());
+                 loginResponse.getId(), loginResponse.getEmail(), loginResponse.getName(),
+                 loginResponse.isNewMember(), loginResponse.isSignUpCompleted());
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_IN_SUCCESS, loginResponse);
     }
 
     @Operation(summary = "[AUTH] 로그아웃", description = "사용자 로그아웃을 처리하고 토큰을 블랙리스트에 추가합니다.")
     @SecurityRequirement(name = "accessToken")
     @PostMapping("/sign-out")
-    public ApiResponse<Void> signOut(@AuthenticationPrincipal UserPrincipal principal, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Void>> signOut(
+            @AuthenticationPrincipal UserPrincipal principal, HttpServletRequest request
+    ) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String accessToken = authHeader.substring("Bearer ".length());
@@ -53,7 +59,9 @@ public class AuthController {
 
     @Operation(summary = "[AUTH] 토큰 리프레시", description = "사용자 리프레시 토큰을 초기화합니다.")
     @PostMapping("/refresh")
-    public ApiResponse<TokenRefreshDTO.Response> refreshToken(@RequestBody TokenRefreshDTO.Request request) {
+    public ResponseEntity<ApiResponse<TokenRefreshDTO.Response>> refreshToken(
+            @RequestBody TokenRefreshDTO.Request request
+    ) {
         TokenRefreshDTO.Response response = authService.refreshAccessToken(request.getRefreshToken());
         return ApiResponse.onSuccess(REFRESH_SUCCESS, response);
     }
