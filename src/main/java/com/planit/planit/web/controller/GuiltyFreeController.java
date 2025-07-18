@@ -52,3 +52,4 @@ public class GuiltyFreeController {
         return ApiResponse.onSuccess(MemberSuccessStatus.GUILTY_FREE_REASON_LIST_FOUND, guiltyFreeReasonListDTO);
     }
 }
+        
