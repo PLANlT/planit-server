@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.planit.planit.common.api.ApiErrorCodeExample;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class PlanController {
     private final PlanCommandService planCommandService;
 
     @Operation(summary = "[PLAN] 플랜 생성하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @PostMapping("/plans")
     public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> createPlan(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -36,6 +38,7 @@ public class PlanController {
 
 
     @Operation(summary = "[PLAN] 플랜 수정하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.plan.status.PlanErrorStatus.class, codes = {"PLAN_NOT_FOUND", "MEMBER_PLAN_NOT_FOUND", "PLAN_DELETED"})
     @PatchMapping("/plans/{planId}")
     public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> updatePlan(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -48,6 +51,7 @@ public class PlanController {
 
 
     @Operation(summary = "[PLAN] 플랜 완료(아카이빙) 하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.plan.status.PlanErrorStatus.class, codes = {"PLAN_NOT_FOUND", "MEMBER_PLAN_NOT_FOUND", "PLAN_DELETED"})
     @PatchMapping("/plans/{planId}/complete")
     public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> completePlan(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -59,6 +63,7 @@ public class PlanController {
 
 
     @Operation(summary = "[PLAN] 플랜 중단하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.plan.status.PlanErrorStatus.class, codes = {"PLAN_NOT_FOUND", "MEMBER_PLAN_NOT_FOUND", "PLAN_DELETED"})
     @PatchMapping("/plans/{planId}/pause")
     public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> pausePlan(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -70,6 +75,7 @@ public class PlanController {
 
 
     @Operation(summary = "[PLAN] 플랜 삭제하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.plan.status.PlanErrorStatus.class, codes = {"PLAN_NOT_FOUND", "MEMBER_PLAN_NOT_FOUND"})
     @PatchMapping("/plans/{planId}/delete")
     public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> deletePlan(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -81,6 +87,7 @@ public class PlanController {
 
 
     @Operation(summary = "[PLAN] 오늘의 플랜 목록 조회하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @GetMapping("/plans/today")
     public ResponseEntity<ApiResponse<PlanResponseDTO.TodayPlanListDTO>> getTodayPlans(@AuthenticationPrincipal UserPrincipal principal) {
         PlanResponseDTO.TodayPlanListDTO todayPlanListDTO = planQueryService.getTodayPlans(principal.getId());
@@ -89,6 +96,7 @@ public class PlanController {
 
 
     @Operation(summary = "[PLAN] 플랜 목록 조회하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @GetMapping("/plans")
     public ResponseEntity<ApiResponse<PlanResponseDTO.PlanListDTO>> getPlans(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -99,6 +107,7 @@ public class PlanController {
     }
 
     @Operation(summary = "[PLAN] 플랜 단건 조회하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.plan.status.PlanErrorStatus.class, codes = {"PLAN_NOT_FOUND", "MEMBER_PLAN_NOT_FOUND", "PLAN_DELETED"})
     @GetMapping("/plans/{planId}")
     public ResponseEntity<ApiResponse<PlanResponseDTO.PlanContentDTO>> getPlan(
             @AuthenticationPrincipal UserPrincipal principal,

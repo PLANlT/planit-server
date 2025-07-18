@@ -29,3 +29,6 @@ app:
       third-party-ad-consent: # 개인정보 제3자 제공 동의
         version: "20250711"
         file-name: "ThirdPartyConsent.html"
+      planit-account-deletion: # 계정 삭제 창구
+        version: "20250711"
+        file-name: "PlanitAccountDeletion.html"
