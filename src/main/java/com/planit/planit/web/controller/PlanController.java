@@ -3,7 +3,6 @@ package com.planit.planit.web.controller;
 import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.plan.status.PlanSuccessStatus;
-import com.planit.planit.common.api.plan.docs.PlanErrorDocs;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.service.PlanCommandService;
 import com.planit.planit.plan.service.PlanQueryService;

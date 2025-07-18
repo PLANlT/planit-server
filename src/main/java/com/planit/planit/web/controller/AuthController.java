@@ -21,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import static com.planit.planit.common.api.token.status.TokenSuccessStatus.REFRESH_SUCCESS;
+import com.planit.planit.common.api.ApiErrorCodeExample;
 
 @Slf4j
 @RestController
@@ -32,7 +33,7 @@ public class AuthController {
     private final AuthService authService;
 
     @Operation(summary = "[AUTH] idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
-    @AuthDocs
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @PostMapping("/sign-in")
     public ResponseEntity<ApiResponse<OAuthLoginDTO.LoginResponse>> signIn(
             @RequestBody OAuthLoginDTO.LoginRequest loginRequest
@@ -46,7 +47,7 @@ public class AuthController {
 
     @Operation(summary = "[AUTH] 로그아웃", description = "사용자 로그아웃을 처리하고 토큰을 블랙리스트에 추가합니다.")
     @SecurityRequirement(name = "accessToken")
-    @AuthDocs
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @PostMapping("/sign-out")
     public ResponseEntity<ApiResponse<Void>> signOut(
             @AuthenticationPrincipal UserPrincipal principal, HttpServletRequest request
@@ -61,7 +62,7 @@ public class AuthController {
     }
 
     @Operation(summary = "[AUTH] 토큰 리프레시", description = "리프레시 토큰을 Authorization 헤더로 전달받아 액세스 토큰을 재발급합니다.")
-    @AuthDocs
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.token.status.TokenErrorStatus.class, codes = {"INVALID_REFRESH_TOKEN"})
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenRefreshDTO.Response>> refreshToken(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshTokenHeader

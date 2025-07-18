@@ -3,7 +3,6 @@ package com.planit.planit.web.controller;
 import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.task.status.TaskSuccessStatus;
-import com.planit.planit.common.api.task.docs.TaskErrorDocs;
 import com.planit.planit.task.service.TaskCommandService;
 import com.planit.planit.task.service.TaskQueryService;
 import com.planit.planit.web.dto.task.TaskRequestDTO;

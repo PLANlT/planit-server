@@ -2,6 +2,8 @@ package com.planit.planit.web.controller;
 
 import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.common.api.ApiResponse;
+import com.planit.planit.common.api.ApiErrorCodeExample;
+import com.planit.planit.common.api.member.status.MemberErrorStatus;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
 import com.planit.planit.member.enums.GuiltyFreeReason;
 import com.planit.planit.member.service.GuiltyFreeService;
@@ -22,6 +24,7 @@ public class GuiltyFreeController {
     private final GuiltyFreeService guiltyFreeService;
 
     @Operation(summary = "[GUILTY-FREE] 길티프리 활성화하기")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND", "GUILTY_FREE_ALREADY_ACTIVATED"})
     @PatchMapping("/guilty-free")
     public ResponseEntity<ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeActivationDTO>> activateGuiltyFree(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -33,6 +36,7 @@ public class GuiltyFreeController {
     }
 
     @Operation(summary = "[GUILTY-FREE] 길티프리 활성일 조회하기")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND", "GUILTY_FREE_NOT_ACTIVATED"})
     @GetMapping("/guilty-free")
     public ResponseEntity<ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeStatusDTO>> getGuiltyFreeStatus(
             @AuthenticationPrincipal UserPrincipal principal
@@ -43,6 +47,7 @@ public class GuiltyFreeController {
     }
 
     @Operation(summary = "[GUILTY-FREE] 길티프리 사유 목록 조회하기")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @GetMapping("/guilty-free/list")
     public ResponseEntity<ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeReasonListDTO>> getGuiltyFreeReasons(
             @AuthenticationPrincipal UserPrincipal principal
