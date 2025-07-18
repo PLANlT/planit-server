@@ -9,6 +9,7 @@ import com.planit.planit.web.dto.member.guiltyfree.GuiltyFreeResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,29 +23,32 @@ public class GuiltyFreeController {
 
     @Operation(summary = "[GUILTY-FREE] 길티프리 활성화하기")
     @PatchMapping("/guilty-free")
-    public ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeActivationDTO> activateGuiltyFree(
+    public ResponseEntity<ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeActivationDTO>> activateGuiltyFree(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam GuiltyFreeReason reason
     ) {
-        GuiltyFreeResponseDTO.GuiltyFreeActivationDTO guiltyFreeActivationDTO = guiltyFreeService.activateGuiltyFree(principal.getId(), reason);
+        GuiltyFreeResponseDTO.GuiltyFreeActivationDTO guiltyFreeActivationDTO = guiltyFreeService
+                .activateGuiltyFree(principal.getId(), reason);
         return ApiResponse.onSuccess(MemberSuccessStatus.GUILTY_FREE_SET, guiltyFreeActivationDTO);
     }
 
     @Operation(summary = "[GUILTY-FREE] 길티프리 활성일 조회하기")
     @GetMapping("/guilty-free")
-    public ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeStatusDTO> getGuiltyFreeStatus(
+    public ResponseEntity<ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeStatusDTO>> getGuiltyFreeStatus(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        GuiltyFreeResponseDTO.GuiltyFreeStatusDTO guiltyFreeActivationDTO = guiltyFreeService.getGuiltyFreeStatus(principal.getId());
+        GuiltyFreeResponseDTO.GuiltyFreeStatusDTO guiltyFreeActivationDTO = guiltyFreeService
+                .getGuiltyFreeStatus(principal.getId());
         return ApiResponse.onSuccess(MemberSuccessStatus.GUILTY_FREE_FOUND, guiltyFreeActivationDTO);
     }
 
     @Operation(summary = "[GUILTY-FREE] 길티프리 사유 목록 조회하기")
     @GetMapping("/guilty-free/list")
-    public ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeReasonListDTO> getGuiltyFreeReasons(
+    public ResponseEntity<ApiResponse<GuiltyFreeResponseDTO.GuiltyFreeReasonListDTO>> getGuiltyFreeReasons(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        GuiltyFreeResponseDTO.GuiltyFreeReasonListDTO guiltyFreeReasonListDTO = guiltyFreeService.getGuiltyFreeReasons(principal.getId());
+        GuiltyFreeResponseDTO.GuiltyFreeReasonListDTO guiltyFreeReasonListDTO = guiltyFreeService
+                .getGuiltyFreeReasons(principal.getId());
         return ApiResponse.onSuccess(MemberSuccessStatus.GUILTY_FREE_REASON_LIST_FOUND, guiltyFreeReasonListDTO);
     }
 }

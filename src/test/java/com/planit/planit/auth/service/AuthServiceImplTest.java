@@ -59,7 +59,7 @@ class AuthServiceImplTest {
     class SignIn {
 
         @Test
-        @DisplayName("신규 회원이면 회원가입 후 토큰을 반환한다")
+        @DisplayName("신규 회원이면 회원가입 후 signUp 토큰을 반환한다")
         void signIn_newMember_registersAndReturnsToken() throws Exception {
             OAuthLoginDTO.LoginRequest loginRequest = OAuthLoginDTO.LoginRequest.builder()
                     .oauthProvider("GOOGLE")
@@ -79,19 +79,15 @@ class AuthServiceImplTest {
             given(memberService.getSignedMemberByUserInfo(
                     "newbie@planit.com", "뉴비", SignType.GOOGLE
             )).willReturn(signedMember);
-            given(jwtProvider.createAccessToken(any(), any(), any(), any()))
-                    .willReturn("access-token2");
-            given(jwtProvider.createRefreshToken(any(), any(), any(), any()))
-                    .willReturn("refresh-token2");
+            given(jwtProvider.createSignUpToken(any())).willReturn("signup-token");
             given(socialTokenVerifier.verify(anyString(), anyString()))
                     .willReturn(new SocialTokenVerifier.SocialUserInfo("newbie@planit.com", "뉴비"));
             OAuthLoginDTO.LoginResponse loginResponse = authServiceImpl.signIn(loginRequest);
 
             //then
-            verify(refreshTokenRedisService).saveRefreshToken(99L, "refresh-token2");  //영속성 때문에 저장 안됨
             assertThat(loginResponse.isNewMember()).isTrue();
             assertThat(loginResponse.getEmail()).isEqualTo("newbie@planit.com");
-            assertThat(loginResponse.getAccessToken()).isEqualTo("access-token2");
+            assertThat(loginResponse.getAccessToken()).isEqualTo("signup-token");
         }
 
         @Test

@@ -4,8 +4,9 @@ import com.planit.planit.member.association.SignedMember;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
-import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public interface MemberService {
@@ -16,7 +17,7 @@ public interface MemberService {
 
     MemberResponseDTO.ConsecutiveDaysDTO getConsecutiveDays(Long memberId);
 
-    void completeTermsAgreement(TermAgreementDTO.Request request);
+    LocalDateTime completeTermsAgreement(String signUpToken);
 
     MemberInfoResponseDTO getMemberInfo(Long memberId);
 }

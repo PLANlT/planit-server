@@ -24,9 +24,9 @@ public class TermInfo {
         public String getFullUrl(String baseUrl) {
             // baseUrl이 '/'로 끝나지 않으면 '/'를 추가하여 올바른 URL 경로를 만듭니다.
             if (baseUrl != null && !baseUrl.endsWith("/")) {
-                return baseUrl + "/" + fileName;
+                return baseUrl + "/terms/" + fileName;
             }
-            return baseUrl + fileName;
+            return baseUrl + "terms/" + fileName;
         }
     }
 }

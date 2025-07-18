@@ -17,12 +17,12 @@ import com.planit.planit.member.repository.NotificationRepository;
 import com.planit.planit.member.repository.TermRepository;
 import com.planit.planit.web.dto.member.MemberInfoResponseDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
-import com.planit.planit.web.dto.member.term.TermAgreementDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -103,19 +103,27 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void completeTermsAgreement(TermAgreementDTO.Request request) {
-        String token = request.getOauthToken();
-        Long memberId = jwtProvider.getId(token);
+    public LocalDateTime completeTermsAgreement(String signUpToken) {
+
+        // 회원가입용 토큰 검증
+        Long memberId = jwtProvider.validateSignUpTokenAndGetId(signUpToken);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
+        // 이미 약관 동의가 완료된 경우 예외 처리
+        if (member.isSignUpCompleted()) {
+            throw new MemberHandler(MemberErrorStatus.MEMBER_ALREADY_SIGN_UP_COMPLETED);
+        }
+
         // Term 저장
+        LocalDateTime now = LocalDateTime.now();
         Term term = Term.builder()
                 .member(member)
-                .termOfUse(request.getTermOfUse())
-                .termOfPrivacy(request.getTermOfPrivacy())
-                .termOfInfo(request.getTermOfInfo())
-                .overFourteen(request.getOverFourteen())
+                .termOfUse(now)
+                .termOfPrivacy(now)
+                .termOfInfo(now)
+                .thirdPartyAdConsent(now)
+                .overFourteen(now)
                 .build();
         termRepository.save(term);
 
@@ -124,8 +132,8 @@ public class MemberServiceImpl implements MemberService {
         member.setTerm(term); // 양방향 매핑도 같이 갱신
 
         // 저장
-        memberRepository.save(member);
         log.info("✅ 약관 동의 성공 - id: {}, email: {}", member.getId(), member.getEmail());
+        return now;
     }
 
     @Override

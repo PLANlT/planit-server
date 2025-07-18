@@ -59,7 +59,7 @@ public class OAuthLoginDTO {
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .isNewMember(signedMember.getIsNewMember())
-                    .isSignUpCompleted(!signedMember.getIsNewMember())  // 신규 회원인 경우 약관 동의 필요
+                    .isSignUpCompleted(signedMember.getIsSignUpCompleted())
                     .build();
         }
     }
