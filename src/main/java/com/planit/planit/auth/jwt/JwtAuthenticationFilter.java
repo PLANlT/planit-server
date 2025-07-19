@@ -2,7 +2,7 @@ package com.planit.planit.auth.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.planit.planit.common.api.ApiResponse;
-import com.planit.planit.common.api.general.status.ErrorStatus;
+import com.planit.planit.common.api.token.status.TokenErrorStatus;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -65,12 +65,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void handleJwtException(HttpServletResponse response, JwtException e) throws IOException {
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(
                 objectMapper.writeValueAsString(
-                        ApiResponse.onFailure(ErrorStatus.FORBIDDEN, e.getMessage())
+                        ApiResponse.onFailure(TokenErrorStatus.INVALID_ACCESS_TOKEN, e.getMessage())
                 )
         );
     }
