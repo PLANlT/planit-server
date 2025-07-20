@@ -6,7 +6,19 @@ import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.task.Task;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.util.Assert;
@@ -60,17 +72,9 @@ public class Plan extends BaseEntity {
 
     protected Plan() {}
 
-    @Builder
-    public Plan(
-            Long id,
-            String title,
-            String motivation,
-            String icon,
-            PlanStatus planStatus,
-            LocalDate startedAt,
-            LocalDate finishedAt,
-            Member member
-
+    @Builder(access = AccessLevel.PRIVATE)
+    private Plan(Long id, String title, String motivation, String icon,
+                 PlanStatus planStatus, LocalDate startedAt, LocalDate finishedAt, Member member
     ) {
         validate(member, title, icon, planStatus);
         this.id = id;
@@ -82,6 +86,27 @@ public class Plan extends BaseEntity {
         this.finishedAt = finishedAt;
         this.member = member;
         this.tasks = new ArrayList<>();
+    }
+
+    public static Plan of(Long id, String title, String motivation, String icon,
+                          PlanStatus planStatus, LocalDate startedAt, LocalDate finishedAt, Member member
+    ) {
+        return Plan.builder()
+                .id(id)
+                .title(title)
+                .motivation(motivation)
+                .icon(icon)
+                .planStatus(planStatus)
+                .startedAt(startedAt)
+                .finishedAt(finishedAt)
+                .member(member)
+                .build();
+    }
+
+    public static Plan of(String title, String motivation, String icon, PlanStatus planStatus,
+                          LocalDate startedAt, LocalDate finishedAt, Member member
+    ) {
+        return of(null, title,  motivation, icon, planStatus, startedAt, finishedAt, member);
     }
 
     /*------------------------------ METHOD ------------------------------*/
