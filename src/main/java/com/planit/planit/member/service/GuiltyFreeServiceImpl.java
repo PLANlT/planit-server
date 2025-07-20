@@ -35,22 +35,10 @@ public class GuiltyFreeServiceImpl implements GuiltyFreeService {
         }
 
         // 길티프리 활성화
-        LocalDate today = LocalDate.now();
-        LocalDate lastGuiltyFreeDate = member.getLastGuiltyFreeDate();
-
-        GuiltyFree guiltyFree = guiltyFreeRepository.save(GuiltyFree.of(member, reason, today));
+        GuiltyFree guiltyFree = guiltyFreeRepository.save(GuiltyFree.of(member, reason, LocalDate.now()));
         member.activateGuiltyFree(guiltyFree);
 
-        // 2주 연속 같은 이유로 길티프리를 활성화한 경우 Advice 반환
-        GuiltyFree lastGuiltyFree = guiltyFreeRepository.findByMemberIdAndActive(memberId, lastGuiltyFreeDate)
-                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.LAST_GUILTY_FREE_NOT_FOUND));
-
-        if (lastGuiltyFreeDate.plusDays(14).isAfter(today) &&
-            lastGuiltyFree.getReason().equals(reason)
-        ) {
-            return GuiltyFreeResponseDTO.GuiltyFreeActivationDTO.of(member, GuiltyFreeReason.toAdvice(reason));
-        }
-        return GuiltyFreeResponseDTO.GuiltyFreeActivationDTO.of(member, null);
+        return GuiltyFreeResponseDTO.GuiltyFreeActivationDTO.of(member);
     }
 
     @Override
