@@ -92,16 +92,8 @@ class PlanCommandServiceTest {
                 .finishedAt(LocalDate.now().plusMonths(1))
                 .build();
 
-        plan = Plan.builder()
-                .id(1L)
-                .title(planDTO.getTitle())
-                .motivation(planDTO.getMotivation())
-                .icon(planDTO.getIcon())
-                .planStatus(planDTO.getPlanStatus())
-                .startedAt(planDTO.getStartedAt())
-                .finishedAt(planDTO.getFinishedAt())
-                .member(member1)
-                .build();
+        plan = Plan.of(1L, planDTO.getTitle(), planDTO.getMotivation(), planDTO.getIcon(),
+                       planDTO.getPlanStatus(), planDTO.getStartedAt(), planDTO.getFinishedAt(), member1);
 
         when(planRepository.save(any(Plan.class))).thenReturn(plan);
 
@@ -132,16 +124,8 @@ class PlanCommandServiceTest {
                 .finishedAt(LocalDate.now().plusMonths(1))
                 .build();
 
-        plan = Plan.builder()
-                .id(1L)
-                .title(planDTO.getTitle())
-                .motivation(planDTO.getMotivation())
-                .icon(planDTO.getIcon())
-                .planStatus(planDTO.getPlanStatus())
-                .startedAt(planDTO.getStartedAt())
-                .finishedAt(planDTO.getFinishedAt())
-                .member(member1)
-                .build();
+        plan = Plan.of(1L, planDTO.getTitle(), planDTO.getMotivation(), planDTO.getIcon(),
+                planDTO.getPlanStatus(), planDTO.getStartedAt(), planDTO.getFinishedAt(), member1);
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
         when(planRepository.save(any(Plan.class))).thenReturn(plan);
@@ -205,16 +189,8 @@ class PlanCommandServiceTest {
     public void completePlanTest_Success() {
 
         // given
-        plan = Plan.builder()
-                .id(1L)
-                .title("제목")
-                .motivation("목표")
-                .icon("아이콘")
-                .planStatus(PlanStatus.ARCHIVED)
-                .startedAt(LocalDate.now())
-                .finishedAt(LocalDate.now().plusMonths(1))
-                .member(member1)
-                .build();
+        plan = Plan.of(1L, "제목", "목표", "아이콘", PlanStatus.ARCHIVED,
+                       LocalDate.now(), LocalDate.now().plusMonths(1), member1);
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
@@ -256,16 +232,8 @@ class PlanCommandServiceTest {
     public void pausePlanTest_Success() {
 
         // given
-        plan = Plan.builder()
-                .id(1L)
-                .title("제목")
-                .motivation("목표")
-                .icon("아이콘")
-                .planStatus(PlanStatus.PAUSED)
-                .startedAt(LocalDate.now())
-                .finishedAt(LocalDate.now().plusMonths(1))
-                .member(member1)
-                .build();
+        plan = Plan.of(1L, "제목", "목표", "아이콘", PlanStatus.PAUSED,
+                       LocalDate.now(), LocalDate.now().plusMonths(1), member1);
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
@@ -307,16 +275,8 @@ class PlanCommandServiceTest {
     public void deletePlanTest_Success() {
 
         // given
-        plan = Plan.builder()
-                .id(1L)
-                .title("제목")
-                .motivation("목표")
-                .icon("아이콘")
-                .planStatus(PlanStatus.DELETED)
-                .startedAt(LocalDate.now())
-                .finishedAt(LocalDate.now().plusMonths(1))
-                .member(member1)
-                .build();
+        plan = Plan.of(1L, "제목", "목표", "아이콘", PlanStatus.DELETED,
+                       LocalDate.now(), LocalDate.now().plusMonths(1), member1);
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
