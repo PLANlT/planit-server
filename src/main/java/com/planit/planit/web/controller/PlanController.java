@@ -107,4 +107,14 @@ public class PlanController {
         PlanResponseDTO.PlanContentDTO planContentDTO = planQueryService.getPlan(principal.getId(), planId);
         return ApiResponse.onSuccess(PlanSuccessStatus.PLAN_FOUND, planContentDTO);
     }
+
+    @Operation(summary = "[ARCHIVE] 아카이빙된 플랜 다시 시작하기")
+    @PatchMapping("/plans/{planId}/restart")
+    public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> restartArchive(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long planId
+    ) {
+        PlanResponseDTO.PlanMetaDTO planMetaDTO = planCommandService.restartArchive(principal.getId(), planId);
+        return ApiResponse.onSuccess(PlanSuccessStatus.ARCHIVE_RESTARTED, planMetaDTO);
+    }
 }
