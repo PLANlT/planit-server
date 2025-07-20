@@ -17,6 +17,7 @@ public enum PlanSuccessStatus implements SuccessResponse {
 
     // 아카이브
     ARCHIVE_RESTARTED(HttpStatus.OK, "PLAN2010", "아카이빙된 플랜을 다시 시작하였습니다."),
+    ARCHIVE_LIST_FOUND(HttpStatus.OK, "PLAN2011", "아카이브 목록을 조회하였습니다."),
 
     ;
 

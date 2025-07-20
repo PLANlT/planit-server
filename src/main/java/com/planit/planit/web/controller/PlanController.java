@@ -109,12 +109,21 @@ public class PlanController {
     }
 
     @Operation(summary = "[ARCHIVE] 아카이빙된 플랜 다시 시작하기")
-    @PatchMapping("/plans/{planId}/restart")
+    @PatchMapping("/archives/{planId}/restart")
     public ResponseEntity<ApiResponse<PlanResponseDTO.PlanMetaDTO>> restartArchive(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long planId
     ) {
         PlanResponseDTO.PlanMetaDTO planMetaDTO = planCommandService.restartArchive(principal.getId(), planId);
         return ApiResponse.onSuccess(PlanSuccessStatus.ARCHIVE_RESTARTED, planMetaDTO);
+    }
+
+    @Operation(summary = "[ARCHIVE] 아카이브 목록 조회하기")
+    @GetMapping("/archives")
+    public ResponseEntity<ApiResponse<PlanResponseDTO.ArchiveListDTO>> getArchives(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        PlanResponseDTO.ArchiveListDTO archiveListDTO = planQueryService.getArchives(principal.getId());
+        return ApiResponse.onSuccess(PlanSuccessStatus.ARCHIVE_LIST_FOUND, archiveListDTO);
     }
 }

@@ -14,4 +14,7 @@ public interface PlanQueryService {
     // 플랜 목록 조회하기
     PlanResponseDTO.PlanListDTO getPlansByPlanStatus(Long memberId, PlanStatus planStatus);
 
+    // 아카이브 목록 조회하기
+    PlanResponseDTO.ArchiveListDTO getArchives(Long memberId);
+
 }
