@@ -55,52 +55,18 @@ class PlanRepositoryTest {
     }
 
     private void initPlan() {
-        planInProgress1 = Plan.builder()
-                .title("1")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.IN_PROGRESS)
-                .member(member)
-                .build();
-        planInProgress2 = Plan.builder()
-                .title("2")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.IN_PROGRESS)
-                .member(member)
-                .build();
-        pausedPlan1 = Plan.builder()
-                .title("3")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.PAUSED)
-                .finishedAt(LocalDate.now())
-                .member(member)
-                .build();
-        pausedPlan2 = Plan.builder()
-                .title("4")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.PAUSED)
-                .finishedAt(LocalDate.now().plusDays(1))
-                .member(member)
-                .build();
-        archivedPlan1 = Plan.builder()
-                .title("5")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.ARCHIVED)
-                .finishedAt(LocalDate.now())
-                .member(member)
-                .build();
-        archivedPlan2 = Plan.builder()
-                .title("6")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.ARCHIVED)
-                .finishedAt(LocalDate.now().plusDays(1))
-                .member(member)
-                .build();
+        planInProgress1 = Plan.of("1", "다짐문장", "아이콘",
+                                  PlanStatus.IN_PROGRESS, null, null, member);
+        planInProgress2 = Plan.of("2", "다짐문장", "아이콘",
+                                  PlanStatus.IN_PROGRESS, null, null, member);
+        pausedPlan1 = Plan.of("3", "다짐문장", "아이콘",
+                              PlanStatus.PAUSED, null, LocalDate.now(), member);
+        pausedPlan2 = Plan.of("4", "다짐문장", "아이콘",
+                              PlanStatus.PAUSED, null, LocalDate.now().plusDays(1), member);
+        archivedPlan1 = Plan.of("5", "다짐문장", "아이콘",
+                                PlanStatus.ARCHIVED, null, LocalDate.now(), member);
+        archivedPlan2 = Plan.of("6", "다짐문장", "아이콘",
+                                PlanStatus.ARCHIVED, null, LocalDate.now().plusDays(1), member);
     }
 
     @Test
