@@ -64,7 +64,7 @@ public class Term {
     }
 
     private void validate(Member member, LocalDateTime termOfUse, LocalDateTime termOfPrivacy,
-                          LocalDateTime thirdPartyAdConsent, LocalDateTime termOfInfo, LocalDateTime overFourteen
+                          LocalDateTime termOfInfo, LocalDateTime thirdPartyAdConsent, LocalDateTime overFourteen
     ) {
         Assert.notNull(member, "member must not be null");
         Assert.notNull(member.getId(), "memberId must not be null");
