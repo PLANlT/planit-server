@@ -21,7 +21,7 @@ public class ExceptionAdvice {
      */
     @ExceptionHandler(GeneralException.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneralException(GeneralException exception) {
-        log.error("COMM:CTRL:GENERAL:::GeneralException msg({})", exception.getMessage());
+        log.error("COMM:CTRL:GENERAL:::GeneralException msg({})", exception.getStatus().getMessage());
         return ApiResponse.onFailure(exception.getStatus());
     }
 

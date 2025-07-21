@@ -19,4 +19,8 @@ public interface PlanCommandService {
 
     // 플랜 삭제하기
     PlanResponseDTO.PlanMetaDTO deletePlan(Long memberId, Long planId);
+
+    // 아카이브된 플랜 다시 시작하기
+    PlanResponseDTO.PlanMetaDTO restartArchive(Long memberId, Long planId);
+
 }

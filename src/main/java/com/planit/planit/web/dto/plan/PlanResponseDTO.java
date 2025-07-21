@@ -78,4 +78,24 @@ public class PlanResponseDTO {
         private final PlanStatus planStatus;
         private final List<PlanPreviewDTO> plans;
     }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class ArchiveListDTO {
+        private final List<ArchiveDTO> archives;
+    }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class ArchiveDTO {
+        private final Long planId;
+        private final String title;
+        private final String icon;
+        private final String motivation;
+        private final Long progressDays;
+        private final Long completedDaysAgo;
+
+    }
 }

@@ -2,6 +2,8 @@ package com.planit.planit.plan;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.planit.planit.common.api.plan.PlanHandler;
+import com.planit.planit.common.api.plan.status.PlanErrorStatus;
 import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
 import com.planit.planit.plan.enums.PlanStatus;
@@ -99,18 +101,33 @@ public class Plan extends BaseEntity {
     }
 
     public void completePlan() {
+        validatePlanInProgress();
         this.planStatus = PlanStatus.ARCHIVED;
         this.inactive = LocalDateTime.now();
     }
 
     public void pausePlan() {
+        validatePlanInProgress();
         this.planStatus = PlanStatus.PAUSED;
         this.inactive = LocalDateTime.now();
     }
 
     public void deletePlan() {
+        validateDeletablePlan();
         this.planStatus = PlanStatus.DELETED;
         this.inactive = LocalDateTime.now();
+    }
+
+    public void restartArchive() {
+        validateArchive();
+        this.planStatus = PlanStatus.IN_PROGRESS;
+        this.inactive = null;
+    }
+
+    private void validateArchive() {
+        if (!this.planStatus.equals(PlanStatus.ARCHIVED)) {
+            throw new PlanHandler(PlanErrorStatus.PLAN_NOT_ARCHIVED);
+        }
     }
 
     public int countTasks() { return this.tasks.size(); }
@@ -124,5 +141,17 @@ public class Plan extends BaseEntity {
         Assert.notNull(title, "Title must not be null");
         Assert.notNull(icon, "Icon must not be null");
         Assert.notNull(planStatus, "PlanStatus must not be null");
+    }
+
+    private void validatePlanInProgress() {
+        if (!this.planStatus.equals(PlanStatus.IN_PROGRESS)) {
+            throw new PlanHandler(PlanErrorStatus.PLAN_NOT_IN_PROGRESS);
+        }
+    }
+
+    private void validateDeletablePlan() {
+        if (this.planStatus.equals(PlanStatus.DELETED)) {
+            throw new PlanHandler(PlanErrorStatus.PLAN_ALREADY_DELETED);
+        }
     }
 }
