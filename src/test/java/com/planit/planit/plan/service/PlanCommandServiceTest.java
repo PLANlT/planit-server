@@ -189,7 +189,7 @@ class PlanCommandServiceTest {
     public void completePlanTest_Success() {
 
         // given
-        plan = Plan.of(1L, "제목", "목표", "아이콘", PlanStatus.ARCHIVED,
+        plan = Plan.of(1L, "제목", "목표", "아이콘", PlanStatus.IN_PROGRESS,
                        LocalDate.now(), LocalDate.now().plusMonths(1), member1);
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
@@ -232,7 +232,7 @@ class PlanCommandServiceTest {
     public void pausePlanTest_Success() {
 
         // given
-        plan = Plan.of(1L, "제목", "목표", "아이콘", PlanStatus.PAUSED,
+        plan = Plan.of(1L, "제목", "목표", "아이콘", PlanStatus.IN_PROGRESS,
                        LocalDate.now(), LocalDate.now().plusMonths(1), member1);
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
@@ -275,7 +275,7 @@ class PlanCommandServiceTest {
     public void deletePlanTest_Success() {
 
         // given
-        plan = Plan.of(1L, "제목", "목표", "아이콘", PlanStatus.DELETED,
+        plan = Plan.of(1L, "제목", "목표", "아이콘", PlanStatus.IN_PROGRESS,
                        LocalDate.now(), LocalDate.now().plusMonths(1), member1);
 
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
