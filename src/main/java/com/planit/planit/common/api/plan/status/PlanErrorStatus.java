@@ -11,6 +11,7 @@ public enum PlanErrorStatus implements ErrorResponse {
     PLAN_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "PLAN4004", "이미 삭제된 플랜을 다시 삭제할 수 없습니다."),
     PLAN_NOT_IN_PROGRESS(HttpStatus.BAD_REQUEST, "PLAN4005", "진행중인 플랜이 아닙니다."),
     PLAN_NOT_ARCHIVED(HttpStatus.BAD_REQUEST, "PLAN4006", "아카이빙된 플랜이 아닙니다."),
+    INVALID_PLAN_STATUS(HttpStatus.BAD_REQUEST, "PLAN4007", "잘못된 플랜 진행 여부입니다."),
 
     ;
 

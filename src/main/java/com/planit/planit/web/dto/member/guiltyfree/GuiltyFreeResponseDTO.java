@@ -4,7 +4,6 @@ import com.planit.planit.member.Member;
 import com.planit.planit.member.association.GuiltyFree;
 import com.planit.planit.member.association.GuiltyFreeProperty;
 import com.planit.planit.member.enums.GuiltyFreeReason;
-import jakarta.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +21,11 @@ public class GuiltyFreeResponseDTO {
     public static class GuiltyFreeActivationDTO {
         private final String memberName;
         private final LocalDateTime activatedAt;
-        private final String advice;
 
-        public static GuiltyFreeActivationDTO of(Member member, @Nullable String advice) {
+        public static GuiltyFreeActivationDTO of(Member member) {
             return new GuiltyFreeActivationDTO(
                     member.getMemberName(),
-                    LocalDateTime.of(member.getLastGuiltyFreeDate(), LocalTime.MIN),
-                    advice
+                    LocalDateTime.of(member.getLastGuiltyFreeDate(), LocalTime.MIN)
             );
         }
     }

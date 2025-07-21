@@ -92,60 +92,18 @@ class PlanQueryServiceTest {
     }
 
     private void initPlan() {
-        planInProgress1 = Plan.builder()
-                .id(1L)
-                .title("1")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.IN_PROGRESS)
-                .finishedAt(LocalDate.now())
-                .member(member1)
-                .build();
-        planInProgress2 = Plan.builder()
-                .id(2L)
-                .title("2")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.IN_PROGRESS)
-                .finishedAt(LocalDate.now().plusDays(1))
-                .member(member1)
-                .build();
-        pausedPlan1 = Plan.builder()
-                .id(3L)
-                .title("3")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.PAUSED)
-                .finishedAt(LocalDate.now())
-                .member(member1)
-                .build();
-        pausedPlan2 = Plan.builder()
-                .id(4L)
-                .title("4")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.PAUSED)
-                .finishedAt(LocalDate.now().plusDays(1))
-                .member(member1)
-                .build();
-        archivedPlan1 = Plan.builder()
-                .id(5L)
-                .title("5")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.ARCHIVED)
-                .finishedAt(LocalDate.now())
-                .member(member1)
-                .build();
-        archivedPlan2 = Plan.builder()
-                .id(6L)
-                .title("6")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.ARCHIVED)
-                .finishedAt(LocalDate.now().minusDays(1))
-                .member(member1)
-                .build();
+        planInProgress1 = Plan.of(1L, "1", "다짐문장", "아이콘",
+                PlanStatus.IN_PROGRESS, null, LocalDate.now(), member1);
+        planInProgress2 = Plan.of(2L, "2", "다짐문장", "아이콘",
+                PlanStatus.IN_PROGRESS, null, LocalDate.now().plusDays(1), member1);
+        pausedPlan1 = Plan.of(3L, "3", "다짐문장", "아이콘",
+                PlanStatus.PAUSED, null, LocalDate.now(), member1);
+        pausedPlan2 = Plan.of(4L, "4", "다짐문장", "아이콘",
+                PlanStatus.PAUSED, null, LocalDate.now().plusDays(1), member1);
+        archivedPlan1 = Plan.of(5L, "5", "다짐문장", "아이콘",
+                PlanStatus.ARCHIVED, null, LocalDate.now(), member1);
+        archivedPlan2 = Plan.of(6L, "6", "다짐문장", "아이콘",
+                PlanStatus.ARCHIVED, null, LocalDate.now().minusDays(1), member1);
     }
 
     private void initTask() {
@@ -232,13 +190,8 @@ class PlanQueryServiceTest {
     public void getPlanTest_NotMyPlan_Fail() {
 
         // given (로그인한 유저의 아이디 : 1L)
-        planInProgress1 = Plan.builder()
-                .title("1")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.IN_PROGRESS)
-                .member(member2)
-                .build();
+        planInProgress1 = Plan.of("1", "다짐문장", "아이콘",
+                                  PlanStatus.IN_PROGRESS, null, null, member2);
 
         when(memberRepository.findById(1L)).thenReturn(Optional.of(member1));
         when(planRepository.findById(1L)).thenReturn(Optional.of(planInProgress1));
