@@ -31,15 +31,10 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
-        Plan plan = Plan.builder()
-                .title(planDTO.getTitle())
-                .motivation(planDTO.getMotivation())
-                .icon(planDTO.getIcon())
-                .planStatus(PlanStatus.IN_PROGRESS)
-                .startedAt(planDTO.getStartedAt())
-                .finishedAt(planDTO.getFinishedAt())
-                .member(member)
-                .build();
+        validatePlanStatus(planDTO.getPlanStatus());
+
+        Plan plan = Plan.of(planDTO.getTitle(), planDTO.getMotivation(), planDTO.getIcon(), planDTO.getPlanStatus(),
+                            planDTO.getStartedAt(), planDTO.getFinishedAt(), member);
 
         plan = planRepository.save(plan);
         member.addPlan(plan);
@@ -54,15 +49,9 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
 
-        // 로그인한 회원의 플랜인지 확인
-        if (!memberId.equals(plan.getMember().getId())) {
-            throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
-        }
-
-        // 삭제된 플랜인지 확인
-        if (plan.getPlanStatus().equals(PlanStatus.DELETED)) {
-            throw new PlanHandler(PlanErrorStatus.PLAN_DELETED);
-        }
+        validatePlanStatus(planDTO.getPlanStatus());
+        validateMemberPlan(memberId, plan);
+        validateNotDeletedPlan(plan);
 
         plan.updatePlan(
                 planDTO.getTitle(),
@@ -83,15 +72,8 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
 
-        // 로그인한 회원의 플랜인지 확인
-        if (!memberId.equals(plan.getMember().getId())) {
-            throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
-        }
-
-        // 삭제된 플랜인지 확인
-        if (plan.getPlanStatus().equals(PlanStatus.DELETED)) {
-            throw new PlanHandler(PlanErrorStatus.PLAN_DELETED);
-        }
+        validateMemberPlan(memberId, plan);
+        validateNotDeletedPlan(plan);
 
         plan.completePlan();
 
@@ -105,15 +87,8 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
 
-        // 로그인한 회원의 플랜인지 확인
-        if (!memberId.equals(plan.getMember().getId())) {
-            throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
-        }
-
-        // 삭제된 플랜인지 확인
-        if (plan.getPlanStatus().equals(PlanStatus.DELETED)) {
-            throw new PlanHandler(PlanErrorStatus.PLAN_DELETED);
-        }
+        validateMemberPlan(memberId, plan);
+        validateNotDeletedPlan(plan);
 
         plan.pausePlan();
 
@@ -127,13 +102,61 @@ public class PlanCommandServiceImpl implements PlanCommandService {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
 
+        validateMemberPlan(memberId, plan);
+
+        plan.deletePlan();
+
+        return PlanConverter.toPlanMetaDTO(plan);
+    }
+
+
+    @Override
+    public PlanResponseDTO.PlanMetaDTO restartArchive(Long memberId, Long planId) {
+
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new PlanHandler(PlanErrorStatus.PLAN_NOT_FOUND));
+
         // 로그인한 회원의 플랜인지 확인
         if (!memberId.equals(plan.getMember().getId())) {
             throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
         }
 
-        plan.deletePlan();
+        plan.restartArchive();
 
         return PlanConverter.toPlanMetaDTO(plan);
+    }
+
+
+    /**
+     * 요청한 플랜 상태가 IN_PROGRESS거나 PAUSED임을 검증하는 메소드
+     * @param planStatus 요청한 플랜 상태
+     */
+    private void validatePlanStatus(PlanStatus planStatus) {
+        if (!(planStatus.equals(PlanStatus.IN_PROGRESS) ||
+                planStatus.equals(PlanStatus.PAUSED))
+        ) {
+            throw new PlanHandler(PlanErrorStatus.INVALID_PLAN_STATUS);
+        }
+    }
+
+    /**
+     * 삭제되지 않은 플랜임을 검증하는 메소드
+     * @param plan 타겟 플랜
+     */
+    private static void validateNotDeletedPlan(Plan plan) {
+        if (plan.getPlanStatus().equals(PlanStatus.DELETED)) {
+            throw new PlanHandler(PlanErrorStatus.PLAN_DELETED);
+        }
+    }
+
+    /**
+     * 로그인한 사용자의 플랜임을 검증하는 메소드
+     * @param memberId 사용자 아이디
+     * @param plan 타겟 플랜
+     */
+    private static void validateMemberPlan(Long memberId, Plan plan) {
+        if (!memberId.equals(plan.getMember().getId())) {
+            throw new PlanHandler(PlanErrorStatus.MEMBER_PLAN_NOT_FOUND);
+        }
     }
 }

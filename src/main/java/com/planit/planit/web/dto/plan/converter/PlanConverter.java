@@ -81,6 +81,25 @@ public class PlanConverter {
                 .build();
     }
 
+    public static PlanResponseDTO.ArchiveListDTO toArchiveListDTO(List<Plan> plans) {
+        return PlanResponseDTO.ArchiveListDTO.builder()
+                .archives(plans.stream()
+                        .map(PlanConverter::toArchiveDTO)
+                        .toList())
+                .build();
+    }
+
+    private static PlanResponseDTO.ArchiveDTO toArchiveDTO(Plan plan) {
+        return PlanResponseDTO.ArchiveDTO.builder()
+                .planId(plan.getId())
+                .title(plan.getTitle())
+                .icon(plan.getIcon())
+                .motivation(plan.getMotivation())
+                .progressDays(ChronoUnit.DAYS.between(plan.getStartedAt(), plan.getInactive().toLocalDate()))
+                .completedDaysAgo(ChronoUnit.DAYS.between(plan.getInactive().toLocalDate(), LocalDate.now()))
+                .build();
+    }
+
     private static String formatDDay(LocalDate startedAt, LocalDate finishedAt) {
         Long day = ChronoUnit.DAYS.between(startedAt, finishedAt);
         if (startedAt.isAfter(finishedAt)) {

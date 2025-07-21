@@ -99,14 +99,8 @@ class TaskCommandServiceTest {
     }
 
     private void initPlan() {
-        plan = Plan.builder()
-                .id(1L)
-                .title("1")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.IN_PROGRESS)
-                .member(member1)
-                .build();
+        plan = Plan.of(1L, "1", "다짐문장", "아이콘",
+                PlanStatus.IN_PROGRESS, null, null, member1);
     }
 
 /*------------------------------ 작업 생성 ------------------------------*/

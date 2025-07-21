@@ -64,13 +64,8 @@ class CompletedTaskRepositoryTest {
     }
 
     private void initPlan() {
-        plan = Plan.builder()
-                .title("1")
-                .motivation("다짐문장")
-                .icon("아이콘")
-                .planStatus(PlanStatus.IN_PROGRESS)
-                .member(member)
-                .build();
+        plan = Plan.of("1", "다짐문장", "아이콘",
+                PlanStatus.IN_PROGRESS, null, null, member);
     }
 
     private void initTask() {

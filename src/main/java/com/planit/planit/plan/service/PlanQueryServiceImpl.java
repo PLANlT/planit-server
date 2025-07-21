@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -68,9 +69,17 @@ public class PlanQueryServiceImpl implements PlanQueryService {
     public PlanResponseDTO.PlanListDTO getPlansByPlanStatus(Long memberId, PlanStatus planStatus) {
         memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
-
         List<Plan> plans = planRepository.findAllByMemberIdAndPlanStatus(memberId, planStatus);
-
         return PlanConverter.toPlanListDTO(planStatus, plans);
+    }
+
+    @Override
+    public PlanResponseDTO.ArchiveListDTO getArchives(Long memberId) {
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        List<Plan> plans = planRepository.findAllByMemberIdAndPlanStatus(memberId, PlanStatus.ARCHIVED).stream()
+                .sorted(Comparator.comparing(Plan::getInactive).reversed())
+                .toList();
+        return PlanConverter.toArchiveListDTO(plans);
     }
 }
