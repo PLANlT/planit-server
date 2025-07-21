@@ -8,6 +8,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.PathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -22,6 +25,9 @@ class TermServiceImplTest {
 
     @Mock
     private TermInfo termInfo;
+
+    @Mock
+    private ResourceLoader resourceLoader;
 
     @InjectMocks
     private TermServiceImpl agreementService; // 테스트 대상 (System Under Test)
@@ -64,6 +70,7 @@ class TermServiceImplTest {
             // Mock 객체 (agreementConfig)의 메서드 호출 시 어떤 값을 반환할지 정의
             when(termInfo.getBaseUrl()).thenReturn(mockBaseUrl);
             when(termInfo.getTerms()).thenReturn(mockTermsMap);
+            when(resourceLoader.getResource(any())).thenReturn(new PathResource(""));
 
             // When:
             Map<String, Map<String, String>> result = agreementService.getAllTermsUrls();
