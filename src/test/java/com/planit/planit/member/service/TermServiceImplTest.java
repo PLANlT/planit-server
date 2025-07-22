@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -23,6 +25,9 @@ class TermServiceImplTest {
     @Mock
     private TermInfo termInfo;
 
+    @Mock
+    private ResourceLoader resourceLoader;
+
     @InjectMocks
     private TermServiceImpl agreementService; // 테스트 대상 (System Under Test)
 
@@ -37,7 +42,13 @@ class TermServiceImplTest {
             String mockBaseUrl = "https://testdomain.com/agreements/";
             Map<String, TermInfo.TermDetail> mockTermsMap = new HashMap<>();
 
-            // 개인정보처리방침
+            // 정보통신망 이용촉진 및 정보보호 등에 관한 법률 관련 약관
+            TermInfo.TermDetail termOfInfo = new TermInfo.TermDetail();
+            termOfInfo.setVersion("20250711");
+            termOfInfo.setFileName("TermOfInfo.html");
+            mockTermsMap.put("term-of-info", termOfInfo);
+
+            // 개인정보 수집 및 이용 동의서
             TermInfo.TermDetail privacyPolicy = new TermInfo.TermDetail();
             privacyPolicy.setVersion("20250711");
             privacyPolicy.setFileName("TermOfPrivacy.html");
@@ -49,21 +60,26 @@ class TermServiceImplTest {
             termOfUse.setFileName("TermOfUse.html");
             mockTermsMap.put("term-of-use", termOfUse);
 
-            // 정보통신망 이용촉진 및 정보보호 등에 관한 법률 관련 약관
-            TermInfo.TermDetail termOfInfo = new TermInfo.TermDetail();
-            termOfInfo.setVersion("20250711");
-            termOfInfo.setFileName("TermOfInfo.html");
-            mockTermsMap.put("term-of-info", termOfInfo);
-
             // 개인정보 제3자 제공 동의
             TermInfo.TermDetail thirdPartyConsent = new TermInfo.TermDetail();
             thirdPartyConsent.setVersion("20250711");
             thirdPartyConsent.setFileName("ThirdPartyConsent.html");
             mockTermsMap.put("third-party-ad-consent", thirdPartyConsent);
 
+            // 계정 삭제 창구
+            TermInfo.TermDetail planitAccountDeletion = new TermInfo.TermDetail();
+            planitAccountDeletion.setVersion("20250711");
+            planitAccountDeletion.setFileName("PlanitAccountDeletion.html");
+            mockTermsMap.put("planit-account-deletion", planitAccountDeletion);
+
             // Mock 객체 (agreementConfig)의 메서드 호출 시 어떤 값을 반환할지 정의
             when(termInfo.getBaseUrl()).thenReturn(mockBaseUrl);
             when(termInfo.getTerms()).thenReturn(mockTermsMap);
+
+            // Mock resourceLoader 동작 추가
+            Resource mockResource = mock(Resource.class);
+            when(resourceLoader.getResource(anyString())).thenReturn(mockResource);
+            when(mockResource.exists()).thenReturn(true);
 
             // When:
             Map<String, Map<String, String>> result = agreementService.getAllTermsUrls();
@@ -76,7 +92,14 @@ class TermServiceImplTest {
             assertEquals(mockTermsMap.size(), result.size(), "결과 맵의 약관 개수가 예상과 일치해야 합니다.");
 
             // 3. 각 약관별로 버전과 URL이 올바르게 생성되었는지 상세 검증
-            // 개인정보처리방침 (term-of-privacy)
+            // 정보통신망 이용촉진 및 정보보호 등에 관한 법률 관련 약관 (term-of-info)
+            assertTrue(result.containsKey("term-of-info"), "'term-of-info' 키가 결과 맵에 포함되어야 합니다.");
+            Map<String, String> infoResult = result.get("term-of-info");
+            assertNotNull(infoResult, "'term-of-info'의 상세 정보는 null이 아니어야 합니다.");
+            assertEquals("20250711", infoResult.get("version"), "'term-of-info'의 버전이 일치해야 합니다.");
+            assertEquals(mockBaseUrl + "terms/" + "TermOfInfo.html", infoResult.get("url"), "'term-of-info'의 URL이 일치해야 합니다.");
+
+            // 개인정보 수집 및 이용 동의서 (term-of-privacy)
             assertTrue(result.containsKey("term-of-privacy"), "'term-of-privacy' 키가 결과 맵에 포함되어야 합니다.");
             Map<String, String> privacyResult = result.get("term-of-privacy");
             assertNotNull(privacyResult, "'term-of-privacy'의 상세 정보는 null이 아니어야 합니다.");
@@ -90,13 +113,6 @@ class TermServiceImplTest {
             assertEquals("20250711", useResult.get("version"), "'term-of-use'의 버전이 일치해야 합니다.");
             assertEquals(mockBaseUrl + "terms/" + "TermOfUse.html", useResult.get("url"), "'term-of-use'의 URL이 일치해야 합니다.");
 
-            // 정보통신망 이용촉진 및 정보보호 등에 관한 법률 관련 약관 (term-of-info)
-            assertTrue(result.containsKey("term-of-info"), "'term-of-info' 키가 결과 맵에 포함되어야 합니다.");
-            Map<String, String> infoResult = result.get("term-of-info");
-            assertNotNull(infoResult, "'term-of-info'의 상세 정보는 null이 아니어야 합니다.");
-            assertEquals("20250711", infoResult.get("version"), "'term-of-info'의 버전이 일치해야 합니다.");
-            assertEquals(mockBaseUrl + "terms/" + "TermOfInfo.html", infoResult.get("url"), "'term-of-info'의 URL이 일치해야 합니다.");
-
             // 개인정보 제3자 제공 동의 (third-party-ad-consent)
             assertTrue(result.containsKey("third-party-ad-consent"), "'third-party-ad-consent' 키가 결과 맵에 포함되어야 합니다.");
             Map<String, String> consentResult = result.get("third-party-ad-consent");
@@ -104,6 +120,12 @@ class TermServiceImplTest {
             assertEquals("20250711", consentResult.get("version"), "'third-party-ad-consent'의 버전이 일치해야 합니다.");
             assertEquals(mockBaseUrl + "terms/" + "ThirdPartyConsent.html", consentResult.get("url"), "'third-party-ad-consent'의 URL이 일치해야 합니다.");
 
+            // 계정 삭제 창구 (planit-account-deletion)
+            assertTrue(result.containsKey("planit-account-deletion"), "'planit-account-deletion' 키가 결과 맵에 포함되어야 합니다.");
+            Map<String, String> deletionResult = result.get("planit-account-deletion");
+            assertNotNull(deletionResult, "'planit-account-deletion'의 상세 정보는 null이 아니어야 합니다.");
+            assertEquals("20250711", deletionResult.get("version"), "'planit-account-deletion'의 버전이 일치해야 합니다.");
+            assertEquals(mockBaseUrl + "terms/" + "PlanitAccountDeletion.html", deletionResult.get("url"), "'planit-account-deletion'의 URL이 일치해야 합니다.");
 
             // 4. Mock 객체의 메서드가 예상대로 호출되었는지 확인 (선택 사항이지만 좋은 습관)
             verify(termInfo, times(1)).getBaseUrl();
