@@ -5,6 +5,7 @@ import com.planit.planit.member.service.FcmTokenService;
 import com.planit.planit.member.service.TermService;
 import com.planit.planit.common.api.ApiResponse;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
+
 import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.member.service.MemberService;
 import com.planit.planit.member.service.NotificationService;
@@ -14,6 +15,7 @@ import com.planit.planit.web.dto.member.fcmtoken.FcmTokenDTO;
 import com.planit.planit.web.dto.member.notification.NotificationDTO;
 import com.planit.planit.web.dto.member.term.TermDTO;
 import com.planit.planit.web.dto.member.MemberResponseDTO;
+import com.planit.planit.web.dto.member.term.TermsUrlsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import com.planit.planit.common.api.ApiErrorCodeExample;
+import com.planit.planit.common.api.member.status.MemberErrorStatus;
 
 @Slf4j
 @RestController
@@ -47,6 +51,7 @@ public class MemberController {
                        사용자가 약관에 동의했음을 저장하고 isSignUpCompleted를 true로 갱신합니다.
                        테스트시 필드에 Authorization을 작성하지 않고 스웨거의 Authorization에 넣어야 합니다.
                """)
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND", "MEMBER_ALREADY_SIGN_UP_COMPLETED"})
     @PostMapping("/terms")
     public ResponseEntity<ApiResponse<String>> agreeTerms(
             @RequestHeader(value = "Authorization", required = false) String signUpToken
@@ -56,15 +61,18 @@ public class MemberController {
     }
 
     @Operation(summary = "[TERM] 모든 약관 URL 조회", description = "최신 약관 HTML 파일들의 URL과 버전을 반환합니다.")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"TERM_FILE_NOT_FOUND"})
     @GetMapping("/terms")
-    public ResponseEntity<ApiResponse<Map<String, Map<String, String>>>> getTermsUrls() {
+    public ResponseEntity<ApiResponse<TermsUrlsResponse>> getTermsUrls() {
         Map<String, Map<String, String>> termsInfo = termService.getAllTermsUrls();
+        TermsUrlsResponse response = TermsUrlsResponse.from(termsInfo);
         log.info("✅ 약관 URL 정보 조회 성공: {}", termsInfo);
-        return ApiResponse.onSuccess(MemberSuccessStatus.TERMS_URLS_FOUND, termsInfo);
+        return ApiResponse.onSuccess(MemberSuccessStatus.TERMS_URLS_FOUND, response);
     }
 
 
     @Operation(summary = "[MEMBER] 연속일 조회하기")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @GetMapping("/consecutive-days")
     public ResponseEntity<ApiResponse<MemberResponseDTO.ConsecutiveDaysDTO>> getConsecutiveDays(
             @AuthenticationPrincipal UserPrincipal principal
@@ -75,6 +83,7 @@ public class MemberController {
 
     // 오늘의 할 일 알림 ON/OFF
     @Operation(summary = "[NOTIFICATION] 오늘의 할 일 알림 설정 변경", description = "오늘의 할 일 알림 ON/OFF를 설정합니다.")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"NOTIFICATION_NOT_FOUND"})
     @PatchMapping("/notification-settings/daily-task")
     public ResponseEntity<ApiResponse<Void>> updateDailyTask(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -86,6 +95,7 @@ public class MemberController {
 
     // 길티프리 모드 알림 ON/OFF
     @Operation(summary = "[NOTIFICATION] 길티프리 모드 알림 설정 변경", description = "길티프리 모드 알림 ON/OFF를 설정합니다.")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"NOTIFICATION_NOT_FOUND"})
     @PatchMapping("/notification-settings/guilty-free")
     public ResponseEntity<ApiResponse<Void>> updateGuiltFree(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -97,6 +107,7 @@ public class MemberController {
 
     // 전체 알림 설정 조회
     @Operation(summary = "[NOTIFICATION] 전체 알림 설정 조회", description = "사용자의 전체 알림 설정 상태를 조회합니다.")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"NOTIFICATION_NOT_FOUND"})
     @GetMapping("/notification-settings")
     public ResponseEntity<ApiResponse<NotificationDTO.Response>> getNotificationSetting(
             @AuthenticationPrincipal UserPrincipal principal
@@ -108,6 +119,7 @@ public class MemberController {
     //사용자 정보 조회
     @Operation(summary = "[MEMBER] 내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다.")
     @SecurityRequirement(name = "accessToken")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @GetMapping("")
     public ResponseEntity<ApiResponse<MemberInfoResponseDTO>> getMyInfo(
             @AuthenticationPrincipal UserPrincipal principal
@@ -118,6 +130,7 @@ public class MemberController {
 
     @Operation(summary = "[FCM] FCM 토큰 저장 또는 갱신", description = "로그인한 사용자의 FCM 토큰을 저장하거나 갱신합니다.")
     @SecurityRequirement(name = "accessToken")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"FCM_TOKEN_SAVED"})
     @PostMapping("/me/fcm-token")
     public ResponseEntity<ApiResponse<Void>> saveOrUpdateFcmToken(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -132,6 +145,7 @@ public class MemberController {
 
     @Operation(summary = "[FCM] 내 FCM 토큰 조회", description = "로그인한 사용자의 저장된 FCM 토큰을 조회합니다.")
     @SecurityRequirement(name = "accessToken")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"FCM_TOKEN_FOUND"})
     @GetMapping("/me/fcm-token")
     public ResponseEntity<ApiResponse<FcmTokenDTO.Response>> getMyFcmToken(
             @AuthenticationPrincipal UserPrincipal principal
@@ -142,6 +156,7 @@ public class MemberController {
 
     @Operation(summary = "[FCM] 내 FCM 토큰 삭제", description = "로그인한 사용자의 FCM 토큰을 삭제합니다.")
     @SecurityRequirement(name = "accessToken")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"FCM_TOKEN_DELETED"})
     @DeleteMapping("/me/fcm-token")
     public ResponseEntity<ApiResponse<Void>> deleteMyFcmToken(@AuthenticationPrincipal UserPrincipal principal) {
         fcmTokenService.deleteTokensByMemberId(principal.getId());

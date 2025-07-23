@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import com.planit.planit.common.api.ApiErrorCodeExample;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +27,8 @@ public class TaskController {
     private final TaskCommandService taskCommandService;
 
     @Operation(summary = "[TASK] 작업 생성하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.plan.status.PlanErrorStatus.class, codes = {"PLAN_NOT_FOUND", "MEMBER_PLAN_NOT_FOUND"})
     @PostMapping("/tasks")
     public ResponseEntity<ApiResponse<TaskResponseDTO.TaskPreviewDTO>> createTask(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -37,6 +40,8 @@ public class TaskController {
     }
 
     @Operation(summary = "[TASK] 작업명 수정하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.task.status.TaskErrorStatus.class, codes = {"TASK_NOT_FOUND", "MEMBER_TASK_NOT_FOUND", "TASK_DELETED"})
     @PatchMapping("/tasks/{taskId}/title")
     public ResponseEntity<ApiResponse<TaskResponseDTO.TaskPreviewDTO>> updateTask(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -49,6 +54,8 @@ public class TaskController {
     }
 
     @Operation(summary = "[TASK] 루틴 설정하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.task.status.TaskErrorStatus.class, codes = {"TASK_NOT_FOUND", "MEMBER_TASK_NOT_FOUND", "TASK_DELETED"})
     @PatchMapping("/tasks/{taskId}/routine")
     public ResponseEntity<ApiResponse<TaskResponseDTO.TaskRoutineDTO>> setRoutine(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -61,6 +68,8 @@ public class TaskController {
     }
 
     @Operation(summary = "[TASK] 작업 삭제하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.task.status.TaskErrorStatus.class, codes = {"TASK_NOT_FOUND", "MEMBER_TASK_NOT_FOUND", "TASK_DELETED"})
     @PatchMapping("/tasks/{taskId}/delete")
     public ResponseEntity<ApiResponse<TaskResponseDTO.TaskPreviewDTO>> deleteTask(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -71,6 +80,8 @@ public class TaskController {
     }
 
     @Operation(summary = "[TASK] 작업 완료하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.task.status.TaskErrorStatus.class, codes = {"TASK_NOT_FOUND", "MEMBER_TASK_NOT_FOUND", "TASK_DELETED", "NOT_ROUTINE_OF_TODAY", "TASK_ALREADY_COMPLETED"})
     @PostMapping("/tasks/{taskId}/complete")
     public ResponseEntity<ApiResponse<TaskResponseDTO.CompletedTaskDTO>> completeTask(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -83,6 +94,8 @@ public class TaskController {
     }
 
     @Operation(summary = "[TASK] 작업 완료 취소하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.task.status.TaskErrorStatus.class, codes = {"TASK_NOT_FOUND", "MEMBER_TASK_NOT_FOUND", "TASK_DELETED", "TASK_NOT_COMPLETED"})
     @PatchMapping("/tasks/{taskId}/cancel-completion")
     public ResponseEntity<ApiResponse<TaskResponseDTO.CompletedTaskDTO>> cancelTaskCompletion(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -95,6 +108,8 @@ public class TaskController {
     }
 
     @Operation(summary = "[TASK] 루틴 조회하기")
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
+    @ApiErrorCodeExample(value = com.planit.planit.common.api.task.status.TaskErrorStatus.class, codes = {"TASK_NOT_FOUND", "MEMBER_TASK_NOT_FOUND", "TASK_DELETED"})
     @GetMapping("/tasks/{taskId}/routine")
     public ResponseEntity<ApiResponse<TaskResponseDTO.TaskRoutineDTO>> getCurrentRoutine(
             @AuthenticationPrincipal UserPrincipal principal,

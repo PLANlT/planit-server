@@ -1,12 +1,16 @@
 package com.planit.planit.common.api.plan.status;
 
+import com.planit.planit.common.api.ExplainError;
 import com.planit.planit.common.api.general.status.ErrorResponse;
 import org.springframework.http.HttpStatus;
 
 public enum PlanErrorStatus implements ErrorResponse {
 
+    @ExplainError("플랜을 찾을 수 없음")
     PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "PLAN4001", "플랜을 찾을 수 없습니다."),
+    @ExplainError("사용자의 플랜을 찾을 수 없음")
     MEMBER_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "PLAN4002", "사용자의 플랜을 찾을 수 없습니다."),
+    @ExplainError("삭제된 플랜")
     PLAN_DELETED(HttpStatus.NOT_FOUND, "PLAN4003", "삭제된 플랜입니다."),
     PLAN_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "PLAN4004", "이미 삭제된 플랜을 다시 삭제할 수 없습니다."),
     PLAN_NOT_IN_PROGRESS(HttpStatus.BAD_REQUEST, "PLAN4005", "진행중인 플랜이 아닙니다."),
