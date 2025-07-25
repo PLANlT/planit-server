@@ -154,21 +154,30 @@ public class MemberServiceImpl implements MemberService {
     /**
      * 회원 탈퇴(soft delete) - inactive에 현재 시간 기록
      */
+    @Override
     public void inactivateMember(Long memberId) {
+        log.info("[회원탈퇴] 탈퇴 요청 - memberId: {}", memberId);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
         member.inactivate();
         memberRepository.save(member);
+        log.info("[회원탈퇴] 탈퇴 처리 완료 - memberId: {}", memberId);
     }
 
     /**
      * 31일 경과한 탈퇴 회원 hard delete (스케줄러에서 호출)
      */
+    @Override   
     public void deleteInactiveMembers() {
+        log.info("[회원탈퇴] 31일 경과 회원 하드 딜리트 시작");
         LocalDateTime threshold = LocalDateTime.now().minusDays(31);
         memberRepository.findAll().stream()
                 .filter(m -> m.getInactive() != null && m.getInactive().isBefore(threshold))
-                .forEach(m -> memberRepository.deleteById(m.getId()));
+                .forEach(m -> {
+                    memberRepository.deleteById(m.getId());
+                    log.info("[회원탈퇴] 하드 딜리트 완료 - memberId: {}", m.getId());
+                });
+        log.info("[회원탈퇴] 31일 경과 회원 하드 딜리트 종료");
     }
 
 }
