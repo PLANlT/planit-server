@@ -151,4 +151,24 @@ public class MemberServiceImpl implements MemberService {
 //        member.updateInfo(request.getName(), request.getEmail());
 //    }
 
+    /**
+     * 회원 탈퇴(soft delete) - inactive에 현재 시간 기록
+     */
+    public void inactivateMember(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        member.inactivate();
+        memberRepository.save(member);
+    }
+
+    /**
+     * 31일 경과한 탈퇴 회원 hard delete (스케줄러에서 호출)
+     */
+    public void deleteInactiveMembers() {
+        LocalDateTime threshold = LocalDateTime.now().minusDays(31);
+        memberRepository.findAll().stream()
+                .filter(m -> m.getInactive() != null && m.getInactive().isBefore(threshold))
+                .forEach(m -> memberRepository.deleteById(m.getId()));
+    }
+
 }
