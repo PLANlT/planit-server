@@ -40,6 +40,7 @@ dependencies {
 	testImplementation 'org.mockito:mockito-junit-jupiter'
 	testCompileOnly 'org.projectlombok:lombok:1.18.30'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+	testImplementation 'org.springframework.security:spring-security-test'
 
 	// H2 Database
 	runtimeOnly 'com.h2database:h2'

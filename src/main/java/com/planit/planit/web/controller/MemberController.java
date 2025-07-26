@@ -163,4 +163,14 @@ public class MemberController {
         log.info("🗑️ FCM 토큰 삭제 완료 - memberId: {}", principal.getId());
         return ApiResponse.onSuccess(MemberSuccessStatus.FCM_TOKEN_DELETED);
     }
+
+    @Operation(summary = "[MEMBER] 회원 탈퇴", description = "로그인한 사용자가 회원 탈퇴(soft delete)를 요청합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @ApiErrorCodeExample(value = MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND", "ALREADY_INACTIVE"})
+    @PatchMapping("/delete")
+    public ResponseEntity<ApiResponse<Void>> deleteMember(@AuthenticationPrincipal UserPrincipal principal) {
+        memberService.inactivateMember(principal.getId());
+        log.info("✅ [회원탈퇴] 컨트롤러 - 탈퇴 요청 완료: memberId={}", principal.getId());
+        return ApiResponse.onSuccess(MemberSuccessStatus.MEMBER_DELETED);
+    }
 }
