@@ -20,4 +20,8 @@ public interface MemberService {
     LocalDateTime completeTermsAgreement(String signUpToken);
 
     MemberInfoResponseDTO getMemberInfo(Long memberId);
+
+    void inactivateMember(Long memberId);
+
+    void deleteInactiveMembers();
 }

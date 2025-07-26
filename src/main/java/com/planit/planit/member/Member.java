@@ -153,6 +153,11 @@ public class Member extends BaseEntity {
         this.inactive = LocalDateTime.now();
     }
 
+    // 테스트 전용: inactive 값을 임의로 세팅
+    public void setInactiveForTest(LocalDateTime inactive) {
+        this.inactive = inactive;
+    }
+
     public void activateGuiltyFree(GuiltyFree guiltyFree) {
 
         // 길티프리 활성화
@@ -215,4 +220,5 @@ public class Member extends BaseEntity {
     public void addGuiltyFree(GuiltyFree guiltyFree) {
         this.guiltyFrees.add(guiltyFree);
     }
+
 }

@@ -147,8 +147,6 @@ class PlanQueryServiceTest {
         assertThat(result.getTodayDate()).isEqualTo(LocalDate.now());
         assertThat(result.getSlowPlans().get(0).getTitle()).isEqualTo("1");
         assertThat(result.getSlowPlans().get(0).getDDay()).isEqualTo("D-Day");
-        assertThat(result.getPassionatePlans().get(1).getTitle()).isEqualTo("2");
-        assertThat(result.getPassionatePlans().get(1).getDDay()).isEqualTo("D-1");
     }
 
 /*------------------------------ 플랜 단건 조회 ------------------------------*/

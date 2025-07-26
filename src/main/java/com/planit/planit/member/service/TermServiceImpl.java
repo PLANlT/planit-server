@@ -1,6 +1,8 @@
 package com.planit.planit.member.service;
 import com.planit.planit.member.association.TermInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -13,6 +15,7 @@ import java.util.Optional;
 public class TermServiceImpl implements TermService {
 
     private final TermInfo termInfo;
+    private final ResourceLoader resourceLoader;
 
     @Override
     public Map<String, Map<String, String>> getAllTermsUrls() {
@@ -26,8 +29,14 @@ public class TermServiceImpl implements TermService {
         configuredTerms.forEach((key, termDetail) -> {
             Map<String, String> detailMap = new HashMap<>();
             detailMap.put("version", termDetail.getVersion());
-            // TermDetail 내부의 getFullUrl 메서드를 사용
-            detailMap.put("url", termDetail.getFullUrl(baseUrl));
+            String url = termDetail.getFullUrl(baseUrl);
+            // 파일 존재 여부 체크
+            Resource resource = resourceLoader.getResource("classpath:/static/terms/" + termDetail.getFileName());
+            if (!resource.exists()) {
+                throw new com.planit.planit.common.api.member.MemberHandler(
+                    com.planit.planit.common.api.member.status.MemberErrorStatus.TERM_FILE_NOT_FOUND);
+            }
+            detailMap.put("url", url);
             termInfos.put(key, detailMap);
         });
 

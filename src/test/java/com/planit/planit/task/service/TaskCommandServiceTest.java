@@ -113,14 +113,21 @@ class TaskCommandServiceTest {
         task = Task.builder()
                 .id(1L)
                 .title("작업1")
+                .taskType(TaskType.ALL)
                 .member(member1)
                 .plan(plan)
+                .build();
+
+        TaskRequestDTO.TaskCreateDTO requestDTO = TaskRequestDTO.TaskCreateDTO.builder()
+                .title("작업1")
+                .taskType(TaskType.ALL)
                 .build();
 
         when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         // when
-        TaskResponseDTO.TaskPreviewDTO result = taskCommandService.createTask(1L, 1L, "작업1");
+        TaskResponseDTO.TaskPreviewDTO result = taskCommandService
+                .createTask(1L, 1L, requestDTO);
 
         // then
         assertNotNull(result);
@@ -137,8 +144,14 @@ class TaskCommandServiceTest {
         task = Task.builder()
                 .id(1L)
                 .title("작업1")
+                .taskType(TaskType.ALL)
                 .member(member1)
                 .plan(plan)
+                .build();
+
+        TaskRequestDTO.TaskCreateDTO requestDTO = TaskRequestDTO.TaskCreateDTO.builder()
+                .title("작업1")
+                .taskType(TaskType.ALL)
                 .build();
 
         when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
@@ -146,7 +159,7 @@ class TaskCommandServiceTest {
 
         // when & then
         assertThrows(PlanHandler.class, () ->
-                taskCommandService.createTask(2L,1L, "작업1"));
+                taskCommandService.createTask(2L,1L, requestDTO));
     }
 
 /*------------------------------ 작업명 수정 ------------------------------*/
@@ -159,6 +172,7 @@ class TaskCommandServiceTest {
         task = Task.builder()
                 .id(1L)
                 .title("작업1")
+                .taskType(TaskType.ALL)
                 .member(member1)
                 .plan(plan)
                 .build();

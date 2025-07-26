@@ -27,8 +27,8 @@ public enum MemberSuccessStatus implements SuccessResponse {
     MEMBER_INFO_FETCHED(HttpStatus.OK,"MEMBER2023", "회원 정보가 성공적으로 조회되었습니다." ),
     FCM_TOKEN_SAVED(HttpStatus.OK,"MEMBER2024", "FCM토큰이 저장되었습니다." ),
     FCM_TOKEN_FOUND(HttpStatus.OK,"MEMBER2025" , "FCM토큰이 조회되었습니다." ),
-    FCM_TOKEN_DELETED(HttpStatus.OK,"MEMBER2026", "FCM 토큰이 삭제되었습니다." )
-    ;
+    FCM_TOKEN_DELETED(HttpStatus.OK,"MEMBER2026", "FCM 토큰이 삭제되었습니다." ),
+    MEMBER_DELETED(HttpStatus.OK,"MEMBER2027" , "회원이 성공적으로 탈퇴하였습니다." );
 
 
 
