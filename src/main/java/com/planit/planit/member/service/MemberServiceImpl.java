@@ -156,7 +156,6 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public void inactivateMember(Long memberId) {
-        log.info("[회원탈퇴] 탈퇴 요청 - memberId: {}", memberId);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
         if (member.getInactive() != null) {
