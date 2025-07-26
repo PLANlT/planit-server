@@ -159,6 +159,9 @@ public class MemberServiceImpl implements MemberService {
         log.info("[회원탈퇴] 탈퇴 요청 - memberId: {}", memberId);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
+        if (member.getInactive() != null) {
+            throw new MemberHandler(MemberErrorStatus.ALREADY_INACTIVE);
+        }
         member.inactivate();
         memberRepository.save(member);
         log.info("[회원탈퇴] 탈퇴 처리 완료 - memberId: {}", memberId);
