@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public interface TaskCommandService {
 
     // 작업 생성하기
-    TaskResponseDTO.TaskPreviewDTO createTask(Long memberId, Long planId, String title);
+    TaskResponseDTO.TaskPreviewDTO createTask(Long memberId, Long planId, TaskRequestDTO.TaskCreateDTO taskCreateDTO);
 
     // 작업명 수정하기
     TaskResponseDTO.TaskPreviewDTO updateTaskTitle(Long memberId, Long taskId, String title);
@@ -24,4 +24,6 @@ public interface TaskCommandService {
 
     // 작업 완료 취소하기
     TaskResponseDTO.CompletedTaskDTO cancelTaskCompletion(Long memberId, Long taskId, LocalDate today);
+
+
 }

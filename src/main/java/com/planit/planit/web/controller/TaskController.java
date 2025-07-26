@@ -26,16 +26,17 @@ public class TaskController {
     private final TaskQueryService taskQueryService;
     private final TaskCommandService taskCommandService;
 
-    @Operation(summary = "[TASK] 작업 생성하기")
+    @Operation(summary = "[TASK] 작업 생성하기", description = "taskType : [ALL, PASSIONATE, SLOW]")
     @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @ApiErrorCodeExample(value = com.planit.planit.common.api.plan.status.PlanErrorStatus.class, codes = {"PLAN_NOT_FOUND", "MEMBER_PLAN_NOT_FOUND"})
     @PostMapping("/tasks")
     public ResponseEntity<ApiResponse<TaskResponseDTO.TaskPreviewDTO>> createTask(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam Long planId,
-            @RequestParam String title
+            @RequestBody TaskRequestDTO.TaskCreateDTO taskCreateDTO
     ) {
-        TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService.createTask(principal.getId(), planId, title);
+        TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService
+                .createTask(principal.getId(), planId, taskCreateDTO);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_CREATED, taskPreviewDTO);
     }
 

@@ -26,4 +26,12 @@ public class TaskRequestDTO {
         @JsonFormat(pattern = "HH:mm")
         private final LocalTime routineTime;
     }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class TaskCreateDTO {
+        private final String title;
+        private final TaskType taskType;
+    }
 }

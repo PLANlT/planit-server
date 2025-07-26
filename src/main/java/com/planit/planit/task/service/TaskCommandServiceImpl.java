@@ -36,8 +36,7 @@ public class TaskCommandServiceImpl implements TaskCommandService {
     private final CompletedTaskRepository completedTaskRepository;
 
     @Override
-    public TaskResponseDTO.TaskPreviewDTO createTask(Long memberId, Long planId, String title) {
-
+    public TaskResponseDTO.TaskPreviewDTO createTask(Long memberId, Long planId, TaskRequestDTO.TaskCreateDTO taskCreateDTO) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(MemberErrorStatus.MEMBER_NOT_FOUND));
 
@@ -51,7 +50,8 @@ public class TaskCommandServiceImpl implements TaskCommandService {
 
         // 새로운 작업 생성
         Task task = Task.builder()
-                .title(title)
+                .title(taskCreateDTO.getTitle())
+                .taskType(taskCreateDTO.getTaskType())
                 .member(member)
                 .plan(plan)
                 .build();
