@@ -105,7 +105,7 @@ class MemberServiceImplTest {
                 .role(Role.USER)
                 .build();
         member.inactivate();
-        member.setInactiveForTest(LocalDateTime.now().minusDays(31));
+        member.setInactiveForTest(LocalDateTime.now().minusDays(32));
         when(memberRepository.findAll()).thenReturn(java.util.List.of(member));
         doNothing().when(memberRepository).deleteById(anyLong());
 
