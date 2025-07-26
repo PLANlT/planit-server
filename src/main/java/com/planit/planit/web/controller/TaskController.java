@@ -2,6 +2,9 @@ package com.planit.planit.web.controller;
 
 import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.common.api.ApiResponse;
+import com.planit.planit.common.api.general.GeneralException;
+import com.planit.planit.common.api.task.TaskHandler;
+import com.planit.planit.common.api.task.status.TaskErrorStatus;
 import com.planit.planit.common.api.task.status.TaskSuccessStatus;
 import com.planit.planit.task.service.TaskCommandService;
 import com.planit.planit.task.service.TaskQueryService;
@@ -35,6 +38,9 @@ public class TaskController {
             @RequestParam Long planId,
             @RequestBody TaskRequestDTO.TaskCreateDTO taskCreateDTO
     ) {
+        if (taskCreateDTO.getTitle() == null || taskCreateDTO.getTitle().isBlank()) {
+            throw new TaskHandler(TaskErrorStatus.TASK_TITLE_NOT_NULLABLE);
+        }
         TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService
                 .createTask(principal.getId(), planId, taskCreateDTO);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_CREATED, taskPreviewDTO);
@@ -49,6 +55,9 @@ public class TaskController {
             @PathVariable Long taskId,
             @RequestParam String title
     ) {
+        if (title == null || title.isBlank()) {
+            throw new TaskHandler(TaskErrorStatus.TASK_TITLE_NOT_NULLABLE);
+        }
         TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService
                 .updateTaskTitle(principal.getId(), taskId, title);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_TITLE_UPDATED, taskPreviewDTO);
