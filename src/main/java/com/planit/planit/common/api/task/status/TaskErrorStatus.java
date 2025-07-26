@@ -18,6 +18,10 @@ public enum TaskErrorStatus implements ErrorResponse {
     NOT_ROUTINE_OF_TODAY(HttpStatus.BAD_REQUEST, "TASK4005", "오늘의 루틴이 아닙니다."),
     @ExplainError("삭제된 작업")
     TASK_DELETED(HttpStatus.BAD_REQUEST, "TASK4006", "삭제된 작업입니다."),
+    @ExplainError("작업명이 비어있음")
+    TASK_TITLE_NOT_NULLABLE(HttpStatus.BAD_REQUEST, "TASK4007", "작업명은 null일 수 없습니다."),
+
+
     ;
 
     private final HttpStatus httpStatus;

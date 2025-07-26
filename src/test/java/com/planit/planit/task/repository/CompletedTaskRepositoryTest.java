@@ -11,6 +11,7 @@ import com.planit.planit.plan.enums.PlanStatus;
 import com.planit.planit.plan.repository.PlanRepository;
 import com.planit.planit.task.Task;
 import com.planit.planit.task.association.CompletedTask;
+import com.planit.planit.task.enums.TaskType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -71,6 +72,7 @@ class CompletedTaskRepositoryTest {
     private void initTask() {
         task = Task.builder()
                 .title("작업1")
+                .taskType(TaskType.ALL)
                 .member(member)
                 .plan(plan)
                 .build();

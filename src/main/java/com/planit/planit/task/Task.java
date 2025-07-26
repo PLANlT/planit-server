@@ -36,7 +36,7 @@ public class Task extends BaseEntity {
     private LocalTime routineTime;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
     private TaskType taskType;
 
     @Column
@@ -64,12 +64,13 @@ public class Task extends BaseEntity {
     public Task(
             Long id,
             String title,
+            TaskType taskType,
             Member member,
             Plan plan
     ) {
         this.id = id;
         this.title = title;
-        this.taskType = TaskType.ALL;
+        this.taskType = taskType;
         this.routine = 0;
         this.member = member;
         this.plan = plan;

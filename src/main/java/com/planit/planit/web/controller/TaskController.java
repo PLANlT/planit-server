@@ -2,6 +2,9 @@ package com.planit.planit.web.controller;
 
 import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.common.api.ApiResponse;
+import com.planit.planit.common.api.general.GeneralException;
+import com.planit.planit.common.api.task.TaskHandler;
+import com.planit.planit.common.api.task.status.TaskErrorStatus;
 import com.planit.planit.common.api.task.status.TaskSuccessStatus;
 import com.planit.planit.task.service.TaskCommandService;
 import com.planit.planit.task.service.TaskQueryService;
@@ -26,16 +29,20 @@ public class TaskController {
     private final TaskQueryService taskQueryService;
     private final TaskCommandService taskCommandService;
 
-    @Operation(summary = "[TASK] 작업 생성하기")
+    @Operation(summary = "[TASK] 작업 생성하기", description = "taskType : [ALL, PASSIONATE, SLOW]")
     @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @ApiErrorCodeExample(value = com.planit.planit.common.api.plan.status.PlanErrorStatus.class, codes = {"PLAN_NOT_FOUND", "MEMBER_PLAN_NOT_FOUND"})
     @PostMapping("/tasks")
     public ResponseEntity<ApiResponse<TaskResponseDTO.TaskPreviewDTO>> createTask(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam Long planId,
-            @RequestParam String title
+            @RequestBody TaskRequestDTO.TaskCreateDTO taskCreateDTO
     ) {
-        TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService.createTask(principal.getId(), planId, title);
+        if (taskCreateDTO.getTitle() == null || taskCreateDTO.getTitle().isBlank()) {
+            throw new TaskHandler(TaskErrorStatus.TASK_TITLE_NOT_NULLABLE);
+        }
+        TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService
+                .createTask(principal.getId(), planId, taskCreateDTO);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_CREATED, taskPreviewDTO);
     }
 
@@ -48,6 +55,9 @@ public class TaskController {
             @PathVariable Long taskId,
             @RequestParam String title
     ) {
+        if (title == null || title.isBlank()) {
+            throw new TaskHandler(TaskErrorStatus.TASK_TITLE_NOT_NULLABLE);
+        }
         TaskResponseDTO.TaskPreviewDTO taskPreviewDTO = taskCommandService
                 .updateTaskTitle(principal.getId(), taskId, title);
         return ApiResponse.onSuccess(TaskSuccessStatus.TASK_TITLE_UPDATED, taskPreviewDTO);

@@ -71,11 +71,13 @@ class TaskRepositoryTest {
     private void initTask() {
         task1 = Task.builder()
                 .title("작업1")
+                .taskType(TaskType.ALL)
                 .member(member)
                 .plan(plan)
                 .build();
         task2 = Task.builder()
                 .title("작업2")
+                .taskType(TaskType.ALL)
                 .member(member)
                 .plan(plan)
                 .build();
