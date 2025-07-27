@@ -28,6 +28,9 @@ import org.springframework.util.Assert;
 
 @Getter
 @Entity
+@Table(uniqueConstraints = {
+    @UniqueConstraint(name = "uk_email_inactive", columnNames = {"email", "inactive"})
+})
 public class Member extends BaseEntity {
 
     @Id
@@ -35,7 +38,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false, length = 15)
