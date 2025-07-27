@@ -65,13 +65,12 @@ public class AuthController {
     @ApiErrorCodeExample(value = com.planit.planit.common.api.token.status.TokenErrorStatus.class, codes = {"INVALID_REFRESH_TOKEN"})
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenRefreshDTO.Response>> refreshToken(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshTokenHeader
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshToken
     ) {
-        if (refreshTokenHeader == null || !refreshTokenHeader.startsWith("Bearer ")) {
+        if (refreshToken == null) {
             throw new GeneralException(TokenErrorStatus.INVALID_REFRESH_TOKEN);
         }
 
-        String refreshToken = refreshTokenHeader.substring(7);
         TokenRefreshDTO.Response response = authService.refreshAccessToken(refreshToken);
         return ApiResponse.onSuccess(REFRESH_SUCCESS, response);
     }
