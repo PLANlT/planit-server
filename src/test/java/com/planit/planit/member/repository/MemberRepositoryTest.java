@@ -66,7 +66,7 @@ class MemberRepositoryTest {
         memberRepository.save(existingMember);
 
         // When
-        Optional<Member> foundMember = memberRepository.findByEmail("existing@example.com");
+        Optional<Member> foundMember = memberRepository.findByEmailAndInactiveIsNull("existing@example.com");
 
         // Then
         assertThat(foundMember).isPresent();
@@ -82,41 +82,45 @@ class MemberRepositoryTest {
         // Given
 
         // When
-        Optional<Member> foundMember = memberRepository.findByEmail("nonexistent@example.com");
+        Optional<Member> foundMember = memberRepository.findByEmailAndInactiveIsNull("nonexistent@example.com");
 
         // Then
         assertThat(foundMember).isEmpty();
     }
 
     @Test
-    @DisplayName("중복된 이메일로 저장 시 예외가 발생한다-성공")
+    @DisplayName("같은 이메일로 활성 회원과 탈퇴 회원이 공존할 수 있다")
     @Order(4)
     @Transactional
-    void testSaveDuplicateEmailThrowsException() {
+    void testActiveAndInactiveMembersCanCoexistWithSameEmail() {
         // Given
-        Member member1 = Member.builder()
-                .email("duplicate@example.com")
+        Member activeMember = Member.builder()
+                .email("same@example.com")
                 .password("password")
                 .signType(SignType.KAKAO)
                 .guiltyFreeMode(false)
-                .memberName("중복1")
+                .memberName("활성회원")
                 .role(Role.USER)
                 .build();
-        memberRepository.save(member1);
+        memberRepository.save(activeMember);
 
-        Member member2 = Member.builder()
-                .email("duplicate@example.com") // 중복 이메일
+        Member inactiveMember = Member.builder()
+                .email("same@example.com") // 같은 이메일
                 .password("pad456")
-                .signType(SignType.KAKAO)
+                .signType(SignType.GOOGLE)
                 .guiltyFreeMode(false)
-                .memberName("중복2")
+                .memberName("탈퇴회원")
                 .role(Role.USER)
                 .build();
+        inactiveMember.inactivate(); // 탈퇴 처리
 
         // When & Then
-        // 중복 이메일 저장은 DataIntegrityViolationException을 발생시켜야 함
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            memberRepository.saveAndFlush(member2); //saveFlush로 바로 에러 발생시킬 수 있게 함. 서비스에서는 MemberHandler로 오류 반환
-        });
+        // 같은 이메일이라도 inactive 값이 다르면 저장 가능해야 함
+        Member savedInactiveMember = memberRepository.saveAndFlush(inactiveMember);
+        
+        assertThat(savedInactiveMember).isNotNull();
+        assertThat(savedInactiveMember.getEmail()).isEqualTo("same@example.com");
+        assertThat(savedInactiveMember.getInactive()).isNotNull();
+        assertThat(savedInactiveMember.getMemberName()).isEqualTo("탈퇴회원");
     }
 }
