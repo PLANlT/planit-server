@@ -21,4 +21,4 @@ spring:
 
 jwt:
   expirationMs: 3600000 # 1시간 (밀리초)
-  refresh-token-expiration-ms: 360000000
+  refresh-token-expiration-ms: 2592000000 #30일
