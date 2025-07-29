@@ -23,9 +23,7 @@ public enum TokenSuccessStatus implements ErrorResponse, SuccessResponse {
     public HttpStatus getErrorStatus() { return httpStatus; }
 
     @Override
-    public HttpStatus getSuccessStatus() {
-        return httpStatus;
-    }
+    public HttpStatus getSuccessStatus() { return httpStatus; }
 
     @Override
     public String getCode() { return code; }

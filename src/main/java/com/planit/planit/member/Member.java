@@ -12,7 +12,18 @@ import com.planit.planit.member.enums.DailyCondition;
 import com.planit.planit.member.enums.SignType;
 import com.planit.planit.plan.Plan;
 import com.planit.planit.task.Task;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -28,6 +39,9 @@ import org.springframework.util.Assert;
 
 @Getter
 @Entity
+@Table(uniqueConstraints = {
+    @UniqueConstraint(name = "uk_email_inactive", columnNames = {"email", "inactive"})
+})
 public class Member extends BaseEntity {
 
     @Id
@@ -35,7 +49,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false, length = 15)

@@ -9,8 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    Optional<Member> findByEmail(String email);
+    // 활성 회원만 조회 (inactive가 null인 회원)
+    Optional<Member> findByEmailAndInactiveIsNull(String email);
     Boolean existsByEmail(String email);
     Optional<Member> findByEmailAndSignType(String email, SignType signType);
-    Optional<Member> findByEmailAndInactiveIsNull(String email);
 }

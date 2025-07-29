@@ -1,9 +1,14 @@
 package com.planit.planit.member.service;
 
 import com.planit.planit.member.Member;
+import com.planit.planit.member.association.GuiltyFree;
+import com.planit.planit.member.association.Notification;
+import com.planit.planit.member.association.SignedMember;
 import com.planit.planit.member.enums.Role;
 import com.planit.planit.member.enums.SignType;
+import com.planit.planit.member.repository.GuiltyFreeRepository;
 import com.planit.planit.member.repository.MemberRepository;
+import com.planit.planit.member.repository.NotificationRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,6 +28,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberServiceImplTest {
     @Mock
     private MemberRepository memberRepository;
+    @Mock
+    private GuiltyFreeRepository guiltyFreeRepository;
+    @Mock
+    private NotificationRepository notificationRepository;
     @InjectMocks
     private MemberServiceImpl memberServiceImpl;
 
@@ -114,6 +124,99 @@ class MemberServiceImplTest {
 
         // then
         verify(memberRepository).deleteById(anyLong());
+    }
+
+    @Test
+    @DisplayName("탈퇴한 회원이 로그인하면 새로운 회원으로 가입한다")
+    void testInactiveMemberLogin_createsNewMember() {
+        // given
+        Member inactiveMember = Member.builder()
+                .email("inactive@planit.com")
+                .password("pw1234")
+                .signType(SignType.GOOGLE)
+                .guiltyFreeMode(false)
+                .memberName("탈퇴회원")
+                .role(Role.USER)
+                .build();
+        inactiveMember.inactivate(); // 탈퇴 처리
+        
+        when(memberRepository.findByEmailAndInactiveIsNull("inactive@planit.com")).thenReturn(Optional.empty());
+        when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(guiltyFreeRepository.save(any(GuiltyFree.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        SignedMember result = memberServiceImpl.getSignedMemberByUserInfo("inactive@planit.com", "새로운회원", SignType.GOOGLE);
+
+        // then
+        assertTrue(result.getIsNewMember(), "새로운 회원으로 처리되어야 한다");
+        assertEquals("새로운회원", result.getName(), "새로운 이름으로 회원이 생성되어야 한다");
+        verify(memberRepository).save(any(Member.class));
+    }
+
+    @Test
+    @DisplayName("탈퇴한 회원이 다른 로그인 타입으로 로그인하면 새로운 회원으로 가입한다")
+    void testInactiveMemberLoginWithDifferentSignType_createsNewMember() {
+        // given
+        Member inactiveMember = Member.builder()
+                .email("inactive@planit.com")
+                .password("pw1234")
+                .signType(SignType.GOOGLE)
+                .guiltyFreeMode(false)
+                .memberName("탈퇴회원")
+                .role(Role.USER)
+                .build();
+        inactiveMember.inactivate(); // 탈퇴 처리
+        
+        when(memberRepository.findByEmailAndInactiveIsNull("inactive@planit.com")).thenReturn(Optional.empty());
+        when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(guiltyFreeRepository.save(any(GuiltyFree.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        SignedMember result = memberServiceImpl.getSignedMemberByUserInfo("inactive@planit.com", "새로운회원", SignType.KAKAO);
+
+        // then
+        assertTrue(result.getIsNewMember(), "새로운 회원으로 처리되어야 한다");
+        assertEquals("새로운회원", result.getName(), "새로운 이름으로 회원이 생성되어야 한다");
+        verify(memberRepository).save(any(Member.class));
+    }
+
+    @Test
+    @DisplayName("복합 unique 제약조건: 같은 이메일로 탈퇴한 회원과 새로운 회원이 공존할 수 있다")
+    void testCompositeUniqueConstraint_allowsInactiveAndActiveMembersWithSameEmail() {
+        // given
+        Member inactiveMember = Member.builder()
+                .email("same@planit.com")
+                .password("pw1234")
+                .signType(SignType.GOOGLE)
+                .guiltyFreeMode(false)
+                .memberName("탈퇴회원")
+                .role(Role.USER)
+                .build();
+        inactiveMember.inactivate(); // 탈퇴 처리
+        
+        Member activeMember = Member.builder()
+                .email("same@planit.com")
+                .password("pw5678")
+                .signType(SignType.KAKAO)
+                .guiltyFreeMode(false)
+                .memberName("활성회원")
+                .role(Role.USER)
+                .build();
+        
+        when(memberRepository.findByEmailAndInactiveIsNull("same@planit.com")).thenReturn(Optional.empty());
+        when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(guiltyFreeRepository.save(any(GuiltyFree.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        SignedMember result = memberServiceImpl.getSignedMemberByUserInfo("same@planit.com", "새로운회원", SignType.NAVER);
+
+        // then
+        assertTrue(result.getIsNewMember(), "새로운 회원으로 처리되어야 한다");
+        assertEquals("새로운회원", result.getName(), "새로운 이름으로 회원이 생성되어야 한다");
+        verify(memberRepository).save(any(Member.class));
     }
 }
 

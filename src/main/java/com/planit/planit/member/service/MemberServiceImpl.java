@@ -41,15 +41,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public SignedMember getSignedMemberByUserInfo(String email, String name, SignType signType) {
-        Member member = memberRepository.findByEmail(email).orElse(null);
+        // 활성 회원만 조회 (inactive가 null인 회원)
+        Member member = memberRepository.findByEmailAndInactiveIsNull(email).orElse(null);
+        
         // 사용자가 존재하지 않으면 신규 회원을 생성하여 반환
         if (member == null) {
             return SignedMember.of(saveMember(email, name, signType), true);
         }
+        
         // 다른 로그인 타입으로 가입한 회원이면 예외 처리
         if (!member.getSignType().equals(signType)) {
             throw new MemberHandler(MemberErrorStatus.DIFFERENT_SIGN_TYPE);
         }
+        
         return SignedMember.of(member, false);
     }
 

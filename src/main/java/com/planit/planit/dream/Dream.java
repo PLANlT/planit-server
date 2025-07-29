@@ -3,7 +3,14 @@ package com.planit.planit.dream;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.planit.planit.common.entity.BaseEntity;
 import com.planit.planit.member.Member;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -34,7 +41,7 @@ public class Dream extends BaseEntity {
     protected Dream() {}
 
     @Builder
-    public Dream(
+    private Dream(
             Long id,
             String content,
             Member member

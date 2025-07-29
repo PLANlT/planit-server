@@ -32,6 +32,7 @@ public class PlanConverter {
                 .icon(plan.getIcon())
                 .motivation(plan.getMotivation())
                 .tasks(plan.getTasks().stream()
+                        .filter(task -> task.getDeletedAt() == null)
                         .map(TaskConverter::toTaskPreviewDTO)
                         .toList())
                 .build();
@@ -65,9 +66,11 @@ public class PlanConverter {
                 .dayOfWeek(todayDate.getDayOfWeek())
                 .slowPlans(plans.stream()
                         .map(plan -> PlanConverter.toTodayPlanDTO(plan, TaskType.SLOW, todayDate))
+                        .filter(dto -> !dto.getTasks().isEmpty())
                         .toList())
                 .passionatePlans(plans.stream()
                         .map(plan -> PlanConverter.toTodayPlanDTO(plan, TaskType.PASSIONATE, todayDate))
+                        .filter(dto -> !dto.getTasks().isEmpty())
                         .toList())
                 .build();
     }
