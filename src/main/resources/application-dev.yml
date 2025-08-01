@@ -24,6 +24,6 @@ logging:
     org.springframework.web: INFO
 
 jwt:
-  expirationMs: 3600000 # 1시간 (밀리초)
-  refresh-token-expiration-ms: 360000000
+  expirationMs: 7200000 # 2시간 (밀리초)
+  refreshTokenExpirationMs: 2592000000 # 30일 (밀리초)
 

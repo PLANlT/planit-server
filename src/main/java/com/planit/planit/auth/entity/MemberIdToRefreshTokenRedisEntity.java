@@ -3,7 +3,7 @@ package com.planit.planit.auth.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-@RedisHash(value = "memberIdToRefreshToken", timeToLive = 1209600)
+@RedisHash(value = "memberIdToRefreshToken", timeToLive = 2592000)
 public class MemberIdToRefreshTokenRedisEntity {
     @Id
     private Long memberId;

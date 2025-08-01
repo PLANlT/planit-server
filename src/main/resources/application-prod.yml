@@ -20,5 +20,5 @@ spring:
       port: ${REDIS_PORT:6379}
 
 jwt:
-  expirationMs: 3600000 # 1시간 (밀리초)
-  refresh-token-expiration-ms: 2592000000 #30일
+  expirationMs: 7200000 # 2시간 (밀리초)
+  refreshTokenExpirationMs: 2592000000 # 30일 (밀리초)
