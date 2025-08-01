@@ -124,6 +124,10 @@ public class AuthServiceImpl implements AuthService {
         return TokenRefreshDTO.Response.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(refreshToken) // Refresh는 만료되면 로그인 다시해야함
+                .id(signedMember.getId())
+                .email(signedMember.getEmail())
+                .name(signedMember.getName())
+                .role(signedMember.getRole().toString())
                 .build();
     }
 

@@ -3,6 +3,7 @@ package com.planit.planit.web.controller.auth;
 import com.planit.planit.auth.service.AuthService;
 import com.planit.planit.config.SecurityConfig;
 import com.planit.planit.auth.jwt.JwtProvider;
+import com.planit.planit.member.service.MemberService;
 
 import com.planit.planit.web.controller.AuthController;
 import org.junit.jupiter.api.DisplayName;
@@ -27,13 +28,17 @@ class AuthControllerSecurityTest {
 
     @MockBean
     private AuthService authService;
+    
+    @MockBean
+    private MemberService memberService;
+    
     @MockBean
     private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("인증되지 않은 사용자가 로그아웃 요청 시 403 Forbidden을 반환한다")
     void signOut_unauthenticatedUser_returnsUnauthorized() throws Exception {
-        mockMvc.perform(post("/auth/sign-out"))
+        mockMvc.perform(post("/planit/auth/sign-out"))
                 .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
     }
 }

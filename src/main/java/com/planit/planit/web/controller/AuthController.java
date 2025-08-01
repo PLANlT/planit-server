@@ -7,6 +7,7 @@ import com.planit.planit.common.api.general.GeneralException;
 import com.planit.planit.common.api.member.status.MemberSuccessStatus;
 import com.planit.planit.auth.docs.AuthDocs;
 import com.planit.planit.common.api.token.status.TokenErrorStatus;
+import com.planit.planit.member.association.SignedMember;
 import com.planit.planit.web.dto.auth.OAuthLoginDTO;
 import com.planit.planit.web.dto.auth.TokenRefreshDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.planit.planit.common.api.token.status.TokenSuccessStatus.REFRESH_SUCCESS;
 import com.planit.planit.common.api.ApiErrorCodeExample;
+import com.planit.planit.member.service.MemberService;
 
 @Slf4j
 @RestController
@@ -31,8 +33,10 @@ import com.planit.planit.common.api.ApiErrorCodeExample;
 public class AuthController {
 
     private final AuthService authService;
+    private final MemberService memberService;
+    private final HttpServletRequest request;
 
-    @Operation(summary = "[AUTH] idToken 기반 로그인/회원가입", description = "모바일 앱에서 받은 idToken을 검증하여 로그인 또는 회원가입을 처리합니다.")
+    @Operation(summary = "[AUTH] 소셜 로그인/회원가입", description = "최초 소셜 로그인 또는 Refresh Token 만료 시에만 사용 (자동 로그인 x). OAuth Token으로 로그인/회원가입을 처리하고 Access Token(2시간)과 Refresh Token(30일)을 발급합니다. 이후 앱 시작 시에는 auth/refresh 사용합니다.")
     @ApiErrorCodeExample(value = com.planit.planit.common.api.member.status.MemberErrorStatus.class, codes = {"MEMBER_NOT_FOUND"})
     @PostMapping("/sign-in")
     public ResponseEntity<ApiResponse<OAuthLoginDTO.LoginResponse>> signIn(
@@ -61,7 +65,7 @@ public class AuthController {
         return ApiResponse.onSuccess(MemberSuccessStatus.SIGN_OUT_SUCCESS, null);
     }
 
-    @Operation(summary = "[AUTH] 토큰 리프레시", description = "리프레시 토큰을 Authorization 헤더로 전달받아 액세스 토큰을 재발급합니다.")
+    @Operation(summary = "[AUTH] 자동 로그인", description = "앱 시작 시 자동 로그인에 사용. Refresh Token으로 새로운 Access Token을 발급받습니다. 30일간 자동 로그인 유지에 사용됩니다.")
     @ApiErrorCodeExample(value = com.planit.planit.common.api.token.status.TokenErrorStatus.class, codes = {"INVALID_REFRESH_TOKEN"})
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenRefreshDTO.Response>> refreshToken(
