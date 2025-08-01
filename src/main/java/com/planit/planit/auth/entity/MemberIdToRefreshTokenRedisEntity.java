@@ -14,6 +14,10 @@ public class MemberIdToRefreshTokenRedisEntity {
         this.memberId = memberId;
         this.refreshToken = refreshToken;
     }
+    
     public Long getMemberId() { return memberId; }
+    public void setMemberId(Long memberId) { this.memberId = memberId; }
+    
     public String getRefreshToken() { return refreshToken; }
+    public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
 } 
