@@ -67,11 +67,20 @@ public class AuthController {
     public ResponseEntity<ApiResponse<TokenRefreshDTO.Response>> refreshToken(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshTokenHeader
     ) {
-        if (refreshTokenHeader == null || !refreshTokenHeader.startsWith("Bearer "))  {
+        if (refreshTokenHeader == null) {
             throw new GeneralException(TokenErrorStatus.INVALID_REFRESH_TOKEN);
         }
 
-        String refreshToken = refreshTokenHeader.substring(7);
+        // Bearer가 있으면 떼고, 없으면 그대로 사용
+        String refreshToken;
+        if (refreshTokenHeader.startsWith("Bearer ")) {
+            refreshToken = refreshTokenHeader.substring(7);
+            log.info("🔄 토큰 갱신 요청 - Bearer 제거됨");
+        } else {
+            refreshToken = refreshTokenHeader;
+            log.info("🔄 토큰 갱신 요청 - Bearer 없이 전송됨");
+        }
+
         TokenRefreshDTO.Response response = authService.refreshAccessToken(refreshToken);
         return ApiResponse.onSuccess(REFRESH_SUCCESS, response);
     }
