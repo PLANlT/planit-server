@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.auth.service.AuthService;
+import com.planit.planit.member.service.MemberService;
 import com.planit.planit.web.controller.AuthController;
 import com.planit.planit.web.dto.auth.OAuthLoginDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,9 @@ class AuthControllerSignInTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private MemberService memberService;
 
     @MockBean
     private JwtProvider jwtProvider;

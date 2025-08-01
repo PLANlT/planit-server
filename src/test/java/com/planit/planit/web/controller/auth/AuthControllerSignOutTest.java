@@ -6,6 +6,7 @@ import com.planit.planit.common.api.general.status.ErrorStatus;
 import com.planit.planit.auth.jwt.JwtProvider;
 import com.planit.planit.auth.jwt.UserPrincipal;
 import com.planit.planit.member.enums.Role;
+import com.planit.planit.member.service.MemberService;
 import com.planit.planit.web.controller.AuthController;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,10 @@ class AuthControllerSignOutTest {
 
     @MockBean
     private AuthService authService;
+    
+    @MockBean
+    private MemberService memberService;
+    
     @MockBean
     private JwtProvider jwtProvider;
 
