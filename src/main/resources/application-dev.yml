@@ -27,7 +27,4 @@ jwt:
   expirationMs: 7200000 # 2시간 (밀리초)
   refreshTokenExpirationMs: 2592000000 # 30일 (밀리초)
 
-server:
-  port: 8081
-  address: 127.0.0.1
 
