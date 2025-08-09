@@ -155,7 +155,9 @@ public class Plan extends BaseEntity {
         }
     }
 
-    public int countTasks() { return this.tasks.size(); }
+    public int countTasks() {
+        return this.tasks.stream().filter(task -> task.getDeletedAt() == null).toList().size();
+    }
 
     public void addTask(Task task) {
         tasks.add(task);
