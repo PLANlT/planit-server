@@ -185,8 +185,6 @@ docker-compose logs -f app
 |--------|-----|------|
 | 🌐 **API 서버** | http://localhost:8080 | 메인 API 엔드포인트 |
 | 📚 **Swagger UI** | http://localhost:8080/swagger-ui/index.html | API 문서 |
-| 🗄️ **H2 콘솔** | http://localhost:8080/h2-console | 데이터베이스 관리 |
-| 💾 **Redis** | localhost:6379 | 캐시 서버 |
 
 </div>
 
