@@ -183,8 +183,8 @@ docker-compose logs -f app
 
 | 서비스 | URL | 설명 |
 |--------|-----|------|
-| 🌐 **API 서버** | http://43.200.111.228:8080 | 메인 API 엔드포인트 |
-| 📚 **Swagger UI** | http://43.200.111.228:8080/swagger-ui/index.html | API 문서 |
+| 🌐 **API 서버** | http://localhost:8080 | 메인 API 엔드포인트 |
+| 📚 **Swagger UI** | http://localhost:8080/swagger-ui/index.html | API 문서 |
 
 </div>
 
@@ -270,8 +270,8 @@ docker-compose down
 | 📄 **약관** | `/planit/terms/*` | 이용약관, 개인정보처리방침 |
 
 ### 📖 Swagger UI
-- **URL**: http://43.200.111.228:8080/swagger-ui/index.html
-- **OpenAPI JSON**: http://43.200.111.228:8080/v3/api-docs
+- **URL**: http://localhost:8080/swagger-ui/index.html
+- **OpenAPI JSON**: http://localhost:8080/v3/api-docs
 
 </div>
 
